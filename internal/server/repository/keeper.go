@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Repository interface {
+type KeeperRepository interface {
 	Get(context.Context, string) (*Record, error)
 	GetByType(context.Context, RecordType) ([]*Record, error)
 	Set(context.Context, *Record) error
@@ -32,6 +32,7 @@ type Record struct {
 	CardHolderName string
 	CardCVC        string
 	CardExpiryDate time.Time
+	CreatedBy      string
 	CreatedAt      time.Time
 	LastEditedAt   time.Time
 }

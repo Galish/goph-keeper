@@ -12,10 +12,10 @@ var (
 )
 
 type NotesUseCase struct {
-	repo repository.Repository
+	repo repository.KeeperRepository
 }
 
-func New(repo repository.Repository) *NotesUseCase {
+func New(repo repository.KeeperRepository) *NotesUseCase {
 	return &NotesUseCase{
 		repo,
 	}
