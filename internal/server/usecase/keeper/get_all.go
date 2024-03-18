@@ -1,4 +1,4 @@
-package notes
+package keeper
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (uc *NotesUseCase) GetAll(ctx context.Context) ([]*entity.Note, error) {
+func (uc *KeeperUseCase) GetAllNotes(ctx context.Context) ([]*entity.Note, error) {
 	records, err := uc.repo.GetByType(ctx, repository.TypeNote)
 	if err != nil {
 		return nil, err

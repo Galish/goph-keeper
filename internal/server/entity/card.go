@@ -7,9 +7,18 @@ type Card struct {
 	Title        string
 	Description  string
 	Number       string
-	HolderName   string
+	Holder       string
 	CVC          string
-	ExpiryDate   time.Time
+	Expiry       time.Time
+	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+}
+
+func (c *Card) IsValid() bool {
+	return c.Title != "" &&
+		c.Number != "" &&
+		c.Holder != "" &&
+		c.CVC != "" &&
+		!c.Expiry.IsZero()
 }

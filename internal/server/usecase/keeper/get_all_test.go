@@ -1,4 +1,4 @@
-package notes_test
+package keeper_test
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
-	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
+	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 )
 
-func TestGetAll(t *testing.T) {
+func TestGetAllNotes(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockRepository(ctrl)
+	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
 		GetByType(gomock.Any(), gomock.Eq(repository.TypeNote)).
@@ -47,7 +47,7 @@ func TestGetAll(t *testing.T) {
 		Return(nil, errReadFromRepo).
 		Times(1)
 
-	uc := notes.New(m)
+	uc := keeper.New(m)
 
 	type want struct {
 		notes []*entity.Note
@@ -93,7 +93,7 @@ func TestGetAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			notes, err := uc.GetAll(context.Background())
+			notes, err := uc.GetAllNotes(context.Background())
 
 			assert.DeepEqual(t, tt.want.notes, notes)
 			assert.Equal(t, tt.want.err, err)

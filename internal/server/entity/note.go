@@ -8,10 +8,12 @@ type Note struct {
 	Description  string
 	Value        string
 	RawValue     []byte
+	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
 }
 
 func (n *Note) IsValid() bool {
-	return n.Title != "" && (n.Value != "" || n.RawValue != nil)
+	return n.Title != "" &&
+		(n.Value != "" || n.RawValue != nil)
 }

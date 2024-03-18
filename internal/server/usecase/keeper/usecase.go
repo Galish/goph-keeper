@@ -1,4 +1,4 @@
-package notes
+package keeper
 
 import (
 	"errors"
@@ -11,12 +11,12 @@ var (
 	ErrInvalidType   = errors.New("invalid entity type")
 )
 
-type NotesUseCase struct {
+type KeeperUseCase struct {
 	repo repository.KeeperRepository
 }
 
-func New(repo repository.KeeperRepository) *NotesUseCase {
-	return &NotesUseCase{
+func New(repo repository.KeeperRepository) *KeeperUseCase {
+	return &KeeperUseCase{
 		repo,
 	}
 }
