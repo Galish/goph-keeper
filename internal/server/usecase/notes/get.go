@@ -2,7 +2,6 @@ package notes
 
 import (
 	"context"
-	"errors"
 
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
@@ -15,7 +14,7 @@ func (uc *NotesUseCase) Get(ctx context.Context, id string) (*entity.Note, error
 	}
 
 	if record.Type != repository.TypeNote {
-		return nil, errors.New("invalid record type")
+		return nil, ErrInvalidType
 	}
 
 	note := entity.Note{

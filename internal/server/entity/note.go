@@ -11,3 +11,7 @@ type Note struct {
 	CreatedAt    time.Time
 	LastEditedAt time.Time
 }
+
+func (n *Note) IsValid() bool {
+	return n.Title != "" && (n.Value != "" || n.RawValue != nil)
+}
