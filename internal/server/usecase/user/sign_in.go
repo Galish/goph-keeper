@@ -12,7 +12,11 @@ func (uc *userUseCase) SignIn(
 	ctx context.Context,
 	username, password string,
 ) (string, error) {
-	user, err := uc.repo.GetUserByLogin(ctx, username)
+	if username == "" || password == "" {
+		return "", ErrMissingCredentials
+	}
+
+	user, err := uc.repo.GetByLogin(ctx, username)
 	if err != nil {
 		return "", err
 	}

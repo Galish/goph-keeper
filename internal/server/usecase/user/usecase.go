@@ -6,6 +6,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
+var ErrMissingCredentials = errors.New("missing login/password")
 var ErrInvalidCredentials = errors.New("incorrect login/password pair")
 
 type userUseCase struct {

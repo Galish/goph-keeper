@@ -12,12 +12,16 @@ func (uc *userUseCase) SignUp(
 	ctx context.Context,
 	username, password string,
 ) (string, error) {
+	if username == "" || password == "" {
+		return "", ErrMissingCredentials
+	}
+
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 
-	user, err := uc.repo.CreateUser(ctx, username, string(bytes))
+	user, err := uc.repo.Create(ctx, username, string(bytes))
 	if err != nil {
 		return "", err
 	}
