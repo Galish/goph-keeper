@@ -6,23 +6,23 @@ import (
 )
 
 type KeeperRepository interface {
-	Get(context.Context, string, string) (*Record, error)
-	GetByType(context.Context, RecordType) ([]*Record, error)
-	Set(context.Context, *Record) error
+	CreateSecureRecord(context.Context, *SecureRecord) error
+	GetSecureRecord(context.Context, string, string) (*SecureRecord, error)
+	GetSecureRecords(context.Context, string, SecureRecordType) ([]*SecureRecord, error)
 }
 
 const (
-	TypeCreds RecordType = iota + 1
+	TypeCredentials SecureRecordType = iota + 1
 	TypeNote
 	TypeRawNote
 	TypeCard
 )
 
-type RecordType int
+type SecureRecordType int
 
-type Record struct {
+type SecureRecord struct {
 	ID           string
-	Type         RecordType
+	Type         SecureRecordType
 	Title        string
 	Description  string
 	Username     string

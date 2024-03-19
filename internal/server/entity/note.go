@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Note struct {
 	ID           string
@@ -11,6 +15,13 @@ type Note struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+}
+
+func NewNote() *Note {
+	return &Note{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+	}
 }
 
 func (n *Note) IsValid() bool {

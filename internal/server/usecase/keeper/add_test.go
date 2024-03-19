@@ -24,8 +24,8 @@ func TestAddNote(t *testing.T) {
 	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
-		Set(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.Record) error {
+		CreateSecureRecord(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}
@@ -96,8 +96,8 @@ func TestAddCard(t *testing.T) {
 	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
-		Set(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.Record) error {
+		CreateSecureRecord(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}
@@ -166,8 +166,8 @@ func TestAddCredentials(t *testing.T) {
 	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
-		Set(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.Record) error {
+		CreateSecureRecord(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}

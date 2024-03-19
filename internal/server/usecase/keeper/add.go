@@ -13,7 +13,7 @@ func (uc *KeeperUseCase) AddNote(ctx context.Context, note *entity.Note) error {
 		return ErrInvalidEntity
 	}
 
-	record := &repository.Record{
+	record := &repository.SecureRecord{
 		ID:          note.ID,
 		Title:       note.Title,
 		Description: note.Description,
@@ -29,7 +29,7 @@ func (uc *KeeperUseCase) AddNote(ctx context.Context, note *entity.Note) error {
 		record.RawNote = note.RawValue
 	}
 
-	return uc.repo.Set(ctx, record)
+	return uc.repo.CreateSecureRecord(ctx, record)
 }
 
 func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
@@ -37,7 +37,7 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 		return ErrInvalidEntity
 	}
 
-	record := &repository.Record{
+	record := &repository.SecureRecord{
 		ID:          card.ID,
 		Type:        repository.TypeCard,
 		Title:       card.Title,
@@ -52,7 +52,7 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.Set(ctx, record)
+	return uc.repo.CreateSecureRecord(ctx, record)
 }
 
 func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
@@ -60,9 +60,9 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 		return ErrInvalidEntity
 	}
 
-	record := &repository.Record{
+	record := &repository.SecureRecord{
 		ID:          creds.ID,
-		Type:        repository.TypeCreds,
+		Type:        repository.TypeCredentials,
 		Title:       creds.Title,
 		Description: creds.Description,
 
@@ -73,5 +73,5 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.Set(ctx, record)
+	return uc.repo.CreateSecureRecord(ctx, record)
 }

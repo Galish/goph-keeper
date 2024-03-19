@@ -24,11 +24,11 @@ func TestGetNote(t *testing.T) {
 	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
-		Get(gomock.Any(), gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, user, id string) (*repository.Record, error) {
+		GetSecureRecord(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, user, id string) (*repository.SecureRecord, error) {
 			switch id {
 			case "#12345":
-				return &repository.Record{
+				return &repository.SecureRecord{
 					ID:       "#12345",
 					Type:     repository.TypeNote,
 					Title:    "Text note",
@@ -36,7 +36,7 @@ func TestGetNote(t *testing.T) {
 				}, nil
 
 			case "#23456":
-				return &repository.Record{
+				return &repository.SecureRecord{
 					ID:      "#23456",
 					Type:    repository.TypeRawNote,
 					Title:   "Binary note",
@@ -44,7 +44,7 @@ func TestGetNote(t *testing.T) {
 				}, nil
 
 			case "#34567":
-				return &repository.Record{}, nil
+				return &repository.SecureRecord{}, nil
 
 			default:
 				return nil, errReadFromRepo
@@ -127,11 +127,11 @@ func TestGetCard(t *testing.T) {
 	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
-		Get(gomock.Any(), gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, user, id string) (*repository.Record, error) {
+		GetSecureRecord(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, user, id string) (*repository.SecureRecord, error) {
 			switch id {
 			case "#12345":
-				return &repository.Record{
+				return &repository.SecureRecord{
 					ID:         "#12345",
 					Type:       repository.TypeCard,
 					Title:      "Credit card",
@@ -142,7 +142,7 @@ func TestGetCard(t *testing.T) {
 				}, nil
 
 			case "#34567":
-				return &repository.Record{}, nil
+				return &repository.SecureRecord{}, nil
 
 			default:
 				return nil, errReadFromRepo
@@ -215,20 +215,20 @@ func TestGetCredentials(t *testing.T) {
 	m := mocks.NewMockKeeperRepository(ctrl)
 
 	m.EXPECT().
-		Get(gomock.Any(), gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, user, id string) (*repository.Record, error) {
+		GetSecureRecord(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, user, id string) (*repository.SecureRecord, error) {
 			switch id {
 			case "#12345":
-				return &repository.Record{
+				return &repository.SecureRecord{
 					ID:       "#12345",
-					Type:     repository.TypeCreds,
+					Type:     repository.TypeCredentials,
 					Title:    "Gmail",
 					Username: "john.doe",
 					Password: "qwe123456",
 				}, nil
 
 			case "#34567":
-				return &repository.Record{}, nil
+				return &repository.SecureRecord{}, nil
 
 			default:
 				return nil, errReadFromRepo

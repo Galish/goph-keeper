@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Card struct {
 	ID           string
@@ -13,6 +17,13 @@ type Card struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+}
+
+func NewCard() *Card {
+	return &Card{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+	}
 }
 
 func (c *Card) IsValid() bool {

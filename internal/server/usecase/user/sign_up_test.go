@@ -5,12 +5,17 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+	"gotest.tools/assert"
+
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
-	"github.com/golang/mock/gomock"
-	"gotest.tools/assert"
+	"github.com/Galish/goph-keeper/pkg/auth"
 )
+
+const secretKey = "secret_key"
 
 var errWriteToRepo = errors.New("failed to write to repo")
 
@@ -21,86 +26,87 @@ func TestSignUp(t *testing.T) {
 	m := mocks.NewMockUserRepository(ctrl)
 
 	m.EXPECT().
-		Create(gomock.Any(), gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, username, password string) (*entity.User, error) {
-			switch username {
+		CreateUser(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, user *entity.User) error {
+			switch user.Login {
 			case "john.doe":
-				return &entity.User{
-						ID:    "#12345",
-						Login: "john.doe",
-					},
-					nil
+				return nil
 			default:
-				return nil, errWriteToRepo
+				return errWriteToRepo
 			}
 		}).
 		AnyTimes()
 
-	uc := user.New(m, "secret_key")
+	uc := user.New(m, secretKey)
 
 	type want struct {
-		token string
-		err   error
+		err error
 	}
 
 	tests := []struct {
-		name     string
-		username string
-		password string
-		want     *want
+		name  string
+		creds *entity.User
+		want  *want
 	}{
 		{
 			"empty input",
-			"",
-			"",
+			nil,
 			&want{
-				"",
 				user.ErrMissingCredentials,
 			},
 		},
 		{
 			"missing username",
-			"",
-			"qwe123456",
+			&entity.User{
+				Login:    "",
+				Password: "qwe123456",
+			},
 			&want{
-				"",
 				user.ErrMissingCredentials,
 			},
 		},
 		{
 			"missing password",
-			"john.doe",
-			"",
+			&entity.User{
+				Login:    "john.doe",
+				Password: "",
+			},
 			&want{
-				"",
 				user.ErrMissingCredentials,
 			},
 		},
 		{
 			"valid credentials",
-			"john.doe",
-			"qwe123456",
+			&entity.User{
+				Login:    "john.doe",
+				Password: "qwe123456",
+			},
 			&want{
-				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIjMTIzNDUifQ.FnPcRyLXm11AqObgLd1HR-OB7FmsPtcbsUg31IUW6Ss",
 				nil,
 			},
 		},
 		{
 			"write to repo error",
-			"johny.doe",
-			"qwe123456",
+			&entity.User{
+				Login:    "johny.doe",
+				Password: "qwe123456",
+			},
 			&want{
-				"",
 				errWriteToRepo,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, err := uc.SignUp(context.Background(), tt.username, tt.password)
+			token, err := uc.SignUp(context.Background(), tt.creds)
 
-			assert.Equal(t, tt.want.token, token)
 			assert.Equal(t, tt.want.err, err)
+
+			if tt.want.err == nil {
+				_, err := auth.ParseToken(secretKey, token)
+
+				require.NoError(t, err)
+			}
 		})
 	}
 }

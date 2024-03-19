@@ -11,7 +11,7 @@ func (uc *KeeperUseCase) GetNote(
 	ctx context.Context,
 	user, id string,
 ) (*entity.Note, error) {
-	record, err := uc.repo.Get(ctx, user, id)
+	record, err := uc.repo.GetSecureRecord(ctx, user, id)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (uc *KeeperUseCase) GetCard(
 	ctx context.Context,
 	user, id string,
 ) (*entity.Card, error) {
-	record, err := uc.repo.Get(ctx, user, id)
+	record, err := uc.repo.GetSecureRecord(ctx, user, id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,12 +73,12 @@ func (uc *KeeperUseCase) GetCredentials(
 	ctx context.Context,
 	user, id string,
 ) (*entity.Credentials, error) {
-	record, err := uc.repo.Get(ctx, user, id)
+	record, err := uc.repo.GetSecureRecord(ctx, user, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if record.Type != repository.TypeCreds {
+	if record.Type != repository.TypeCredentials {
 		return nil, ErrInvalidType
 	}
 

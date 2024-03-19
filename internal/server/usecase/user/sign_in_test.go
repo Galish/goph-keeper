@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"gotest.tools/assert"
+
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
-	"github.com/golang/mock/gomock"
-	"gotest.tools/assert"
 )
 
 func TestSignIn(t *testing.T) {
@@ -18,7 +19,7 @@ func TestSignIn(t *testing.T) {
 	m := mocks.NewMockUserRepository(ctrl)
 
 	m.EXPECT().
-		GetByLogin(gomock.Any(), gomock.Any()).
+		GetUserByLogin(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, username string) (*entity.User, error) {
 			switch username {
 			case "john.doe":
@@ -42,15 +43,13 @@ func TestSignIn(t *testing.T) {
 	}
 
 	tests := []struct {
-		name     string
-		username string
-		password string
-		want     *want
+		name  string
+		creds *entity.User
+		want  *want
 	}{
 		{
 			"empty input",
-			"",
-			"",
+			nil,
 			&want{
 				"",
 				user.ErrMissingCredentials,
@@ -58,8 +57,10 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"missing username",
-			"",
-			"qwe123456",
+			&entity.User{
+				Login:    "",
+				Password: "qwe123456",
+			},
 			&want{
 				"",
 				user.ErrMissingCredentials,
@@ -67,8 +68,10 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"missing password",
-			"john.doe",
-			"",
+			&entity.User{
+				Login:    "john.doe",
+				Password: "",
+			},
 			&want{
 				"",
 				user.ErrMissingCredentials,
@@ -76,8 +79,10 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"valid credentials",
-			"john.doe",
-			"qwe123456",
+			&entity.User{
+				Login:    "john.doe",
+				Password: "qwe123456",
+			},
 			&want{
 				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIjMTIzNDUifQ.FnPcRyLXm11AqObgLd1HR-OB7FmsPtcbsUg31IUW6Ss",
 				nil,
@@ -85,8 +90,10 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"invalid credentials",
-			"john.doe",
-			"qwe12345678",
+			&entity.User{
+				Login:    "john.doe",
+				Password: "qwe12345678",
+			},
 			&want{
 				"",
 				user.ErrInvalidCredentials,
@@ -94,8 +101,10 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"write to repo error",
-			"johny.doe",
-			"qwe123456",
+			&entity.User{
+				Login:    "johny.doe",
+				Password: "qwe123456",
+			},
 			&want{
 				"",
 				errWriteToRepo,
@@ -104,7 +113,7 @@ func TestSignIn(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, err := uc.SignIn(context.Background(), tt.username, tt.password)
+			token, err := uc.SignIn(context.Background(), tt.creds)
 
 			assert.Equal(t, tt.want.token, token)
 			assert.Equal(t, tt.want.err, err)

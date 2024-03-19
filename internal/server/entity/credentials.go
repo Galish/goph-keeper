@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Credentials struct {
 	ID           string
@@ -11,6 +15,13 @@ type Credentials struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+}
+
+func NewCredentials() *Credentials {
+	return &Credentials{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+	}
 }
 
 func (c *Credentials) IsValid() bool {
