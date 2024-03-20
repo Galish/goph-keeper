@@ -8,8 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	entity "github.com/Galish/goph-keeper/internal/server/entity"
 	gomock "github.com/golang/mock/gomock"
+
+	entity "github.com/Galish/goph-keeper/internal/server/entity"
 )
 
 // MockUserRepository is a mock of UserRepository interface.
