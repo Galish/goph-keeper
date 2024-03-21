@@ -15,10 +15,12 @@ func (s *KeeperServer) AddCard(
 	var response pb.AddCardResponse
 
 	card := entity.NewCard()
+	card.Title = in.Card.Title
+	card.Description = in.Card.Description
 	card.Number = in.Card.Number
 	card.Holder = in.Card.Holder
 	card.CVC = in.Card.Cvc
-	// card.Expiry = in.Card.Expiry
+	card.Expiry = in.Card.Expiry.AsTime()
 	card.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	if err := s.keeper.AddCard(ctx, card); err != nil {
