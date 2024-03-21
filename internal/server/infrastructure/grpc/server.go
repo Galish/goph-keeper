@@ -32,8 +32,8 @@ func NewServer(
 ) *KeeperServer {
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			interceptors.NewAuthInterceptor(user).Unary(),
 			interceptors.LoggerInterceptor,
-			interceptors.UserCheckInterceptor,
 		),
 	)
 	reflection.Register(s)

@@ -6,29 +6,28 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Galish/goph-keeper/internal/server/entity"
-	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
 func (uc *userUseCase) SignUp(
 	ctx context.Context,
-	creds *entity.User,
+	username, password string,
 ) (string, error) {
-	if creds == nil || creds.Login == "" || creds.Password == "" {
+	if username == "" || password == "" {
 		return "", ErrMissingCredentials
 	}
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(creds.Password), bcrypt.DefaultCost)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 
 	user := entity.NewUser()
-	user.Login = creds.Login
+	user.Login = username
 	user.Password = string(bytes)
 
 	if err := uc.repo.CreateUser(ctx, user); err != nil {
 		return "", err
 	}
 
-	return auth.GenerateToken(uc.secretKey, user)
+	return uc.jwtManager.Generate(user)
 }

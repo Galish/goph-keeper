@@ -8,6 +8,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository/psql"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
+	"github.com/Galish/goph-keeper/pkg/auth"
 	"github.com/Galish/goph-keeper/pkg/logger"
 )
 
@@ -25,7 +26,9 @@ func main() {
 		panic(err)
 	}
 
-	userUsecase := user.New(repo, "secret_key")
+	jwtManager := auth.NewJWTManager("secret_key")
+
+	userUsecase := user.New(repo, jwtManager)
 	keeperUsecase := keeper.New(repo)
 
 	grpcServer := grpc.NewServer(cfg, userUsecase, keeperUsecase)

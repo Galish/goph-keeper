@@ -7,7 +7,6 @@ package service;
 
 option go_package = "api/grpc";
 
-// Auth
 
 message AuthRequest {
   string username = 1;
@@ -15,11 +14,9 @@ message AuthRequest {
 }
 
 message AuthResponse {
-  string token = 1;
-  string error = 2;
+  string access_token = 1;
 }
 
-// Note
 
 message Note {
   string title = 1;
@@ -50,7 +47,6 @@ message GetNotesResponse {
   string error = 2;
 }
 
-// Card
 
 message Card {
   string title = 1;
@@ -83,7 +79,6 @@ message GetCardsResponse {
   string error = 2;
 }
 
-// Credentials
 
 message Credentials {
   string title = 1;

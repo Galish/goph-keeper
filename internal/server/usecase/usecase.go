@@ -7,8 +7,9 @@ import (
 )
 
 type User interface {
-	SignUp(context.Context, *entity.User) (token string, err error)
-	SignIn(context.Context, *entity.User) (token string, err error)
+	SignUp(context.Context, string, string) (token string, err error)
+	SignIn(context.Context, string, string) (token string, err error)
+	Verify(string) (*entity.User, error)
 }
 
 type Keeper interface {

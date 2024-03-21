@@ -8,48 +8,66 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	"github.com/Galish/goph-keeper/internal/server/usecase"
 )
 
 type contextKey string
 
 var (
-	UserContextKey = contextKey("user")
+	authMethods = map[string]bool{
+		"/service.Keeper/SignIn": true,
+		"/service.Keeper/SignUp": true,
+	}
 
-	ErrMissingUserID = errors.New("missing user identifier")
+	ErrInvalidAccessToken = errors.New("access token is invalid")
+	ErrNoAccessToken      = errors.New("authorization token is not provided")
+
+	UserContextKey = contextKey("user")
 )
 
-var authMethods = map[string]bool{
-	"/service.Keeper/SignIn": true,
-	"/service.Keeper/SignUp": true,
+type AuthInterceptor struct {
+	user usecase.User
 }
 
-// UserCheckInterceptor serves authentication error if user identifier not provided.
-func UserCheckInterceptor(
-	ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler,
-) (interface{}, error) {
-	if isAuth := authMethods[info.FullMethod]; isAuth {
+func NewAuthInterceptor(user usecase.User) *AuthInterceptor {
+	return &AuthInterceptor{
+		user: user,
+	}
+}
+
+func (ai *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
+	return func(
+		ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
+		if isAuth := authMethods[info.FullMethod]; isAuth {
+			return handler(ctx, req)
+		}
+
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return nil, status.Error(codes.Unauthenticated, ErrNoAccessToken.Error())
+		}
+
+		values := md.Get("authorization")
+		if len(values) == 0 {
+			return nil, status.Error(codes.Unauthenticated, ErrNoAccessToken.Error())
+		}
+
+		if values[0] == "" {
+			return nil, status.Error(codes.Unauthenticated, ErrNoAccessToken.Error())
+		}
+
+		user, err := ai.user.Verify(values[0])
+		if err != nil {
+			return nil, status.Error(codes.Unauthenticated, ErrInvalidAccessToken.Error())
+		}
+
+		ctx = context.WithValue(ctx, UserContextKey, user.ID)
+
 		return handler(ctx, req)
 	}
-
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Error(codes.Unauthenticated, ErrMissingUserID.Error())
-	}
-
-	values := md.Get("user")
-	if len(values) == 0 {
-		return nil, status.Error(codes.Unauthenticated, ErrMissingUserID.Error())
-	}
-
-	if values[0] == "" {
-		return nil, status.Error(codes.Unauthenticated, ErrMissingUserID.Error())
-	}
-
-	ctx = context.WithValue(ctx, UserContextKey, values[0])
-
-	return handler(ctx, req)
-
 }

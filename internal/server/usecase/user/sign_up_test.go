@@ -37,60 +37,54 @@ func TestSignUp(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := user.New(m, secretKey)
+	uc := user.New(m, auth.NewJWTManager(secretKey))
 
 	type want struct {
 		err error
 	}
 
 	tests := []struct {
-		name  string
-		creds *entity.User
-		want  *want
+		name     string
+		username string
+		password string
+		want     *want
 	}{
 		{
-			"empty input",
-			nil,
+			"missing credentials",
+			"",
+			"",
 			&want{
 				user.ErrMissingCredentials,
 			},
 		},
 		{
 			"missing username",
-			&entity.User{
-				Login:    "",
-				Password: "qwe123456",
-			},
+			"",
+			"qwe123456",
 			&want{
 				user.ErrMissingCredentials,
 			},
 		},
 		{
 			"missing password",
-			&entity.User{
-				Login:    "john.doe",
-				Password: "",
-			},
+			"john.doe",
+			"",
 			&want{
 				user.ErrMissingCredentials,
 			},
 		},
 		{
 			"valid credentials",
-			&entity.User{
-				Login:    "john.doe",
-				Password: "qwe123456",
-			},
+			"john.doe",
+			"qwe123456",
 			&want{
 				nil,
 			},
 		},
 		{
 			"write to repo error",
-			&entity.User{
-				Login:    "johny.doe",
-				Password: "qwe123456",
-			},
+			"johny.doe",
+			"qwe123456",
 			&want{
 				errWriteToRepo,
 			},
@@ -98,12 +92,12 @@ func TestSignUp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, err := uc.SignUp(context.Background(), tt.creds)
+			token, err := uc.SignUp(context.Background(), tt.username, tt.password)
 
 			assert.Equal(t, tt.want.err, err)
 
 			if tt.want.err == nil {
-				_, err := auth.ParseToken(secretKey, token)
+				_, err := uc.Verify(token)
 
 				require.NoError(t, err)
 			}

@@ -2,9 +2,13 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/server/usecase/user"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *KeeperServer) SignUp(
@@ -13,17 +17,16 @@ func (s *KeeperServer) SignUp(
 ) (*pb.AuthResponse, error) {
 	var response pb.AuthResponse
 
-	credentials := &entity.User{
-		Login:    in.Username,
-		Password: in.Password,
+	token, err := s.user.SignUp(ctx, in.GetUsername(), in.GetPassword())
+	if errors.Is(err, user.ErrMissingCredentials) {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	token, err := s.user.SignUp(ctx, credentials)
 	if err != nil {
-		response.Error = err.Error()
-	} else {
-		response.Token = token
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
+	response.AccessToken = token
 
 	return &response, nil
 }

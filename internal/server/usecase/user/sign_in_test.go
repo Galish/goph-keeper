@@ -10,6 +10,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
+	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
 func TestSignIn(t *testing.T) {
@@ -35,7 +36,7 @@ func TestSignIn(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := user.New(m, "secret_key")
+	uc := user.New(m, auth.NewJWTManager(secretKey))
 
 	type want struct {
 		token string
@@ -43,13 +44,15 @@ func TestSignIn(t *testing.T) {
 	}
 
 	tests := []struct {
-		name  string
-		creds *entity.User
-		want  *want
+		name     string
+		username string
+		password string
+		want     *want
 	}{
 		{
-			"empty input",
-			nil,
+			"missing credentials input",
+			"",
+			"",
 			&want{
 				"",
 				user.ErrMissingCredentials,
@@ -57,10 +60,8 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"missing username",
-			&entity.User{
-				Login:    "",
-				Password: "qwe123456",
-			},
+			"",
+			"qwe123456",
 			&want{
 				"",
 				user.ErrMissingCredentials,
@@ -68,10 +69,8 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"missing password",
-			&entity.User{
-				Login:    "john.doe",
-				Password: "",
-			},
+			"john.doe",
+			"",
 			&want{
 				"",
 				user.ErrMissingCredentials,
@@ -79,10 +78,8 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"valid credentials",
-			&entity.User{
-				Login:    "john.doe",
-				Password: "qwe123456",
-			},
+			"john.doe",
+			"qwe123456",
 			&want{
 				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIjMTIzNDUifQ.FnPcRyLXm11AqObgLd1HR-OB7FmsPtcbsUg31IUW6Ss",
 				nil,
@@ -90,10 +87,8 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"invalid credentials",
-			&entity.User{
-				Login:    "john.doe",
-				Password: "qwe12345678",
-			},
+			"john.doe",
+			"qwe12345678",
 			&want{
 				"",
 				user.ErrInvalidCredentials,
@@ -101,10 +96,8 @@ func TestSignIn(t *testing.T) {
 		},
 		{
 			"write to repo error",
-			&entity.User{
-				Login:    "johny.doe",
-				Password: "qwe123456",
-			},
+			"johny.doe",
+			"qwe123456",
 			&want{
 				"",
 				errWriteToRepo,
@@ -113,7 +106,7 @@ func TestSignIn(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, err := uc.SignIn(context.Background(), tt.creds)
+			token, err := uc.SignIn(context.Background(), tt.username, tt.password)
 
 			assert.Equal(t, tt.want.token, token)
 			assert.Equal(t, tt.want.err, err)

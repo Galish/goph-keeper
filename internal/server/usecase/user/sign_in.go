@@ -4,28 +4,25 @@ import (
 	"context"
 
 	"golang.org/x/crypto/bcrypt"
-
-	"github.com/Galish/goph-keeper/internal/server/entity"
-	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
 func (uc *userUseCase) SignIn(
 	ctx context.Context,
-	creds *entity.User,
+	username, password string,
 ) (string, error) {
-	if creds == nil || creds.Login == "" || creds.Password == "" {
+	if username == "" || password == "" {
 		return "", ErrMissingCredentials
 	}
 
-	user, err := uc.repo.GetUserByLogin(ctx, creds.Login)
+	user, err := uc.repo.GetUserByLogin(ctx, username)
 	if err != nil {
 		return "", err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return "", ErrInvalidCredentials
 	}
 
-	return auth.GenerateToken(uc.secretKey, user)
+	return uc.jwtManager.Generate(user)
 }

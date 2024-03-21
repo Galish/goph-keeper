@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 
 	"github.com/Galish/goph-keeper/pkg/logger"
 )
@@ -20,12 +19,8 @@ func LoggerInterceptor(
 	start := time.Now()
 
 	var user string
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		values := md.Get("token")
-		if len(values) > 0 {
-			user = values[0]
-		}
+	if ctx.Value(UserContextKey) != nil {
+		user = ctx.Value(UserContextKey).(string)
 	}
 
 	logger.WithFields(logger.Fields{

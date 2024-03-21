@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang-jwt/jwt/v4"
-
 	"github.com/Galish/goph-keeper/internal/server/entity"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type JWTClaims struct {
@@ -14,7 +14,17 @@ type JWTClaims struct {
 	UserID string
 }
 
-func GenerateToken(secretKey string, user *entity.User) (string, error) {
+type JWTManager struct {
+	secretKey string
+}
+
+func NewJWTManager(secretKey string) *JWTManager {
+	return &JWTManager{
+		secretKey,
+	}
+}
+
+func (m *JWTManager) Generate(user *entity.User) (string, error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		&JWTClaims{
@@ -22,26 +32,21 @@ func GenerateToken(secretKey string, user *entity.User) (string, error) {
 		},
 	)
 
-	tokenString, err := token.SignedString([]byte(secretKey))
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+	return token.SignedString([]byte(m.secretKey))
 }
 
-func ParseToken(secretKey string, tokenString string) (*JWTClaims, error) {
+func (m *JWTManager) Verify(accessToken string) (*JWTClaims, error) {
 	var claims JWTClaims
 
 	token, err := jwt.ParseWithClaims(
-		tokenString,
+		accessToken,
 		&claims,
 		func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
 
-			return []byte(secretKey), nil
+			return []byte(m.secretKey), nil
 		},
 	)
 	if err != nil {
