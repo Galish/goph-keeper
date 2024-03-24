@@ -44,7 +44,7 @@ type KeeperClient interface {
 	GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error)
 	GetTextNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetNotesResponse, error)
 	GetRawNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetNotesResponse, error)
-	AddCard(ctx context.Context, in *AddCardRequest, opts ...grpc.CallOption) (*AddCardResponse, error)
+	AddCard(ctx context.Context, in *AddCardRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
 	GetCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetCardsResponse, error)
 	AddCredentials(ctx context.Context, in *AddCredentialsRequest, opts ...grpc.CallOption) (*AddCredentialsResponse, error)
@@ -114,8 +114,8 @@ func (c *keeperClient) GetRawNotes(ctx context.Context, in *emptypb.Empty, opts 
 	return out, nil
 }
 
-func (c *keeperClient) AddCard(ctx context.Context, in *AddCardRequest, opts ...grpc.CallOption) (*AddCardResponse, error) {
-	out := new(AddCardResponse)
+func (c *keeperClient) AddCard(ctx context.Context, in *AddCardRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Keeper_AddCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -178,7 +178,7 @@ type KeeperServer interface {
 	GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error)
 	GetTextNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error)
 	GetRawNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error)
-	AddCard(context.Context, *AddCardRequest) (*AddCardResponse, error)
+	AddCard(context.Context, *AddCardRequest) (*emptypb.Empty, error)
 	GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error)
 	GetCards(context.Context, *emptypb.Empty) (*GetCardsResponse, error)
 	AddCredentials(context.Context, *AddCredentialsRequest) (*AddCredentialsResponse, error)
@@ -209,7 +209,7 @@ func (UnimplementedKeeperServer) GetTextNotes(context.Context, *emptypb.Empty) (
 func (UnimplementedKeeperServer) GetRawNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRawNotes not implemented")
 }
-func (UnimplementedKeeperServer) AddCard(context.Context, *AddCardRequest) (*AddCardResponse, error) {
+func (UnimplementedKeeperServer) AddCard(context.Context, *AddCardRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCard not implemented")
 }
 func (UnimplementedKeeperServer) GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error) {

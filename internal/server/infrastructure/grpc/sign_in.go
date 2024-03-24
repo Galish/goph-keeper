@@ -6,6 +6,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -19,14 +20,17 @@ func (s *KeeperServer) SignIn(
 
 	token, err := s.user.SignIn(ctx, in.GetUsername(), in.GetPassword())
 	if errors.Is(err, user.ErrMissingCredentials) {
+		logger.WithError(err).Debug("unable to login")
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	if errors.Is(err, user.ErrInvalidCredentials) {
+		logger.WithError(err).Debug("unable to login")
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 
 	if err != nil {
+		logger.WithError(err).Debug("unable to login")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

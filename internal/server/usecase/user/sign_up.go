@@ -25,7 +25,7 @@ func (uc *userUseCase) SignUp(
 	user.Login = username
 	user.Password = string(bytes)
 
-	if err := uc.repo.CreateUser(ctx, user); err != nil {
+	if err := uc.repo.SetUser(ctx, user); err != nil {
 		return "", err
 	}
 

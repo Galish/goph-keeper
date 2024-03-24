@@ -6,7 +6,7 @@ import (
 )
 
 type KeeperRepository interface {
-	CreateSecureRecord(context.Context, *SecureRecord) error
+	SetSecureRecord(context.Context, *SecureRecord) error
 	GetSecureRecord(context.Context, string, string) (*SecureRecord, error)
 	GetSecureRecords(context.Context, string, SecureRecordType) ([]*SecureRecord, error)
 }

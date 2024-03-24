@@ -8,9 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
-
 	repository "github.com/Galish/goph-keeper/internal/server/repository"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockKeeperRepository is a mock of KeeperRepository interface.
@@ -34,20 +33,6 @@ func NewMockKeeperRepository(ctrl *gomock.Controller) *MockKeeperRepository {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockKeeperRepository) EXPECT() *MockKeeperRepositoryMockRecorder {
 	return m.recorder
-}
-
-// CreateSecureRecord mocks base method.
-func (m *MockKeeperRepository) CreateSecureRecord(arg0 context.Context, arg1 *repository.SecureRecord) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateSecureRecord", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateSecureRecord indicates an expected call of CreateSecureRecord.
-func (mr *MockKeeperRepositoryMockRecorder) CreateSecureRecord(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).CreateSecureRecord), arg0, arg1)
 }
 
 // GetSecureRecord mocks base method.
@@ -78,4 +63,18 @@ func (m *MockKeeperRepository) GetSecureRecords(arg0 context.Context, arg1 strin
 func (mr *MockKeeperRepositoryMockRecorder) GetSecureRecords(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecureRecords", reflect.TypeOf((*MockKeeperRepository)(nil).GetSecureRecords), arg0, arg1, arg2)
+}
+
+// SetSecureRecord mocks base method.
+func (m *MockKeeperRepository) SetSecureRecord(arg0 context.Context, arg1 *repository.SecureRecord) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetSecureRecord", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetSecureRecord indicates an expected call of SetSecureRecord.
+func (mr *MockKeeperRepositoryMockRecorder) SetSecureRecord(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).SetSecureRecord), arg0, arg1)
 }

@@ -8,9 +8,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
-
 	entity "github.com/Galish/goph-keeper/internal/server/entity"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockUserRepository is a mock of UserRepository interface.
@@ -36,20 +35,6 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 	return m.recorder
 }
 
-// CreateUser mocks base method.
-func (m *MockUserRepository) CreateUser(arg0 context.Context, arg1 *entity.User) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateUser indicates an expected call of CreateUser.
-func (mr *MockUserRepositoryMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUserRepository)(nil).CreateUser), arg0, arg1)
-}
-
 // GetUserByLogin mocks base method.
 func (m *MockUserRepository) GetUserByLogin(arg0 context.Context, arg1 string) (*entity.User, error) {
 	m.ctrl.T.Helper()
@@ -63,4 +48,18 @@ func (m *MockUserRepository) GetUserByLogin(arg0 context.Context, arg1 string) (
 func (mr *MockUserRepositoryMockRecorder) GetUserByLogin(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByLogin", reflect.TypeOf((*MockUserRepository)(nil).GetUserByLogin), arg0, arg1)
+}
+
+// SetUser mocks base method.
+func (m *MockUserRepository) SetUser(arg0 context.Context, arg1 *entity.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetUser", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetUser indicates an expected call of SetUser.
+func (mr *MockUserRepositoryMockRecorder) SetUser(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUser", reflect.TypeOf((*MockUserRepository)(nil).SetUser), arg0, arg1)
 }

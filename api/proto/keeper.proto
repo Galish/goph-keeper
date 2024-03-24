@@ -61,10 +61,6 @@ message AddCardRequest {
   Card card = 1;
 }
 
-message AddCardResponse {
-  string error = 1;
-}
-
 message GetCardRequest {
   string id = 1;
 }
@@ -119,7 +115,7 @@ service Keeper {
   rpc GetTextNotes(google.protobuf.Empty) returns (GetNotesResponse);
   rpc GetRawNotes(google.protobuf.Empty) returns (GetNotesResponse);
 
-  rpc AddCard(AddCardRequest) returns (AddCardResponse);
+  rpc AddCard(AddCardRequest) returns (google.protobuf.Empty);
   rpc GetCard(GetCardRequest) returns (GetCardResponse);
   rpc GetCards(google.protobuf.Empty) returns (GetCardsResponse);
 

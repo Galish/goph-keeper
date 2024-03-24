@@ -29,7 +29,7 @@ func (uc *KeeperUseCase) AddNote(ctx context.Context, note *entity.Note) error {
 		record.RawNote = note.RawValue
 	}
 
-	return uc.repo.CreateSecureRecord(ctx, record)
+	return uc.repo.SetSecureRecord(ctx, record)
 }
 
 func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
@@ -52,7 +52,7 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.CreateSecureRecord(ctx, record)
+	return uc.repo.SetSecureRecord(ctx, record)
 }
 
 func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
@@ -73,5 +73,5 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.CreateSecureRecord(ctx, record)
+	return uc.repo.SetSecureRecord(ctx, record)
 }

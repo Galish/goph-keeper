@@ -2,13 +2,14 @@ package config
 
 type Config struct {
 	DBAddr       string
+	DBInitPath   string
 	GRPCServAddr string
 	LogLevel     string
 }
 
 var defaultConfig = &Config{
-	LogLevel:     "info",
 	GRPCServAddr: ":3200",
+	LogLevel:     "info",
 }
 
 func New() *Config {
@@ -39,6 +40,10 @@ func withConfig(c *Config) func(*Config) {
 	return func(cfg *Config) {
 		if c.DBAddr != "" {
 			cfg.DBAddr = c.DBAddr
+		}
+
+		if c.DBInitPath != "" {
+			cfg.DBInitPath = c.DBInitPath
 		}
 
 		if c.GRPCServAddr != "" {
