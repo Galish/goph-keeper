@@ -6,6 +6,8 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -19,9 +21,7 @@ func (s *KeeperServer) GetAllCredentials(
 
 	creds, err := s.keeper.GetAllCredentials(ctx, user)
 	if err != nil {
-		response.Error = err.Error()
-
-		return &response, nil
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	response.Credentials = make([]*pb.Credentials, len(creds))

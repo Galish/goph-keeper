@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
@@ -19,9 +21,7 @@ func (s *KeeperServer) GetTextNotes(
 
 	notes, err := s.keeper.GetTextNotes(ctx, user)
 	if err != nil {
-		response.Error = err.Error()
-
-		return &response, nil
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	response.Notes = make([]*pb.Note, len(notes))

@@ -30,7 +30,7 @@ message AddNoteRequest {
 }
 
 message AddNoteResponse {
-  string error = 1;
+  string id = 1;
 }
 
 message GetNoteRequest {
@@ -39,12 +39,10 @@ message GetNoteRequest {
 
 message GetNoteResponse {
   Note note = 1;
-  string error = 2;
 }
 
 message GetNotesResponse {
   repeated Note notes = 1;
-  string error = 2;
 }
 
 
@@ -61,18 +59,20 @@ message AddCardRequest {
   Card card = 1;
 }
 
+message AddCardResponse {
+  string id = 1;
+}
+
 message GetCardRequest {
   string id = 1;
 }
 
 message GetCardResponse {
   Card card = 1;
-  string error = 2;
 }
 
 message GetCardsResponse {
   repeated Card cards = 1;
-  string error = 2;
 }
 
 
@@ -88,7 +88,7 @@ message AddCredentialsRequest {
 }
 
 message AddCredentialsResponse {
-  string error = 1;
+  string id = 1;
 }
 
 message GetCredentialsRequest {
@@ -97,12 +97,10 @@ message GetCredentialsRequest {
 
 message GetCredentialsResponse {
   Credentials credentials = 1;
-  string error = 2;
 }
 
 message GetAllCredentialsResponse {
   repeated Credentials credentials = 1;
-  string error = 2;
 }
 
 
@@ -115,7 +113,7 @@ service Keeper {
   rpc GetTextNotes(google.protobuf.Empty) returns (GetNotesResponse);
   rpc GetRawNotes(google.protobuf.Empty) returns (GetNotesResponse);
 
-  rpc AddCard(AddCardRequest) returns (google.protobuf.Empty);
+  rpc AddCard(AddCardRequest) returns (AddCardResponse);
   rpc GetCard(GetCardRequest) returns (GetCardResponse);
   rpc GetCards(google.protobuf.Empty) returns (GetCardsResponse);
 

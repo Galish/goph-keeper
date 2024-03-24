@@ -6,6 +6,9 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *KeeperServer) AddNote(
@@ -22,8 +25,10 @@ func (s *KeeperServer) AddNote(
 	note.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	if err := s.keeper.AddNote(ctx, note); err != nil {
-		response.Error = err.Error()
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
+
+	response.Id = note.ID
 
 	return &response, nil
 }

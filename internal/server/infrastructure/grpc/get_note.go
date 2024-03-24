@@ -5,6 +5,9 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *KeeperServer) GetNote(
@@ -17,12 +20,14 @@ func (s *KeeperServer) GetNote(
 
 	note, err := s.keeper.GetNote(ctx, user, in.Id)
 	if err != nil {
-		response.Error = err.Error()
-	} else {
-		response.Note.Title = note.Title
-		response.Note.Description = note.Description
-		response.Note.Value = note.Value
-		response.Note.RawValue = note.RawValue
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	response.Note = &pb.Note{
+		Title:       note.Title,
+		Description: note.Description,
+		Value:       note.Value,
+		RawValue:    note.RawValue,
 	}
 
 	return &response, nil

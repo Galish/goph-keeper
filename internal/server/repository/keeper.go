@@ -2,7 +2,12 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrNothingFound = errors.New("nothing was found")
 )
 
 type KeeperRepository interface {

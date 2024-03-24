@@ -9,13 +9,14 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *KeeperServer) AddCard(
 	ctx context.Context,
 	in *pb.AddCardRequest,
-) (*emptypb.Empty, error) {
+) (*pb.AddCardResponse, error) {
+	var response pb.AddCardResponse
+
 	card := entity.NewCard()
 	card.Title = in.Card.Title
 	card.Description = in.Card.Description
@@ -29,5 +30,7 @@ func (s *KeeperServer) AddCard(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	return nil, nil
+	response.Id = card.ID
+
+	return &response, nil
 }

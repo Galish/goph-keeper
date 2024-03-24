@@ -5,6 +5,9 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (s *KeeperServer) GetCredentials(
@@ -17,12 +20,14 @@ func (s *KeeperServer) GetCredentials(
 
 	creds, err := s.keeper.GetCredentials(ctx, user, in.Id)
 	if err != nil {
-		response.Error = err.Error()
-	} else {
-		response.Credentials.Title = creds.Title
-		response.Credentials.Description = creds.Description
-		response.Credentials.Username = creds.Username
-		response.Credentials.Password = creds.Password
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	response.Credentials = &pb.Credentials{
+		Title:       creds.Title,
+		Description: creds.Description,
+		Username:    creds.Username,
+		Password:    creds.Password,
 	}
 
 	return &response, nil

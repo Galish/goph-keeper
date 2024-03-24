@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -20,9 +22,7 @@ func (s *KeeperServer) GetCards(
 
 	cards, err := s.keeper.GetCards(ctx, user)
 	if err != nil {
-		response.Error = err.Error()
-
-		return &response, nil
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	response.Cards = make([]*pb.Card, len(cards))

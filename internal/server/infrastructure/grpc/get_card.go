@@ -3,6 +3,8 @@ package grpc
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
@@ -19,14 +21,16 @@ func (s *KeeperServer) GetCard(
 
 	card, err := s.keeper.GetCard(ctx, user, in.Id)
 	if err != nil {
-		response.Error = err.Error()
-	} else {
-		response.Card.Title = card.Title
-		response.Card.Description = card.Description
-		response.Card.Number = card.Number
-		response.Card.Holder = card.Holder
-		response.Card.Cvc = card.CVC
-		response.Card.Expiry = timestamppb.New(card.Expiry)
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	response.Card = &pb.Card{
+		Title:       card.Title,
+		Description: card.Description,
+		Number:      card.Number,
+		Holder:      card.Holder,
+		Cvc:         card.CVC,
+		Expiry:      timestamppb.New(card.Expiry),
 	}
 
 	return &response, nil
