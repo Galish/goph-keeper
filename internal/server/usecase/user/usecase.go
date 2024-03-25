@@ -7,16 +7,18 @@ import (
 	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
-var ErrMissingCredentials = errors.New("missing login/password")
-var ErrInvalidCredentials = errors.New("incorrect login/password pair")
+var (
+	ErrMissingCredentials = errors.New("missing login/password")
+	ErrInvalidCredentials = errors.New("incorrect login/password pair")
+)
 
-type userUseCase struct {
+type UserUseCase struct {
 	repo       repository.UserRepository
 	jwtManager *auth.JWTManager
 }
 
-func New(repo repository.UserRepository, jwtManager *auth.JWTManager) *userUseCase {
-	return &userUseCase{
+func New(repo repository.UserRepository, jwtManager *auth.JWTManager) *UserUseCase {
+	return &UserUseCase{
 		repo:       repo,
 		jwtManager: jwtManager,
 	}
