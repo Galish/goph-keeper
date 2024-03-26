@@ -25,8 +25,8 @@ func NewUI() *UI {
 	return &UI{}
 }
 
-func (ui *UI) Display(str string) {
-	fmt.Println(str)
+func (ui *UI) Display(str ...string) {
+	fmt.Print(str)
 	ui.LineBreak()
 }
 

@@ -12,6 +12,7 @@ var (
 
 type KeeperRepository interface {
 	SetSecureRecord(context.Context, *SecureRecord) error
+	DeleteSecureRecord(context.Context, string, string, SecureRecordType) error
 	GetSecureRecord(context.Context, string, string) (*SecureRecord, error)
 	GetSecureRecords(context.Context, string, SecureRecordType) ([]*SecureRecord, error)
 }

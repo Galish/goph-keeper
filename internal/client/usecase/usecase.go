@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/client/entity"
 )
 
 type User interface {
@@ -16,10 +16,12 @@ type Keeper interface {
 
 	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
 	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)
-	// GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error)
+	GetCredentials(id string) (*entity.Credentials, error)
 
 	// GetTextNotes(ctx context.Context, user string) ([]*entity.Note, error)
 	// GetRawNotes(ctx context.Context, user string) ([]*entity.Note, error)
 	// GetCards(ctx context.Context, user string) ([]*entity.Card, error)
 	GetAllCredentials() ([]*entity.Credentials, error)
+
+	DeleteCredentials(id string) error
 }

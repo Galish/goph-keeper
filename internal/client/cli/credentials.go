@@ -46,13 +46,19 @@ func (a *App) renderCredentials(id string) {
 		return
 	}
 
-	fmt.Printf(
-		"View credentials\nTitle: %s\nDescription: %s\nUsername: %s\nPassword: %s\n\n",
-		creds.Title,
-		creds.Description,
-		creds.Username,
-		creds.Password,
-	)
+	// fmt.Printf(
+	// 	"View credentials\nTitle: %s\nDescription: %s\nUsername: %s\nPassword: %s\n\n",
+	// 	creds.Title,
+	// 	creds.Description,
+	// 	creds.Username,
+	// 	creds.Password,
+	// )
+
+	a.ui.Display("Print:\n", creds.Print())
+
+	// creds.Iterate(func(s1, s2 string) {
+	// 	fmt.Println("+++", s1, s2)
+	// })
 
 	var commands = []*SelectOption{
 		{

@@ -7,7 +7,7 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/client/entity"
 )
 
 type KeeperUseCase struct {
@@ -18,6 +18,46 @@ func New(client pb.KeeperClient) *KeeperUseCase {
 	return &KeeperUseCase{
 		client: client,
 	}
+}
+
+func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	req := &pb.GetRequest{
+		Id: id,
+	}
+
+	resp, err := uc.client.GetCredentials(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	creds := &entity.Credentials{
+		ID:          resp.Credentials.GetPassword(),
+		Title:       resp.Credentials.GetTitle(),
+		Description: resp.Credentials.GetDescription(),
+		Username:    resp.Credentials.GetUsername(),
+		Password:    resp.Credentials.GetPassword(),
+	}
+
+	return creds, nil
+}
+
+func (uc *KeeperUseCase) DeleteCredentials(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	req := &pb.DeleteRequest{
+		Id: id,
+	}
+
+	_, err := uc.client.DeleteCredentials(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (uc *KeeperUseCase) GetAllCredentials() ([]*entity.Credentials, error) {
@@ -33,10 +73,11 @@ func (uc *KeeperUseCase) GetAllCredentials() ([]*entity.Credentials, error) {
 
 	for i, c := range resp.Credentials {
 		creds[i] = &entity.Credentials{
-			Title:       c.Title,
-			Description: c.Description,
-			Username:    c.Username,
-			Password:    c.Password,
+			ID:          c.GetId(),
+			Title:       c.GetTitle(),
+			Description: c.GetDescription(),
+			Username:    c.GetUsername(),
+			Password:    c.GetPassword(),
 		}
 	}
 

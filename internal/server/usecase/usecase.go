@@ -25,4 +25,9 @@ type Keeper interface {
 	GetRawNotes(ctx context.Context, user string) ([]*entity.Note, error)
 	GetCards(ctx context.Context, user string) ([]*entity.Card, error)
 	GetAllCredentials(ctx context.Context, user string) ([]*entity.Credentials, error)
+
+	DeleteTextNote(ctx context.Context, user, id string) error
+	DeleteRawNote(ctx context.Context, user, id string) error
+	DeleteCard(ctx context.Context, user, id string) error
+	DeleteCredentials(ctx context.Context, user, id string) error
 }

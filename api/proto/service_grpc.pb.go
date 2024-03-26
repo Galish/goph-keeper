@@ -32,6 +32,7 @@ const (
 	Keeper_AddCredentials_FullMethodName    = "/service.Keeper/AddCredentials"
 	Keeper_GetCredentials_FullMethodName    = "/service.Keeper/GetCredentials"
 	Keeper_GetAllCredentials_FullMethodName = "/service.Keeper/GetAllCredentials"
+	Keeper_DeleteCredentials_FullMethodName = "/service.Keeper/DeleteCredentials"
 )
 
 // KeeperClient is the client API for Keeper service.
@@ -48,8 +49,9 @@ type KeeperClient interface {
 	GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
 	GetCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetCardsResponse, error)
 	AddCredentials(ctx context.Context, in *AddCredentialsRequest, opts ...grpc.CallOption) (*AddCredentialsResponse, error)
-	GetCredentials(ctx context.Context, in *GetCredentialsRequest, opts ...grpc.CallOption) (*GetCredentialsResponse, error)
+	GetCredentials(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetCredentialsResponse, error)
 	GetAllCredentials(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllCredentialsResponse, error)
+	DeleteCredentials(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type keeperClient struct {
@@ -150,7 +152,7 @@ func (c *keeperClient) AddCredentials(ctx context.Context, in *AddCredentialsReq
 	return out, nil
 }
 
-func (c *keeperClient) GetCredentials(ctx context.Context, in *GetCredentialsRequest, opts ...grpc.CallOption) (*GetCredentialsResponse, error) {
+func (c *keeperClient) GetCredentials(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetCredentialsResponse, error) {
 	out := new(GetCredentialsResponse)
 	err := c.cc.Invoke(ctx, Keeper_GetCredentials_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -162,6 +164,15 @@ func (c *keeperClient) GetCredentials(ctx context.Context, in *GetCredentialsReq
 func (c *keeperClient) GetAllCredentials(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllCredentialsResponse, error) {
 	out := new(GetAllCredentialsResponse)
 	err := c.cc.Invoke(ctx, Keeper_GetAllCredentials_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) DeleteCredentials(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_DeleteCredentials_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -182,8 +193,9 @@ type KeeperServer interface {
 	GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error)
 	GetCards(context.Context, *emptypb.Empty) (*GetCardsResponse, error)
 	AddCredentials(context.Context, *AddCredentialsRequest) (*AddCredentialsResponse, error)
-	GetCredentials(context.Context, *GetCredentialsRequest) (*GetCredentialsResponse, error)
+	GetCredentials(context.Context, *GetRequest) (*GetCredentialsResponse, error)
 	GetAllCredentials(context.Context, *emptypb.Empty) (*GetAllCredentialsResponse, error)
+	DeleteCredentials(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedKeeperServer()
 }
 
@@ -221,11 +233,14 @@ func (UnimplementedKeeperServer) GetCards(context.Context, *emptypb.Empty) (*Get
 func (UnimplementedKeeperServer) AddCredentials(context.Context, *AddCredentialsRequest) (*AddCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCredentials not implemented")
 }
-func (UnimplementedKeeperServer) GetCredentials(context.Context, *GetCredentialsRequest) (*GetCredentialsResponse, error) {
+func (UnimplementedKeeperServer) GetCredentials(context.Context, *GetRequest) (*GetCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCredentials not implemented")
 }
 func (UnimplementedKeeperServer) GetAllCredentials(context.Context, *emptypb.Empty) (*GetAllCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllCredentials not implemented")
+}
+func (UnimplementedKeeperServer) DeleteCredentials(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCredentials not implemented")
 }
 func (UnimplementedKeeperServer) mustEmbedUnimplementedKeeperServer() {}
 
@@ -421,7 +436,7 @@ func _Keeper_AddCredentials_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _Keeper_GetCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCredentialsRequest)
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -433,7 +448,7 @@ func _Keeper_GetCredentials_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: Keeper_GetCredentials_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetCredentials(ctx, req.(*GetCredentialsRequest))
+		return srv.(KeeperServer).GetCredentials(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -452,6 +467,24 @@ func _Keeper_GetAllCredentials_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KeeperServer).GetAllCredentials(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_DeleteCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).DeleteCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_DeleteCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).DeleteCredentials(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -510,6 +543,10 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllCredentials",
 			Handler:    _Keeper_GetAllCredentials_Handler,
+		},
+		{
+			MethodName: "DeleteCredentials",
+			Handler:    _Keeper_DeleteCredentials_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

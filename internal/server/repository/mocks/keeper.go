@@ -35,6 +35,20 @@ func (m *MockKeeperRepository) EXPECT() *MockKeeperRepositoryMockRecorder {
 	return m.recorder
 }
 
+// DeleteSecureRecord mocks base method.
+func (m *MockKeeperRepository) DeleteSecureRecord(arg0 context.Context, arg1, arg2 string, arg3 repository.SecureRecordType) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSecureRecord", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteSecureRecord indicates an expected call of DeleteSecureRecord.
+func (mr *MockKeeperRepositoryMockRecorder) DeleteSecureRecord(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).DeleteSecureRecord), arg0, arg1, arg2, arg3)
+}
+
 // GetSecureRecord mocks base method.
 func (m *MockKeeperRepository) GetSecureRecord(arg0 context.Context, arg1, arg2 string) (*repository.SecureRecord, error) {
 	m.ctrl.T.Helper()
