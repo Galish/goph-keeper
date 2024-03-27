@@ -33,9 +33,9 @@ loop:
 
 		default:
 			if a.authClient.IsAuthorized() {
-				a.renderWelcomeView()
+				a.selectCategory()
 			} else {
-				a.renderHomeView()
+				a.viewHomeScreen()
 			}
 		}
 	}

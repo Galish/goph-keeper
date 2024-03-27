@@ -21,7 +21,6 @@ func (a *App) viewAllCredentials() {
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.renderHomeView,
 		},
 	}
 
