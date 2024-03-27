@@ -25,12 +25,14 @@ func (a *App) viewAllCredentials() {
 	}
 
 	for i, c := range creds {
+		id := c.ID
+
 		commands = append(
 			commands,
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
-					a.viewCredentials(c.ID)
+					a.viewCredentials(id)
 				},
 			},
 		)
@@ -50,7 +52,10 @@ func (a *App) viewCredentials(id string) {
 
 	handleDelete := func() {
 		if ok := a.ui.Confirm("Are you sure"); ok {
-			a.keeper.DeleteCredentials(id)
+			if err := a.keeper.DeleteCredentials(id); err != nil {
+				a.ui.Error(err)
+			}
+
 			a.viewAllCredentials()
 			return
 		} else {
