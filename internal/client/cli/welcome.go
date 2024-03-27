@@ -1,14 +1,18 @@
 package cli
 
+import (
+	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+)
+
 func (a *App) renderWelcomeView() {
-	a.ui.Display("Welcome to Goph Keeper!")
+	a.ui.Print("Welcome to Goph Keeper!")
 
 	a.ui.Select(
 		"Select category",
-		[]*SelectOption{
+		[]*ui.SelectOption{
 			{
-				"Credentials",
-				a.renderCredentialsOverview,
+				Label: "Credentials",
+				Run:   a.renderAllCredentials,
 			},
 			{
 				Label: "Text notes",

@@ -2,23 +2,25 @@ package cli
 
 import (
 	"os"
+
+	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 )
 
 func (a *App) renderHomeView() {
 	a.ui.Select(
 		"You need to log in or sign up before continuing",
-		[]*SelectOption{
+		[]*ui.SelectOption{
 			{
-				"Already have an account? Log in",
-				a.renderSignInView,
+				Label: "Already have an account? Log in",
+				Run:   a.renderSignInView,
 			},
 			{
-				"Create account",
-				a.renderSignUpView,
+				Label: "Create account",
+				Run:   a.renderSignUpView,
 			},
 			{
-				"Exit",
-				func() {
+				Label: "Exit",
+				Run: func() {
 					os.Exit(0)
 				},
 			},

@@ -2,21 +2,22 @@ package cli
 
 import (
 	"fmt"
+
+	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/entity"
 )
 
-func (a *App) renderCredentialsOverview() {
+func (a *App) renderAllCredentials() {
 	creds, err := a.keeper.GetAllCredentials()
 	if err != nil {
-		fmt.Println("Err:", err)
+		a.ui.Error(err)
 		return
 	}
 
-	commands := []*SelectOption{
+	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run: func() {
-				fmt.Println("___add new___")
-			},
+			Run:   a.addCredentials,
 		},
 		{
 			Label: "  Cancel",
@@ -27,7 +28,7 @@ func (a *App) renderCredentialsOverview() {
 	for i, c := range creds {
 		commands = append(
 			commands,
-			&SelectOption{
+			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
 					a.renderCredentials(c.ID)
@@ -42,47 +43,71 @@ func (a *App) renderCredentialsOverview() {
 func (a *App) renderCredentials(id string) {
 	creds, err := a.keeper.GetCredentials(id)
 	if err != nil {
-		fmt.Println("Err:", err)
+		a.ui.Error(err)
 		return
 	}
 
-	// fmt.Printf(
-	// 	"View credentials\nTitle: %s\nDescription: %s\nUsername: %s\nPassword: %s\n\n",
-	// 	creds.Title,
-	// 	creds.Description,
-	// 	creds.Username,
-	// 	creds.Password,
-	// )
+	a.ui.Print(creds.String())
 
-	a.ui.Display("Print:\n", creds.Print())
+	handleDelete := func() {
+		if ok := a.ui.Confirm("Are you sure"); ok {
+			a.keeper.DeleteCredentials(id)
+			a.renderAllCredentials()
+			return
+		} else {
+			a.renderCredentials(id)
+		}
+	}
 
-	// creds.Iterate(func(s1, s2 string) {
-	// 	fmt.Println("+++", s1, s2)
-	// })
-
-	var commands = []*SelectOption{
+	var commands = []*ui.SelectOption{
 		{
 			Label: "Edit",
-			Run: func() {
-				fmt.Println("___edit___")
-			},
+			Run:   a.editCredentials,
 		},
 		{
 			Label: "Delete",
-			Run: func() {
-				if ok := a.ui.Confirm("Are you sure?"); ok {
-					a.keeper.DeleteCredentials(id)
-					a.renderCredentialsOverview()
-				} else {
-					a.renderCredentials(id)
-				}
-			},
+			Run:   handleDelete,
 		},
 		{
 			Label: "Cancel",
-			Run:   a.renderCredentialsOverview,
+			Run:   a.renderAllCredentials,
 		},
 	}
 
 	a.ui.Select("Select action", commands)
+}
+
+func (a *App) addCredentials() {
+	creds := entity.Credentials{}
+
+	creds.Title = a.ui.Input("Title", true)
+	creds.Description = a.ui.Input("Description", false)
+	creds.Username = a.ui.Input("Username", true)
+	creds.Password = a.ui.Input("Password", true)
+
+	ok := a.ui.Confirm("Add credentials")
+	if ok {
+		fmt.Println("-save-")
+	}
+
+	a.renderAllCredentials()
+}
+
+func (a *App) editCredentials() {
+	creds := entity.Credentials{}
+
+	creds.Title = a.ui.Input("Title", true)
+	creds.Description = a.ui.Input("Description", false)
+	creds.Username = a.ui.Input("Username", true)
+	creds.Password = a.ui.Input("Password", true)
+
+	fmt.Printf(
+		"Edit credentials\nTitle: %s\nDescription: %s\nUsername: %s\nPassword: %s\n\n",
+		creds.Title,
+		creds.Description,
+		creds.Username,
+		creds.Password,
+	)
+
+	a.renderAllCredentials()
 }

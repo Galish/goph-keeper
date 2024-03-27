@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/Galish/goph-keeper/internal/client/auth"
+	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 	"github.com/Galish/goph-keeper/internal/client/usecase"
 )
 
@@ -9,7 +10,7 @@ type App struct {
 	authClient *auth.AuthClient
 	user       usecase.User
 	keeper     usecase.Keeper
-	ui         *UI
+	ui         *ui.UI
 	done       chan struct{}
 }
 
@@ -18,7 +19,7 @@ func NewApp(authClient *auth.AuthClient, user usecase.User, keeper usecase.Keepe
 		authClient: authClient,
 		user:       user,
 		keeper:     keeper,
-		ui:         NewUI(),
+		ui:         ui.New(),
 		done:       make(chan struct{}),
 	}
 }
@@ -43,5 +44,5 @@ loop:
 func (a *App) Close() error {
 	close(a.done)
 
-	return nil
+	return a.ui.Close()
 }
