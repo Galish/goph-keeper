@@ -12,7 +12,7 @@ type User interface {
 type Keeper interface {
 	// AddNote(ctx context.Context, note *entity.Note) error
 	// AddCard(ctx context.Context, card *entity.Card) error
-	// AddCredentials(ctx context.Context, creds *entity.Credentials) error
+	AddCredentials(creds *entity.Credentials) error
 
 	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
 	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)

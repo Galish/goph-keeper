@@ -16,7 +16,6 @@ type Credentials struct {
 }
 
 func (c *Credentials) String() string {
-
 	return fmt.Sprintf(
 		"Title: %s\nDescription: %s\nUsername: %s\nPassword: %s\n",
 		c.Title,

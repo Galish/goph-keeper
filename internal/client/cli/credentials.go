@@ -7,7 +7,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/entity"
 )
 
-func (a *App) renderAllCredentials() {
+func (a *App) viewAllCredentials() {
 	creds, err := a.keeper.GetAllCredentials()
 	if err != nil {
 		a.ui.Error(err)
@@ -31,7 +31,7 @@ func (a *App) renderAllCredentials() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
-					a.renderCredentials(c.ID)
+					a.viewCredentials(c.ID)
 				},
 			},
 		)
@@ -40,7 +40,7 @@ func (a *App) renderAllCredentials() {
 	a.ui.Select("Add new credentials or select existing", commands)
 }
 
-func (a *App) renderCredentials(id string) {
+func (a *App) viewCredentials(id string) {
 	creds, err := a.keeper.GetCredentials(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -52,10 +52,10 @@ func (a *App) renderCredentials(id string) {
 	handleDelete := func() {
 		if ok := a.ui.Confirm("Are you sure"); ok {
 			a.keeper.DeleteCredentials(id)
-			a.renderAllCredentials()
+			a.viewAllCredentials()
 			return
 		} else {
-			a.renderCredentials(id)
+			a.viewCredentials(id)
 		}
 	}
 
@@ -70,7 +70,7 @@ func (a *App) renderCredentials(id string) {
 		},
 		{
 			Label: "Cancel",
-			Run:   a.renderAllCredentials,
+			Run:   a.viewAllCredentials,
 		},
 	}
 
@@ -85,12 +85,13 @@ func (a *App) addCredentials() {
 	creds.Username = a.ui.Input("Username", true)
 	creds.Password = a.ui.Input("Password", true)
 
-	ok := a.ui.Confirm("Add credentials")
-	if ok {
-		fmt.Println("-save-")
+	if ok := a.ui.Confirm("Add credentials"); ok {
+		if err := a.keeper.AddCredentials(&creds); err != nil {
+			a.ui.Error(err)
+		}
 	}
 
-	a.renderAllCredentials()
+	a.viewAllCredentials()
 }
 
 func (a *App) editCredentials() {
@@ -109,5 +110,5 @@ func (a *App) editCredentials() {
 		creds.Password,
 	)
 
-	a.renderAllCredentials()
+	a.viewAllCredentials()
 }

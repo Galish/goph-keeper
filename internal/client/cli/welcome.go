@@ -12,7 +12,7 @@ func (a *App) renderWelcomeView() {
 		[]*ui.SelectOption{
 			{
 				Label: "Credentials",
-				Run:   a.renderAllCredentials,
+				Run:   a.viewAllCredentials,
 			},
 			{
 				Label: "Text notes",
