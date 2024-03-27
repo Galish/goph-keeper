@@ -59,10 +59,14 @@ func (a *App) viewCredentials(id string) {
 		}
 	}
 
+	handleEdit := func() {
+		a.editCredentials(id)
+	}
+
 	var commands = []*ui.SelectOption{
 		{
 			Label: "Edit",
-			Run:   a.editCredentials,
+			Run:   handleEdit,
 		},
 		{
 			Label: "Delete",
@@ -94,21 +98,17 @@ func (a *App) addCredentials() {
 	a.viewAllCredentials()
 }
 
-func (a *App) editCredentials() {
-	creds := entity.Credentials{}
+func (a *App) editCredentials(id string) {
+	creds := entity.Credentials{
+		ID: id,
+	}
 
 	creds.Title = a.ui.Input("Title", true)
 	creds.Description = a.ui.Input("Description", false)
 	creds.Username = a.ui.Input("Username", true)
 	creds.Password = a.ui.Input("Password", true)
 
-	fmt.Printf(
-		"Edit credentials\nTitle: %s\nDescription: %s\nUsername: %s\nPassword: %s\n\n",
-		creds.Title,
-		creds.Description,
-		creds.Username,
-		creds.Password,
-	)
+	a.keeper.UpdateCredentials(&creds)
 
 	a.viewAllCredentials()
 }

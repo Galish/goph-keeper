@@ -92,6 +92,10 @@ message AddCredentialsResponse {
   string id = 1;
 }
 
+message UpdateCredentialsRequest {
+  Credentials credentials = 1;
+}
+
 message GetCredentialsResponse {
   Credentials credentials = 1;
 }
@@ -124,6 +128,8 @@ service Keeper {
   rpc AddCredentials(AddCredentialsRequest) returns (AddCredentialsResponse);
   rpc GetCredentials(GetRequest) returns (GetCredentialsResponse);
   rpc GetAllCredentials(google.protobuf.Empty) returns (GetAllCredentialsResponse);
+
+  rpc UpdateCredentials(UpdateCredentialsRequest) returns (google.protobuf.Empty);
 
   rpc DeleteCredentials(DeleteRequest) returns (google.protobuf.Empty);
 }

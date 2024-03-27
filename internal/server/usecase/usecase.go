@@ -30,4 +30,6 @@ type Keeper interface {
 	DeleteRawNote(ctx context.Context, user, id string) error
 	DeleteCard(ctx context.Context, user, id string) error
 	DeleteCredentials(ctx context.Context, user, id string) error
+
+	UpdateCredentials(ctx context.Context, creds *entity.Credentials) error
 }

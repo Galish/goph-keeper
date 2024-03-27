@@ -7,11 +7,13 @@ import (
 )
 
 var (
-	ErrNothingFound = errors.New("nothing was found")
+	ErrNothingFound   = errors.New("nothing was found")
+	ErrRecordConflict = errors.New("record id already exists")
 )
 
 type KeeperRepository interface {
-	SetSecureRecord(context.Context, *SecureRecord) error
+	AddSecureRecord(context.Context, *SecureRecord) error
+	UpdateSecureRecord(context.Context, *SecureRecord) error
 	DeleteSecureRecord(context.Context, string, string, SecureRecordType) error
 	GetSecureRecord(context.Context, string, string) (*SecureRecord, error)
 	GetSecureRecords(context.Context, string, SecureRecordType) ([]*SecureRecord, error)

@@ -2,11 +2,13 @@ package psql
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Galish/goph-keeper/internal/server/repository"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (s *psqlStore) SetSecureRecord(
+func (s *psqlStore) AddSecureRecord(
 	ctx context.Context,
 	record *repository.SecureRecord,
 ) error {
@@ -51,5 +53,13 @@ func (s *psqlStore) SetSecureRecord(
 		record.LastEditedAt,
 	)
 
-	return err
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == errCodeConflict {
+		return repository.ErrRecordConflict
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

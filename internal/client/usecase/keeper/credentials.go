@@ -22,8 +22,28 @@ func (uc *KeeperUseCase) AddCredentials(creds *entity.Credentials) error {
 		},
 	}
 
-	_, err := uc.client.AddCredentials(ctx, req)
-	if err != nil {
+	if _, err := uc.client.AddCredentials(ctx, req); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	req := &pb.UpdateCredentialsRequest{
+		Credentials: &pb.Credentials{
+			Id:          creds.ID,
+			Title:       creds.Title,
+			Description: creds.Description,
+			Username:    creds.Username,
+			Password:    creds.Password,
+		},
+	}
+
+	if _, err := uc.client.UpdateCredentials(ctx, req); err != nil {
 		return err
 	}
 

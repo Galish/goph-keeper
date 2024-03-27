@@ -14,6 +14,8 @@ type Keeper interface {
 	// AddCard(ctx context.Context, card *entity.Card) error
 	AddCredentials(creds *entity.Credentials) error
 
+	UpdateCredentials(creds *entity.Credentials) error
+
 	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
 	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)
 	GetCredentials(id string) (*entity.Credentials, error)
