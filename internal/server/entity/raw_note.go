@@ -6,25 +6,24 @@ import (
 	"github.com/google/uuid"
 )
 
-type Note struct {
+type RawNote struct {
 	ID           string
 	Title        string
 	Description  string
-	Value        string
-	RawValue     []byte
+	Value        []byte
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
 }
 
-func NewNote() *Note {
-	return &Note{
+func NewRawNote() *RawNote {
+	return &RawNote{
 		ID:        uuid.NewString(),
 		CreatedAt: time.Now(),
 	}
 }
 
-func (n *Note) IsValid() bool {
+func (n *RawNote) IsValid() bool {
 	return n.Title != "" &&
-		(n.Value != "" || n.RawValue != nil)
+		n.Value != nil
 }

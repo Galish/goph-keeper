@@ -13,16 +13,14 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *KeeperServer) DeleteCredentials(
-	ctx context.Context,
-	in *pb.DeleteRequest,
-) (*emptypb.Empty, error) {
+func (s *KeeperServer) DeleteCredentials(ctx context.Context, in *pb.DeleteRequest) (*emptypb.Empty, error) {
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.keeper.DeleteCredentials(ctx, user, in.GetId())
 	if errors.Is(err, keeper.ErrNothingFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

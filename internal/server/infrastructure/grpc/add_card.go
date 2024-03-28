@@ -11,18 +11,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *KeeperServer) AddCard(
-	ctx context.Context,
-	in *pb.AddCardRequest,
-) (*pb.AddCardResponse, error) {
+func (s *KeeperServer) AddCard(ctx context.Context, in *pb.AddCardRequest) (*pb.AddCardResponse, error) {
 	var response pb.AddCardResponse
 
 	card := entity.NewCard()
-	card.Title = in.Card.Title
-	card.Description = in.Card.Description
-	card.Number = in.Card.Number
-	card.Holder = in.Card.Holder
-	card.CVC = in.Card.Cvc
+	card.Title = in.Card.GetTitle()
+	card.Description = in.Card.GetDescription()
+	card.Number = in.Card.GetNumber()
+	card.Holder = in.Card.GetHolder()
+	card.CVC = in.Card.GetCvc()
 	card.Expiry = in.Card.Expiry.AsTime()
 	card.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -9,17 +10,19 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 )
 
-func (s *KeeperServer) GetCard(
-	ctx context.Context,
-	in *pb.GetCardRequest,
-) (*pb.GetCardResponse, error) {
+func (s *KeeperServer) GetCard(ctx context.Context, in *pb.GetRequest) (*pb.GetCardResponse, error) {
 	var response pb.GetCardResponse
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	card, err := s.keeper.GetCard(ctx, user, in.Id)
+	if errors.Is(err, keeper.ErrNothingFound) {
+		return nil, status.Errorf(codes.NotFound, err.Error())
+	}
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}

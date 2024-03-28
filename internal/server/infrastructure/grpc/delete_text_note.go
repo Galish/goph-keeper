@@ -10,14 +10,13 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*pb.GetCredentialsResponse, error) {
-	var response pb.GetCredentialsResponse
-
+func (s *KeeperServer) DeleteTextNote(ctx context.Context, in *pb.DeleteRequest) (*emptypb.Empty, error) {
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	creds, err := s.keeper.GetCredentials(ctx, user, in.GetId())
+	err := s.keeper.DeleteTextNote(ctx, user, in.GetId())
 	if errors.Is(err, keeper.ErrNothingFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
@@ -26,12 +25,5 @@ func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Credentials = &pb.Credentials{
-		Title:       creds.Title,
-		Description: creds.Description,
-		Username:    creds.Username,
-		Password:    creds.Password,
-	}
-
-	return &response, nil
+	return nil, nil
 }

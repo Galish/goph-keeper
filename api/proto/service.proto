@@ -18,31 +18,70 @@ message AuthResponse {
 }
 
 
-message Note {
+message GetRequest {
+  string id = 1;
+}
+
+message DeleteRequest {
+  string id = 1;
+}
+
+message ListItem {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message GetListResponse {
+  repeated ListItem list = 1;
+}
+
+
+message TextNote {
   string title = 1;
   string description = 2;
   string value = 3;
-  bytes raw_value = 4;
 }
 
-message AddNoteRequest {
-  Note note = 1;
+message AddTextNoteRequest {
+  TextNote note = 1;
 }
 
-message AddNoteResponse {
+message AddTextNoteResponse {
   string id = 1;
 }
 
-message GetNoteRequest {
+message UpdateTextNoteRequest {
+  string id = 1;
+  TextNote note = 2;
+}
+
+message GetTextNoteResponse {
+  TextNote note = 1;
+}
+
+
+message RawNote {
+  string title = 1;
+  string description = 2;
+  bytes value = 3;
+}
+
+message AddRawNoteRequest {
+  RawNote note = 1;
+}
+
+message AddRawNoteResponse {
   string id = 1;
 }
 
-message GetNoteResponse {
-  Note note = 1;
+message UpdateRawNoteRequest {
+  string id = 1;
+  RawNote note = 2;
 }
 
-message GetNotesResponse {
-  repeated Note notes = 1;
+message GetRawNoteResponse {
+  RawNote note = 1;
 }
 
 
@@ -63,25 +102,21 @@ message AddCardResponse {
   string id = 1;
 }
 
-message GetCardRequest {
+message UpdateCardRequest {
   string id = 1;
+  Card card = 2;
 }
 
 message GetCardResponse {
   Card card = 1;
 }
 
-message GetCardsResponse {
-  repeated Card cards = 1;
-}
-
 
 message Credentials {
-  string id = 1;
-  string title = 2;
-  string description = 3;
-  string username = 4;
-  string password = 5;
+  string title = 1;
+  string description = 2;
+  string username = 3;
+  string password = 4;
 }
 
 message AddCredentialsRequest {
@@ -93,43 +128,40 @@ message AddCredentialsResponse {
 }
 
 message UpdateCredentialsRequest {
-  Credentials credentials = 1;
+  string id = 1;
+  Credentials credentials = 2;
 }
 
 message GetCredentialsResponse {
   Credentials credentials = 1;
 }
 
-message GetAllCredentialsResponse {
-  repeated Credentials credentials = 1;
-}
-
-message GetRequest {
-  string id = 1;
-}
-
-message DeleteRequest {
-  string id = 1;
-}
 
 service Keeper {
   rpc SignUp(AuthRequest) returns (AuthResponse);
   rpc SignIn(AuthRequest) returns (AuthResponse);
 
-  rpc AddNote(AddNoteRequest) returns (AddNoteResponse);
-  rpc GetNote(GetNoteRequest) returns (GetNoteResponse);
-  rpc GetTextNotes(google.protobuf.Empty) returns (GetNotesResponse);
-  rpc GetRawNotes(google.protobuf.Empty) returns (GetNotesResponse);
+  rpc AddTextNote(AddTextNoteRequest) returns (AddTextNoteResponse);
+  rpc GetTextNote(GetRequest) returns (GetTextNoteResponse);
+  rpc GetTextNotesList(google.protobuf.Empty) returns (GetListResponse);
+  rpc UpdateTextNote(UpdateTextNoteRequest) returns (google.protobuf.Empty);
+  rpc DeleteTextNote(DeleteRequest) returns (google.protobuf.Empty);
+
+  rpc AddRawNote(AddRawNoteRequest) returns (AddRawNoteResponse);
+  rpc GetRawNote(GetRequest) returns (GetRawNoteResponse);
+  rpc GetRawNotesList(google.protobuf.Empty) returns (GetListResponse);
+  rpc UpdateRawNote(UpdateRawNoteRequest) returns (google.protobuf.Empty);
+  rpc DeleteRawNote(DeleteRequest) returns (google.protobuf.Empty);
 
   rpc AddCard(AddCardRequest) returns (AddCardResponse);
-  rpc GetCard(GetCardRequest) returns (GetCardResponse);
-  rpc GetCards(google.protobuf.Empty) returns (GetCardsResponse);
+  rpc GetCard(GetRequest) returns (GetCardResponse);
+  rpc GetCardsList(google.protobuf.Empty) returns (GetListResponse);
+  rpc UpdateCard(UpdateCardRequest) returns (google.protobuf.Empty);
+  rpc DeleteCard(DeleteRequest) returns (google.protobuf.Empty);
 
   rpc AddCredentials(AddCredentialsRequest) returns (AddCredentialsResponse);
   rpc GetCredentials(GetRequest) returns (GetCredentialsResponse);
-  rpc GetAllCredentials(google.protobuf.Empty) returns (GetAllCredentialsResponse);
-
+  rpc GetCredentialsList(google.protobuf.Empty) returns (GetListResponse);
   rpc UpdateCredentials(UpdateCredentialsRequest) returns (google.protobuf.Empty);
-
   rpc DeleteCredentials(DeleteRequest) returns (google.protobuf.Empty);
 }

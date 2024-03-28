@@ -12,12 +12,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*pb.GetCredentialsResponse, error) {
-	var response pb.GetCredentialsResponse
+func (s *KeeperServer) GetTextNote(ctx context.Context, in *pb.GetRequest) (*pb.GetTextNoteResponse, error) {
+	var response pb.GetTextNoteResponse
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	creds, err := s.keeper.GetCredentials(ctx, user, in.GetId())
+	note, err := s.keeper.GetTextNote(ctx, user, in.Id)
 	if errors.Is(err, keeper.ErrNothingFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
@@ -26,11 +26,10 @@ func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Credentials = &pb.Credentials{
-		Title:       creds.Title,
-		Description: creds.Description,
-		Username:    creds.Username,
-		Password:    creds.Password,
+	response.Note = &pb.TextNote{
+		Title:       note.Title,
+		Description: note.Description,
+		Value:       note.Value,
 	}
 
 	return &response, nil

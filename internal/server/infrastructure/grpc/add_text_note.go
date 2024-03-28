@@ -11,20 +11,16 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *KeeperServer) AddNote(
-	ctx context.Context,
-	in *pb.AddNoteRequest,
-) (*pb.AddNoteResponse, error) {
-	var response pb.AddNoteResponse
+func (s *KeeperServer) AddTextNote(ctx context.Context, in *pb.AddTextNoteRequest) (*pb.AddTextNoteResponse, error) {
+	var response pb.AddTextNoteResponse
 
-	note := entity.NewNote()
-	note.Title = in.Note.Title
-	note.Description = in.Note.Description
-	note.Value = in.Note.Value
-	note.RawValue = in.Note.RawValue
+	note := entity.NewTextNote()
+	note.Title = in.Note.GetTitle()
+	note.Description = in.Note.GetDescription()
+	note.Value = in.Note.GetValue()
 	note.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
-	if err := s.keeper.AddNote(ctx, note); err != nil {
+	if err := s.keeper.AddTextNote(ctx, note); err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
