@@ -24,6 +24,12 @@ type Keeper interface {
 	UpdateCredentials(creds *entity.Credentials) error
 	DeleteCredentials(id string) error
 
+	AddTextNote(creds *entity.TextNote) error
+	GetTextNote(id string) (*entity.TextNote, error)
+	GetTextNotesList() ([]*entity.TextNote, error)
+	UpdateTextNote(creds *entity.TextNote) error
+	DeleteTextNote(id string) error
+
 	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
 	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)
 

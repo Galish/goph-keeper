@@ -105,7 +105,7 @@ func (a *App) addCard() {
 }
 
 func (a *App) editCard(id string) {
-	card := entity.Card{
+	card := &entity.Card{
 		ID: id,
 	}
 
@@ -116,7 +116,7 @@ func (a *App) editCard(id string) {
 	card.CVC = a.ui.Input("CVC code", true)
 	card.SetExpiry(a.ui.Input("Expiration date", true))
 
-	a.keeper.UpdateCard(&card)
+	a.keeper.UpdateCard(card)
 
 	a.viewCardsList()
 }

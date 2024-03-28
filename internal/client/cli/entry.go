@@ -44,6 +44,7 @@ func (a *App) selectCategory() {
 			},
 			{
 				Label: "Text notes",
+				Run:   a.viewTextNotesList,
 			},
 			{
 				Label: "Binary notes",

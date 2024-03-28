@@ -103,7 +103,7 @@ func (a *App) addCredentials() {
 }
 
 func (a *App) editCredentials(id string) {
-	creds := entity.Credentials{
+	creds := &entity.Credentials{
 		ID: id,
 	}
 
@@ -112,7 +112,7 @@ func (a *App) editCredentials(id string) {
 	creds.Username = a.ui.Input("Username", true)
 	creds.Password = a.ui.Input("Password", true)
 
-	a.keeper.UpdateCredentials(&creds)
+	a.keeper.UpdateCredentials(creds)
 
 	a.viewCredentialsList()
 }

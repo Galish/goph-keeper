@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const dateLayout = "02/06"
+const expiryDateLayout = "02/06"
 
 type Card struct {
 	ID          string
@@ -30,7 +30,7 @@ func (c *Card) String() string {
 }
 
 func (c *Card) SetExpiry(input string) error {
-	expiry, err := time.Parse(dateLayout, input)
+	expiry, err := time.Parse(expiryDateLayout, input)
 	if err != nil {
 		return err
 	}
@@ -41,5 +41,5 @@ func (c *Card) SetExpiry(input string) error {
 }
 
 func (c *Card) FormatExpiry(input time.Time) string {
-	return input.Format(dateLayout)
+	return input.Format(expiryDateLayout)
 }

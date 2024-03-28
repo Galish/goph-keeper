@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
@@ -27,10 +26,7 @@ func (uc *KeeperUseCase) AddCard(card *entity.Card) error {
 		},
 	}
 
-	fmt.Print("Add card:", card, req.Card)
-
 	if _, err := uc.client.AddCard(ctx, req); err != nil {
-		fmt.Println("Err:", err)
 		return err
 	}
 
@@ -85,22 +81,6 @@ func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) DeleteCard(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	req := &pb.DeleteRequest{
-		Id: id,
-	}
-
-	_, err := uc.client.DeleteCredentials(ctx, req)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
@@ -121,4 +101,20 @@ func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
 	}
 
 	return creds, nil
+}
+
+func (uc *KeeperUseCase) DeleteCard(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	req := &pb.DeleteRequest{
+		Id: id,
+	}
+
+	_, err := uc.client.DeleteCredentials(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
