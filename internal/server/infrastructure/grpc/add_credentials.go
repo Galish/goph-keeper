@@ -6,6 +6,7 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,6 +26,8 @@ func (s *KeeperServer) AddCredentials(
 	creds.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	if err := s.keeper.AddCredentials(ctx, creds); err != nil {
+		logger.WithError(err).Debug("unable to add the record")
+
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

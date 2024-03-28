@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/Galish/goph-keeper/internal/server/config"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc"
 	"github.com/Galish/goph-keeper/internal/server/repository/psql"
@@ -16,8 +14,6 @@ func main() {
 	logger.Init()
 
 	cfg := config.New()
-
-	fmt.Println("Config:", cfg)
 
 	logger.SetLevel(cfg.LogLevel)
 

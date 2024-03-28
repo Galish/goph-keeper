@@ -2,11 +2,13 @@ package user
 
 import (
 	"context"
+	"errors"
 
+	"github.com/Galish/goph-keeper/internal/server/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (uc *userUseCase) SignIn(
+func (uc *UserUseCase) SignIn(
 	ctx context.Context,
 	username, password string,
 ) (string, error) {
@@ -15,6 +17,10 @@ func (uc *userUseCase) SignIn(
 	}
 
 	user, err := uc.repo.GetUserByLogin(ctx, username)
+	if errors.Is(err, repository.ErrUserNotFound) {
+		return "", ErrInvalidCredentials
+	}
+
 	if err != nil {
 		return "", err
 	}

@@ -28,6 +28,7 @@ func (s *KeeperServer) GetAllCredentials(
 
 	for i, c := range creds {
 		response.Credentials[i] = &pb.Credentials{
+			Id:          c.ID,
 			Title:       c.Title,
 			Description: c.Description,
 			Username:    c.Username,

@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE UNIQUE INDEX IF NOT EXISTS login_idx ON users (login);
 
 CREATE TABLE IF NOT EXISTS secure_notes (
-	_id SERIAL PRIMARY KEY,
-	uuid VARCHAR(250) NOT NULL,
+	_id SERIAL,
+	uuid VARCHAR(250) PRIMARY KEY NOT NULL,
 	type   NUMERIC DEFAULT 0,
 	title VARCHAR(250) NOT NULL,
 	description  VARCHAR(250),
@@ -26,5 +26,3 @@ CREATE TABLE IF NOT EXISTS secure_notes (
 	created_at TIMESTAMPTZ NOT NULL,
 	last_edited_at TIMESTAMPTZ
 );
-
-CREATE UNIQUE INDEX IF NOT EXISTS uuid_idx ON secure_notes (uuid);

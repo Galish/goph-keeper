@@ -8,7 +8,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/entity"
 )
 
-func (uc *userUseCase) SignUp(
+func (uc *UserUseCase) SignUp(
 	ctx context.Context,
 	username, password string,
 ) (string, error) {
