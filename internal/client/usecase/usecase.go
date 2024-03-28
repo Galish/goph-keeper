@@ -11,19 +11,23 @@ type User interface {
 
 type Keeper interface {
 	// AddNote(ctx context.Context, note *entity.Note) error
-	// AddCard(ctx context.Context, card *entity.Card) error
-	AddCredentials(creds *entity.Credentials) error
 
+	AddCard(card *entity.Card) error
+	GetCard(id string) (*entity.Card, error)
+	GetCardsList() ([]*entity.Card, error)
+	UpdateCard(creds *entity.Card) error
+	DeleteCard(id string) error
+
+	AddCredentials(creds *entity.Credentials) error
+	GetCredentials(id string) (*entity.Credentials, error)
+	GetCredentialsList() ([]*entity.Credentials, error)
 	UpdateCredentials(creds *entity.Credentials) error
+	DeleteCredentials(id string) error
 
 	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
 	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)
-	GetCredentials(id string) (*entity.Credentials, error)
 
 	// GetTextNotes(ctx context.Context, user string) ([]*entity.Note, error)
 	// GetRawNotes(ctx context.Context, user string) ([]*entity.Note, error)
-	// GetCards(ctx context.Context, user string) ([]*entity.Card, error)
-	GetAllCredentials() ([]*entity.Credentials, error)
 
-	DeleteCredentials(id string) error
 }
