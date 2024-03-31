@@ -10,8 +10,6 @@ type User interface {
 }
 
 type Keeper interface {
-	// AddNote(ctx context.Context, note *entity.Note) error
-
 	AddCard(card *entity.Card) error
 	GetCard(id string) (*entity.Card, error)
 	GetCardsList() ([]*entity.Card, error)
@@ -30,10 +28,9 @@ type Keeper interface {
 	UpdateTextNote(creds *entity.TextNote) error
 	DeleteTextNote(id string) error
 
-	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
-	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)
-
-	// GetTextNotes(ctx context.Context, user string) ([]*entity.Note, error)
-	// GetRawNotes(ctx context.Context, user string) ([]*entity.Note, error)
-
+	AddRawNote(creds *entity.RawNote) error
+	GetRawNote(id string) (*entity.RawNote, error)
+	GetRawNotesList() ([]*entity.RawNote, error)
+	UpdateRawNote(creds *entity.RawNote) error
+	DeleteRawNote(id string) error
 }
