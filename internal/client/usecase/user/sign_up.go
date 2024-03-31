@@ -29,6 +29,9 @@ func (uc *UserUseCase) SignUp(username, password string) error {
 		case codes.InvalidArgument:
 			return ErrInvalidCredentials
 
+		case codes.AlreadyExists:
+			return ErrAlreadyExists
+
 		default:
 			return err
 		}

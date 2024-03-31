@@ -17,7 +17,7 @@ func (s *KeeperServer) DeleteTextNote(ctx context.Context, in *pb.DeleteRequest)
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.keeper.DeleteTextNote(ctx, user, in.GetId())
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

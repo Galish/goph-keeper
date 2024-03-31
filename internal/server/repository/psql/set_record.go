@@ -55,7 +55,7 @@ func (s *psqlStore) AddSecureRecord(
 
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == errCodeConflict {
-		return repository.ErrRecordConflict
+		return repository.ErrConflict
 	}
 	if err != nil {
 		return err

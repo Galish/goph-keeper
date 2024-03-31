@@ -102,13 +102,19 @@ func (a *App) addTextNote() {
 }
 
 func (a *App) editTextNote(id string) {
-	note := &entity.TextNote{
+	note, err := a.keeper.GetTextNote(id)
+	if err != nil {
+		a.ui.Error(err)
+		return
+	}
+
+	var updated = &entity.TextNote{
 		ID: id,
 	}
 
-	note.Title = a.ui.Input("Title", true)
-	note.Description = a.ui.Input("Description", false)
-	note.Value = a.ui.Input("Note", true)
+	updated.Title = a.ui.Edit("Title", note.Title, true)
+	updated.Description = a.ui.Edit("Description", note.Description, true)
+	updated.Value = a.ui.Edit("Note", note.Value, true)
 
 	a.keeper.UpdateTextNote(note)
 

@@ -18,7 +18,7 @@ func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	creds, err := s.keeper.GetCredentials(ctx, user, in.GetId())
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

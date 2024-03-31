@@ -18,7 +18,7 @@ func (s *KeeperServer) GetRawNote(ctx context.Context, in *pb.GetRequest) (*pb.G
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	note, err := s.keeper.GetRawNote(ctx, user, in.Id)
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

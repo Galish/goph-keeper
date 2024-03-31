@@ -1,26 +1,64 @@
 package ui
 
 import (
-	"bufio"
-	"fmt"
-	"strings"
+	"errors"
+	"os"
+
+	"github.com/manifoldco/promptui"
 )
 
+var ErrIsRequired = errors.New("field is required")
+
 func (ui *UI) Input(label string, isRequired bool) string {
-	var input string
-
-	r := bufio.NewReader(ui.r)
-
-	for {
-		ui.Print(fmt.Sprintf("%s: ", label))
-
-		input, _ = r.ReadString('\n')
-		input = strings.TrimSpace(input)
-
-		if !isRequired || input != "" {
-			break
+	validate := func(input string) error {
+		if isRequired && input == "" {
+			return ErrIsRequired
 		}
+
+		return nil
 	}
 
-	return input
+	prompt := promptui.Prompt{
+		Label:    label,
+		Validate: validate,
+	}
+
+	result, err := prompt.Run()
+	if errors.Is(err, promptui.ErrInterrupt) {
+		os.Exit(0)
+	}
+
+	if err != nil {
+		return ""
+	}
+
+	return result
+}
+
+func (ui *UI) Edit(label, value string, isRequired bool) string {
+	validate := func(input string) error {
+		if isRequired && input == "" {
+			return ErrIsRequired
+		}
+
+		return nil
+	}
+
+	prompt := promptui.Prompt{
+		Label:     label,
+		Validate:  validate,
+		Default:   value,
+		AllowEdit: true,
+	}
+
+	result, err := prompt.Run()
+	if errors.Is(err, promptui.ErrInterrupt) {
+		os.Exit(0)
+	}
+
+	if err != nil {
+		return ""
+	}
+
+	return result
 }

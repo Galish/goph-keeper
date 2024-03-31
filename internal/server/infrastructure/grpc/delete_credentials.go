@@ -17,7 +17,7 @@ func (s *KeeperServer) DeleteCredentials(ctx context.Context, in *pb.DeleteReque
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.keeper.DeleteCredentials(ctx, user, in.GetId())
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

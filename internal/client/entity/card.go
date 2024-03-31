@@ -25,8 +25,12 @@ func (c *Card) String() string {
 		c.Number,
 		c.Holder,
 		c.CVC,
-		c.FormatExpiry(c.Expiry),
+		c.GetExpiry(),
 	)
+}
+
+func (c *Card) GetExpiry() string {
+	return c.Expiry.Format(expiryDateLayout)
 }
 
 func (c *Card) SetExpiry(input string) error {
@@ -38,8 +42,4 @@ func (c *Card) SetExpiry(input string) error {
 	c.Expiry = expiry
 
 	return nil
-}
-
-func (c *Card) FormatExpiry(input time.Time) string {
-	return input.Format(expiryDateLayout)
 }

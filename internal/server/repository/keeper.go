@@ -2,13 +2,7 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"time"
-)
-
-var (
-	ErrNothingFound   = errors.New("nothing was found")
-	ErrRecordConflict = errors.New("record id already exists")
 )
 
 type KeeperRepository interface {

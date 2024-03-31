@@ -26,8 +26,11 @@ func (uc *UserUseCase) SignIn(username, password string) error {
 		}
 
 		switch e.Code() {
-		case codes.InvalidArgument, codes.NotFound:
+		case codes.InvalidArgument:
 			return ErrInvalidCredentials
+
+		case codes.NotFound:
+			return ErrNotFound
 
 		default:
 			return err

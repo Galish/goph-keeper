@@ -2,10 +2,12 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
 func (uc *UserUseCase) SignUp(
@@ -25,7 +27,12 @@ func (uc *UserUseCase) SignUp(
 	user.Login = username
 	user.Password = string(bytes)
 
-	if err := uc.repo.SetUser(ctx, user); err != nil {
+	err = uc.repo.SetUser(ctx, user)
+	if errors.Is(err, repository.ErrConflict) {
+		return "", ErrConflict
+	}
+
+	if err != nil {
 		return "", err
 	}
 

@@ -23,6 +23,10 @@ func (s *KeeperServer) SignUp(
 		logger.WithError(err).Debug("unable to create the user")
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
+	if errors.Is(err, user.ErrConflict) {
+		logger.WithError(err).Debug("unable to create the user")
+		return nil, status.Errorf(codes.AlreadyExists, err.Error())
+	}
 
 	if err != nil {
 		logger.WithError(err).Debug("unable to create the user")

@@ -1,6 +1,11 @@
 package ui
 
-import "github.com/manifoldco/promptui"
+import (
+	"errors"
+	"os"
+
+	"github.com/manifoldco/promptui"
+)
 
 type SelectOption struct {
 	Label string
@@ -21,9 +26,12 @@ func (ui *UI) Select(label string, items []*SelectOption) {
 		Stdout: ui.w,
 	}
 
-	index, _, _ := prompt.Run()
+	index, _, err := prompt.Run()
+	if errors.Is(err, promptui.ErrInterrupt) {
+		os.Exit(0)
+	}
 
-	if items[index].Run == nil {
+	if err != nil || items[index].Run == nil {
 		return
 	}
 

@@ -29,7 +29,7 @@ func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCrede
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

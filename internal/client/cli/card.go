@@ -105,18 +105,24 @@ func (a *App) addCard() {
 }
 
 func (a *App) editCard(id string) {
-	card := &entity.Card{
+	card, err := a.keeper.GetCard(id)
+	if err != nil {
+		a.ui.Error(err)
+		return
+	}
+
+	var updated = &entity.Card{
 		ID: id,
 	}
 
-	card.Title = a.ui.Input("Title", true)
-	card.Description = a.ui.Input("Description", false)
-	card.Number = a.ui.Input("Card number", true)
-	card.Holder = a.ui.Input("Card holder", true)
-	card.CVC = a.ui.Input("CVC code", true)
-	card.SetExpiry(a.ui.Input("Expiration date", true))
+	updated.Title = a.ui.Edit("Title", card.Title, true)
+	updated.Description = a.ui.Edit("Description", card.Description, false)
+	updated.Number = a.ui.Edit("Card number", card.Number, true)
+	updated.Holder = a.ui.Edit("Card holder", card.Holder, true)
+	updated.CVC = a.ui.Edit("CVC code", card.CVC, true)
+	updated.SetExpiry(a.ui.Edit("Expiration date", card.GetExpiry(), true))
 
-	a.keeper.UpdateCard(card)
+	a.keeper.UpdateCard(updated)
 
 	a.viewCardsList()
 }

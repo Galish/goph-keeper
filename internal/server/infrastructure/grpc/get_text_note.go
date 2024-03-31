@@ -18,7 +18,7 @@ func (s *KeeperServer) GetTextNote(ctx context.Context, in *pb.GetRequest) (*pb.
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	note, err := s.keeper.GetTextNote(ctx, user, in.Id)
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

@@ -8,14 +8,12 @@ import (
 type UI struct {
 	r io.ReadCloser
 	w io.WriteCloser
-	e io.WriteCloser
 }
 
 func New() *UI {
 	return &UI{
 		r: os.Stdin,
 		w: os.Stdout,
-		e: os.Stderr,
 	}
 }
 

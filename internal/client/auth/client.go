@@ -6,7 +6,7 @@ type AuthClient struct {
 
 func New() *AuthClient {
 	return &AuthClient{
-		accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJiMmQzMGViYS05ZjRlLTQwY2UtYTg3Zi01NDUyZWY4Y2U3NWYifQ.ULO0zhbUk-UbdlhPJE5KsqKT_hHHHUBfsr2894FO9jc",
+		accessToken: "",
 	}
 }
 

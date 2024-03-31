@@ -103,16 +103,22 @@ func (a *App) addCredentials() {
 }
 
 func (a *App) editCredentials(id string) {
-	creds := &entity.Credentials{
+	creds, err := a.keeper.GetCredentials(id)
+	if err != nil {
+		a.ui.Error(err)
+		return
+	}
+
+	var updated = &entity.Credentials{
 		ID: id,
 	}
 
-	creds.Title = a.ui.Input("Title", true)
-	creds.Description = a.ui.Input("Description", false)
-	creds.Username = a.ui.Input("Username", true)
-	creds.Password = a.ui.Input("Password", true)
+	updated.Title = a.ui.Edit("Title", creds.Title, true)
+	updated.Description = a.ui.Edit("Description", creds.Description, false)
+	updated.Username = a.ui.Edit("Username", creds.Username, true)
+	updated.Password = a.ui.Edit("Password", creds.Password, true)
 
-	a.keeper.UpdateCredentials(creds)
+	a.keeper.UpdateCredentials(updated)
 
 	a.viewCredentialsList()
 }

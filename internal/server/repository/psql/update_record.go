@@ -53,7 +53,7 @@ func (s *psqlStore) UpdateSecureRecord(
 		return err
 	}
 	if count < 1 {
-		return repository.ErrNothingFound
+		return repository.ErrNotFound
 	}
 
 	return err

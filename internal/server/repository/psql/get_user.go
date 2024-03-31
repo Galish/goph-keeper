@@ -25,7 +25,7 @@ func (s *psqlStore) GetUserByLogin(ctx context.Context, login string) (*entity.U
 	)
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, repository.ErrUserNotFound
+		return nil, repository.ErrNotFound
 	}
 
 	if err != nil {

@@ -1,6 +1,10 @@
 package ui
 
-import "io"
+import (
+	"io"
+
+	"github.com/fatih/color"
+)
 
 func (ui *UI) Print(str string) {
 	io.WriteString(ui.w, str)
@@ -11,5 +15,5 @@ func (ui *UI) LineBreak() {
 }
 
 func (ui *UI) Error(err error) {
-	io.WriteString(ui.e, "An error occured: "+err.Error())
+	color.New(color.FgRed).Fprintf(ui.w, "Error: %s\n", err.Error())
 }

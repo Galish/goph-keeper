@@ -2,14 +2,8 @@ package repository
 
 import (
 	"context"
-	"errors"
 
 	"github.com/Galish/goph-keeper/internal/server/entity"
-)
-
-var (
-	ErrUserConflict = errors.New("user already exists")
-	ErrUserNotFound = errors.New("user not found")
 )
 
 type UserRepository interface {

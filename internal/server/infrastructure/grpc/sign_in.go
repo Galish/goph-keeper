@@ -19,12 +19,13 @@ func (s *KeeperServer) SignIn(
 	var response pb.AuthResponse
 
 	token, err := s.user.SignIn(ctx, in.GetUsername(), in.GetPassword())
-	if errors.Is(err, user.ErrMissingCredentials) {
+	if errors.Is(err, user.ErrMissingCredentials) ||
+		errors.Is(err, user.ErrInvalidCredentials) {
 		logger.WithError(err).Debug("unable to login")
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	if errors.Is(err, user.ErrInvalidCredentials) {
+	if errors.Is(err, user.ErrNotFound) {
 		logger.WithError(err).Debug("unable to login")
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}

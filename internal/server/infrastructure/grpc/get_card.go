@@ -19,7 +19,7 @@ func (s *KeeperServer) GetCard(ctx context.Context, in *pb.GetRequest) (*pb.GetC
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	card, err := s.keeper.GetCard(ctx, user, in.Id)
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 
