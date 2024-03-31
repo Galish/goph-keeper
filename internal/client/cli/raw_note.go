@@ -7,8 +7,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/entity"
 )
 
-func (a *App) viewTextNotesList() {
-	notes, err := a.keeper.GetTextNotesList()
+func (a *App) viewRawNotesList() {
+	notes, err := a.keeper.GetRawNotesList()
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -17,7 +17,7 @@ func (a *App) viewTextNotesList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addTextNote,
+			Run:   a.addRawNote,
 		},
 		{
 			Label: "  Cancel",
@@ -32,17 +32,17 @@ func (a *App) viewTextNotesList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, n.Title, n.Description),
 				Run: func() {
-					a.viewTextNote(id)
+					a.viewRawNote(id)
 				},
 			},
 		)
 	}
 
-	a.ui.Select("Add new text note or select existing", commands)
+	a.ui.Select("Add new binary note or select existing", commands)
 }
 
-func (a *App) viewTextNote(id string) {
-	note, err := a.keeper.GetTextNote(id)
+func (a *App) viewRawNote(id string) {
+	note, err := a.keeper.GetRawNote(id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -52,19 +52,19 @@ func (a *App) viewTextNote(id string) {
 
 	handleDelete := func() {
 		if ok := a.ui.Confirm("Are you sure"); ok {
-			if err := a.keeper.DeleteTextNote(id); err != nil {
+			if err := a.keeper.DeleteRawNote(id); err != nil {
 				a.ui.Error(err)
 			}
 
-			a.viewTextNotesList()
+			a.viewRawNotesList()
 			return
 		} else {
-			a.viewTextNote(id)
+			a.viewRawNote(id)
 		}
 	}
 
 	handleEdit := func() {
-		a.editTextNote(id)
+		a.editRawNote(id)
 	}
 
 	var commands = []*ui.SelectOption{
@@ -78,45 +78,49 @@ func (a *App) viewTextNote(id string) {
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewTextNotesList,
+			Run:   a.viewRawNotesList,
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addTextNote() {
-	note := entity.TextNote{}
+func (a *App) addRawNote() {
+	note := entity.RawNote{}
 
 	note.Title = a.ui.Input("Title", true)
 	note.Description = a.ui.Input("Description", false)
-	note.Value = a.ui.Input("Note", true)
+
+	value := a.ui.Input("Note", true)
+	if err := note.SetValue(value); err != nil {
+		a.ui.Error(err)
+	}
 
 	if ok := a.ui.Confirm("Add text note"); ok {
-		if err := a.keeper.AddTextNote(&note); err != nil {
+		if err := a.keeper.AddRawNote(&note); err != nil {
 			a.ui.Error(err)
 		}
 	}
 
-	a.viewTextNotesList()
+	a.viewRawNotesList()
 }
 
-func (a *App) editTextNote(id string) {
-	note, err := a.keeper.GetTextNote(id)
+func (a *App) editRawNote(id string) {
+	note, err := a.keeper.GetRawNote(id)
 	if err != nil {
 		a.ui.Error(err)
 		return
 	}
 
-	var updated = &entity.TextNote{
+	var updated = &entity.RawNote{
 		ID: id,
 	}
 
 	updated.Title = a.ui.Edit("Title", note.Title, true)
 	updated.Description = a.ui.Edit("Description", note.Description, false)
-	updated.Value = a.ui.Edit("Note", note.Value, true)
+	updated.SetValue(a.ui.Edit("Note", note.GetValue(), true))
 
-	a.keeper.UpdateTextNote(note)
+	a.keeper.UpdateRawNote(note)
 
-	a.viewTextNotesList()
+	a.viewRawNotesList()
 }

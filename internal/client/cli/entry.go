@@ -48,6 +48,7 @@ func (a *App) selectCategory() {
 			},
 			{
 				Label: "Binary notes",
+				Run:   a.viewRawNotesList,
 			},
 		},
 	)
