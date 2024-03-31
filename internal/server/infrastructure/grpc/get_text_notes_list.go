@@ -11,11 +11,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 )
 
-func (s *KeeperServer) GetTextNotes(
-	ctx context.Context,
-	_ *emptypb.Empty,
-) (*pb.GetNotesResponse, error) {
-	var response pb.GetNotesResponse
+func (s *KeeperServer) GetTextNotesList(ctx context.Context, _ *emptypb.Empty) (*pb.GetListResponse, error) {
+	var response pb.GetListResponse
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
@@ -24,13 +21,13 @@ func (s *KeeperServer) GetTextNotes(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Notes = make([]*pb.Note, len(notes))
+	response.List = make([]*pb.ListItem, len(notes))
 
 	for i, n := range notes {
-		response.Notes[i] = &pb.Note{
+		response.List[i] = &pb.ListItem{
+			Id:          n.ID,
 			Title:       n.Title,
 			Description: n.Description,
-			Value:       n.Value,
 		}
 	}
 

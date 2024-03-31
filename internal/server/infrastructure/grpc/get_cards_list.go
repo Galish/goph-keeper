@@ -6,17 +6,13 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 )
 
-func (s *KeeperServer) GetCards(
-	ctx context.Context,
-	_ *emptypb.Empty,
-) (*pb.GetCardsResponse, error) {
-	var response pb.GetCardsResponse
+func (s *KeeperServer) GetCardsList(ctx context.Context, _ *emptypb.Empty) (*pb.GetListResponse, error) {
+	var response pb.GetListResponse
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
@@ -25,16 +21,13 @@ func (s *KeeperServer) GetCards(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Cards = make([]*pb.Card, len(cards))
+	response.List = make([]*pb.ListItem, len(cards))
 
 	for i, c := range cards {
-		response.Cards[i] = &pb.Card{
+		response.List[i] = &pb.ListItem{
+			Id:          c.ID,
 			Title:       c.Title,
 			Description: c.Description,
-			Number:      c.Number,
-			Holder:      c.Holder,
-			Cvc:         c.CVC,
-			Expiry:      timestamppb.New(c.Expiry),
 		}
 	}
 

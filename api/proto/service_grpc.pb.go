@@ -20,20 +20,28 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Keeper_SignUp_FullMethodName            = "/service.Keeper/SignUp"
-	Keeper_SignIn_FullMethodName            = "/service.Keeper/SignIn"
-	Keeper_AddNote_FullMethodName           = "/service.Keeper/AddNote"
-	Keeper_GetNote_FullMethodName           = "/service.Keeper/GetNote"
-	Keeper_GetTextNotes_FullMethodName      = "/service.Keeper/GetTextNotes"
-	Keeper_GetRawNotes_FullMethodName       = "/service.Keeper/GetRawNotes"
-	Keeper_AddCard_FullMethodName           = "/service.Keeper/AddCard"
-	Keeper_GetCard_FullMethodName           = "/service.Keeper/GetCard"
-	Keeper_GetCards_FullMethodName          = "/service.Keeper/GetCards"
-	Keeper_AddCredentials_FullMethodName    = "/service.Keeper/AddCredentials"
-	Keeper_GetCredentials_FullMethodName    = "/service.Keeper/GetCredentials"
-	Keeper_GetAllCredentials_FullMethodName = "/service.Keeper/GetAllCredentials"
-	Keeper_UpdateCredentials_FullMethodName = "/service.Keeper/UpdateCredentials"
-	Keeper_DeleteCredentials_FullMethodName = "/service.Keeper/DeleteCredentials"
+	Keeper_SignUp_FullMethodName             = "/service.Keeper/SignUp"
+	Keeper_SignIn_FullMethodName             = "/service.Keeper/SignIn"
+	Keeper_AddTextNote_FullMethodName        = "/service.Keeper/AddTextNote"
+	Keeper_GetTextNote_FullMethodName        = "/service.Keeper/GetTextNote"
+	Keeper_GetTextNotesList_FullMethodName   = "/service.Keeper/GetTextNotesList"
+	Keeper_UpdateTextNote_FullMethodName     = "/service.Keeper/UpdateTextNote"
+	Keeper_DeleteTextNote_FullMethodName     = "/service.Keeper/DeleteTextNote"
+	Keeper_AddRawNote_FullMethodName         = "/service.Keeper/AddRawNote"
+	Keeper_GetRawNote_FullMethodName         = "/service.Keeper/GetRawNote"
+	Keeper_GetRawNotesList_FullMethodName    = "/service.Keeper/GetRawNotesList"
+	Keeper_UpdateRawNote_FullMethodName      = "/service.Keeper/UpdateRawNote"
+	Keeper_DeleteRawNote_FullMethodName      = "/service.Keeper/DeleteRawNote"
+	Keeper_AddCard_FullMethodName            = "/service.Keeper/AddCard"
+	Keeper_GetCard_FullMethodName            = "/service.Keeper/GetCard"
+	Keeper_GetCardsList_FullMethodName       = "/service.Keeper/GetCardsList"
+	Keeper_UpdateCard_FullMethodName         = "/service.Keeper/UpdateCard"
+	Keeper_DeleteCard_FullMethodName         = "/service.Keeper/DeleteCard"
+	Keeper_AddCredentials_FullMethodName     = "/service.Keeper/AddCredentials"
+	Keeper_GetCredentials_FullMethodName     = "/service.Keeper/GetCredentials"
+	Keeper_GetCredentialsList_FullMethodName = "/service.Keeper/GetCredentialsList"
+	Keeper_UpdateCredentials_FullMethodName  = "/service.Keeper/UpdateCredentials"
+	Keeper_DeleteCredentials_FullMethodName  = "/service.Keeper/DeleteCredentials"
 )
 
 // KeeperClient is the client API for Keeper service.
@@ -42,16 +50,24 @@ const (
 type KeeperClient interface {
 	SignUp(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	SignIn(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
-	AddNote(ctx context.Context, in *AddNoteRequest, opts ...grpc.CallOption) (*AddNoteResponse, error)
-	GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error)
-	GetTextNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetNotesResponse, error)
-	GetRawNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetNotesResponse, error)
+	AddTextNote(ctx context.Context, in *AddTextNoteRequest, opts ...grpc.CallOption) (*AddTextNoteResponse, error)
+	GetTextNote(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetTextNoteResponse, error)
+	GetTextNotesList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error)
+	UpdateTextNote(ctx context.Context, in *UpdateTextNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteTextNote(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AddRawNote(ctx context.Context, in *AddRawNoteRequest, opts ...grpc.CallOption) (*AddRawNoteResponse, error)
+	GetRawNote(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetRawNoteResponse, error)
+	GetRawNotesList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error)
+	UpdateRawNote(ctx context.Context, in *UpdateRawNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteRawNote(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AddCard(ctx context.Context, in *AddCardRequest, opts ...grpc.CallOption) (*AddCardResponse, error)
-	GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
-	GetCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetCardsResponse, error)
+	GetCard(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
+	GetCardsList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error)
+	UpdateCard(ctx context.Context, in *UpdateCardRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteCard(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AddCredentials(ctx context.Context, in *AddCredentialsRequest, opts ...grpc.CallOption) (*AddCredentialsResponse, error)
 	GetCredentials(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetCredentialsResponse, error)
-	GetAllCredentials(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllCredentialsResponse, error)
+	GetCredentialsList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error)
 	UpdateCredentials(ctx context.Context, in *UpdateCredentialsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCredentials(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -82,36 +98,90 @@ func (c *keeperClient) SignIn(ctx context.Context, in *AuthRequest, opts ...grpc
 	return out, nil
 }
 
-func (c *keeperClient) AddNote(ctx context.Context, in *AddNoteRequest, opts ...grpc.CallOption) (*AddNoteResponse, error) {
-	out := new(AddNoteResponse)
-	err := c.cc.Invoke(ctx, Keeper_AddNote_FullMethodName, in, out, opts...)
+func (c *keeperClient) AddTextNote(ctx context.Context, in *AddTextNoteRequest, opts ...grpc.CallOption) (*AddTextNoteResponse, error) {
+	out := new(AddTextNoteResponse)
+	err := c.cc.Invoke(ctx, Keeper_AddTextNote_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *keeperClient) GetNote(ctx context.Context, in *GetNoteRequest, opts ...grpc.CallOption) (*GetNoteResponse, error) {
-	out := new(GetNoteResponse)
-	err := c.cc.Invoke(ctx, Keeper_GetNote_FullMethodName, in, out, opts...)
+func (c *keeperClient) GetTextNote(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetTextNoteResponse, error) {
+	out := new(GetTextNoteResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetTextNote_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *keeperClient) GetTextNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetNotesResponse, error) {
-	out := new(GetNotesResponse)
-	err := c.cc.Invoke(ctx, Keeper_GetTextNotes_FullMethodName, in, out, opts...)
+func (c *keeperClient) GetTextNotesList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error) {
+	out := new(GetListResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetTextNotesList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *keeperClient) GetRawNotes(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetNotesResponse, error) {
-	out := new(GetNotesResponse)
-	err := c.cc.Invoke(ctx, Keeper_GetRawNotes_FullMethodName, in, out, opts...)
+func (c *keeperClient) UpdateTextNote(ctx context.Context, in *UpdateTextNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_UpdateTextNote_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) DeleteTextNote(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_DeleteTextNote_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) AddRawNote(ctx context.Context, in *AddRawNoteRequest, opts ...grpc.CallOption) (*AddRawNoteResponse, error) {
+	out := new(AddRawNoteResponse)
+	err := c.cc.Invoke(ctx, Keeper_AddRawNote_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) GetRawNote(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetRawNoteResponse, error) {
+	out := new(GetRawNoteResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetRawNote_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) GetRawNotesList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error) {
+	out := new(GetListResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetRawNotesList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) UpdateRawNote(ctx context.Context, in *UpdateRawNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_UpdateRawNote_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) DeleteRawNote(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_DeleteRawNote_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +197,7 @@ func (c *keeperClient) AddCard(ctx context.Context, in *AddCardRequest, opts ...
 	return out, nil
 }
 
-func (c *keeperClient) GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error) {
+func (c *keeperClient) GetCard(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetCardResponse, error) {
 	out := new(GetCardResponse)
 	err := c.cc.Invoke(ctx, Keeper_GetCard_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -136,9 +206,27 @@ func (c *keeperClient) GetCard(ctx context.Context, in *GetCardRequest, opts ...
 	return out, nil
 }
 
-func (c *keeperClient) GetCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetCardsResponse, error) {
-	out := new(GetCardsResponse)
-	err := c.cc.Invoke(ctx, Keeper_GetCards_FullMethodName, in, out, opts...)
+func (c *keeperClient) GetCardsList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error) {
+	out := new(GetListResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetCardsList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) UpdateCard(ctx context.Context, in *UpdateCardRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_UpdateCard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *keeperClient) DeleteCard(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_DeleteCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -163,9 +251,9 @@ func (c *keeperClient) GetCredentials(ctx context.Context, in *GetRequest, opts 
 	return out, nil
 }
 
-func (c *keeperClient) GetAllCredentials(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllCredentialsResponse, error) {
-	out := new(GetAllCredentialsResponse)
-	err := c.cc.Invoke(ctx, Keeper_GetAllCredentials_FullMethodName, in, out, opts...)
+func (c *keeperClient) GetCredentialsList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetListResponse, error) {
+	out := new(GetListResponse)
+	err := c.cc.Invoke(ctx, Keeper_GetCredentialsList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -196,16 +284,24 @@ func (c *keeperClient) DeleteCredentials(ctx context.Context, in *DeleteRequest,
 type KeeperServer interface {
 	SignUp(context.Context, *AuthRequest) (*AuthResponse, error)
 	SignIn(context.Context, *AuthRequest) (*AuthResponse, error)
-	AddNote(context.Context, *AddNoteRequest) (*AddNoteResponse, error)
-	GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error)
-	GetTextNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error)
-	GetRawNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error)
+	AddTextNote(context.Context, *AddTextNoteRequest) (*AddTextNoteResponse, error)
+	GetTextNote(context.Context, *GetRequest) (*GetTextNoteResponse, error)
+	GetTextNotesList(context.Context, *emptypb.Empty) (*GetListResponse, error)
+	UpdateTextNote(context.Context, *UpdateTextNoteRequest) (*emptypb.Empty, error)
+	DeleteTextNote(context.Context, *DeleteRequest) (*emptypb.Empty, error)
+	AddRawNote(context.Context, *AddRawNoteRequest) (*AddRawNoteResponse, error)
+	GetRawNote(context.Context, *GetRequest) (*GetRawNoteResponse, error)
+	GetRawNotesList(context.Context, *emptypb.Empty) (*GetListResponse, error)
+	UpdateRawNote(context.Context, *UpdateRawNoteRequest) (*emptypb.Empty, error)
+	DeleteRawNote(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	AddCard(context.Context, *AddCardRequest) (*AddCardResponse, error)
-	GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error)
-	GetCards(context.Context, *emptypb.Empty) (*GetCardsResponse, error)
+	GetCard(context.Context, *GetRequest) (*GetCardResponse, error)
+	GetCardsList(context.Context, *emptypb.Empty) (*GetListResponse, error)
+	UpdateCard(context.Context, *UpdateCardRequest) (*emptypb.Empty, error)
+	DeleteCard(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	AddCredentials(context.Context, *AddCredentialsRequest) (*AddCredentialsResponse, error)
 	GetCredentials(context.Context, *GetRequest) (*GetCredentialsResponse, error)
-	GetAllCredentials(context.Context, *emptypb.Empty) (*GetAllCredentialsResponse, error)
+	GetCredentialsList(context.Context, *emptypb.Empty) (*GetListResponse, error)
 	UpdateCredentials(context.Context, *UpdateCredentialsRequest) (*emptypb.Empty, error)
 	DeleteCredentials(context.Context, *DeleteRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedKeeperServer()
@@ -221,26 +317,50 @@ func (UnimplementedKeeperServer) SignUp(context.Context, *AuthRequest) (*AuthRes
 func (UnimplementedKeeperServer) SignIn(context.Context, *AuthRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
-func (UnimplementedKeeperServer) AddNote(context.Context, *AddNoteRequest) (*AddNoteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddNote not implemented")
+func (UnimplementedKeeperServer) AddTextNote(context.Context, *AddTextNoteRequest) (*AddTextNoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTextNote not implemented")
 }
-func (UnimplementedKeeperServer) GetNote(context.Context, *GetNoteRequest) (*GetNoteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNote not implemented")
+func (UnimplementedKeeperServer) GetTextNote(context.Context, *GetRequest) (*GetTextNoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTextNote not implemented")
 }
-func (UnimplementedKeeperServer) GetTextNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTextNotes not implemented")
+func (UnimplementedKeeperServer) GetTextNotesList(context.Context, *emptypb.Empty) (*GetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTextNotesList not implemented")
 }
-func (UnimplementedKeeperServer) GetRawNotes(context.Context, *emptypb.Empty) (*GetNotesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRawNotes not implemented")
+func (UnimplementedKeeperServer) UpdateTextNote(context.Context, *UpdateTextNoteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTextNote not implemented")
+}
+func (UnimplementedKeeperServer) DeleteTextNote(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTextNote not implemented")
+}
+func (UnimplementedKeeperServer) AddRawNote(context.Context, *AddRawNoteRequest) (*AddRawNoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRawNote not implemented")
+}
+func (UnimplementedKeeperServer) GetRawNote(context.Context, *GetRequest) (*GetRawNoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRawNote not implemented")
+}
+func (UnimplementedKeeperServer) GetRawNotesList(context.Context, *emptypb.Empty) (*GetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRawNotesList not implemented")
+}
+func (UnimplementedKeeperServer) UpdateRawNote(context.Context, *UpdateRawNoteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRawNote not implemented")
+}
+func (UnimplementedKeeperServer) DeleteRawNote(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRawNote not implemented")
 }
 func (UnimplementedKeeperServer) AddCard(context.Context, *AddCardRequest) (*AddCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCard not implemented")
 }
-func (UnimplementedKeeperServer) GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error) {
+func (UnimplementedKeeperServer) GetCard(context.Context, *GetRequest) (*GetCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCard not implemented")
 }
-func (UnimplementedKeeperServer) GetCards(context.Context, *emptypb.Empty) (*GetCardsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCards not implemented")
+func (UnimplementedKeeperServer) GetCardsList(context.Context, *emptypb.Empty) (*GetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCardsList not implemented")
+}
+func (UnimplementedKeeperServer) UpdateCard(context.Context, *UpdateCardRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCard not implemented")
+}
+func (UnimplementedKeeperServer) DeleteCard(context.Context, *DeleteRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
 }
 func (UnimplementedKeeperServer) AddCredentials(context.Context, *AddCredentialsRequest) (*AddCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddCredentials not implemented")
@@ -248,8 +368,8 @@ func (UnimplementedKeeperServer) AddCredentials(context.Context, *AddCredentials
 func (UnimplementedKeeperServer) GetCredentials(context.Context, *GetRequest) (*GetCredentialsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCredentials not implemented")
 }
-func (UnimplementedKeeperServer) GetAllCredentials(context.Context, *emptypb.Empty) (*GetAllCredentialsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllCredentials not implemented")
+func (UnimplementedKeeperServer) GetCredentialsList(context.Context, *emptypb.Empty) (*GetListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCredentialsList not implemented")
 }
 func (UnimplementedKeeperServer) UpdateCredentials(context.Context, *UpdateCredentialsRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCredentials not implemented")
@@ -306,74 +426,182 @@ func _Keeper_SignIn_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_AddNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddNoteRequest)
+func _Keeper_AddTextNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddTextNoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServer).AddNote(ctx, in)
+		return srv.(KeeperServer).AddTextNote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keeper_AddNote_FullMethodName,
+		FullMethod: Keeper_AddTextNote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).AddNote(ctx, req.(*AddNoteRequest))
+		return srv.(KeeperServer).AddTextNote(ctx, req.(*AddTextNoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_GetNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetNoteRequest)
+func _Keeper_GetTextNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServer).GetNote(ctx, in)
+		return srv.(KeeperServer).GetTextNote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keeper_GetNote_FullMethodName,
+		FullMethod: Keeper_GetTextNote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetNote(ctx, req.(*GetNoteRequest))
+		return srv.(KeeperServer).GetTextNote(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_GetTextNotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Keeper_GetTextNotesList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServer).GetTextNotes(ctx, in)
+		return srv.(KeeperServer).GetTextNotesList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keeper_GetTextNotes_FullMethodName,
+		FullMethod: Keeper_GetTextNotesList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetTextNotes(ctx, req.(*emptypb.Empty))
+		return srv.(KeeperServer).GetTextNotesList(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_GetRawNotes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Keeper_UpdateTextNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTextNoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).UpdateTextNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_UpdateTextNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).UpdateTextNote(ctx, req.(*UpdateTextNoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_DeleteTextNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).DeleteTextNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_DeleteTextNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).DeleteTextNote(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_AddRawNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddRawNoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).AddRawNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_AddRawNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).AddRawNote(ctx, req.(*AddRawNoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_GetRawNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).GetRawNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_GetRawNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).GetRawNote(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_GetRawNotesList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServer).GetRawNotes(ctx, in)
+		return srv.(KeeperServer).GetRawNotesList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keeper_GetRawNotes_FullMethodName,
+		FullMethod: Keeper_GetRawNotesList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetRawNotes(ctx, req.(*emptypb.Empty))
+		return srv.(KeeperServer).GetRawNotesList(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_UpdateRawNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRawNoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).UpdateRawNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_UpdateRawNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).UpdateRawNote(ctx, req.(*UpdateRawNoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_DeleteRawNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).DeleteRawNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_DeleteRawNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).DeleteRawNote(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -397,7 +625,7 @@ func _Keeper_AddCard_Handler(srv interface{}, ctx context.Context, dec func(inte
 }
 
 func _Keeper_GetCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCardRequest)
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -409,25 +637,61 @@ func _Keeper_GetCard_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: Keeper_GetCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetCard(ctx, req.(*GetCardRequest))
+		return srv.(KeeperServer).GetCard(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_GetCards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Keeper_GetCardsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServer).GetCards(ctx, in)
+		return srv.(KeeperServer).GetCardsList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keeper_GetCards_FullMethodName,
+		FullMethod: Keeper_GetCardsList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetCards(ctx, req.(*emptypb.Empty))
+		return srv.(KeeperServer).GetCardsList(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_UpdateCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).UpdateCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_UpdateCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).UpdateCard(ctx, req.(*UpdateCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Keeper_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).DeleteCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_DeleteCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).DeleteCard(ctx, req.(*DeleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -468,20 +732,20 @@ func _Keeper_GetCredentials_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Keeper_GetAllCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Keeper_GetCredentialsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServer).GetAllCredentials(ctx, in)
+		return srv.(KeeperServer).GetCredentialsList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Keeper_GetAllCredentials_FullMethodName,
+		FullMethod: Keeper_GetCredentialsList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServer).GetAllCredentials(ctx, req.(*emptypb.Empty))
+		return srv.(KeeperServer).GetCredentialsList(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -538,20 +802,44 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keeper_SignIn_Handler,
 		},
 		{
-			MethodName: "AddNote",
-			Handler:    _Keeper_AddNote_Handler,
+			MethodName: "AddTextNote",
+			Handler:    _Keeper_AddTextNote_Handler,
 		},
 		{
-			MethodName: "GetNote",
-			Handler:    _Keeper_GetNote_Handler,
+			MethodName: "GetTextNote",
+			Handler:    _Keeper_GetTextNote_Handler,
 		},
 		{
-			MethodName: "GetTextNotes",
-			Handler:    _Keeper_GetTextNotes_Handler,
+			MethodName: "GetTextNotesList",
+			Handler:    _Keeper_GetTextNotesList_Handler,
 		},
 		{
-			MethodName: "GetRawNotes",
-			Handler:    _Keeper_GetRawNotes_Handler,
+			MethodName: "UpdateTextNote",
+			Handler:    _Keeper_UpdateTextNote_Handler,
+		},
+		{
+			MethodName: "DeleteTextNote",
+			Handler:    _Keeper_DeleteTextNote_Handler,
+		},
+		{
+			MethodName: "AddRawNote",
+			Handler:    _Keeper_AddRawNote_Handler,
+		},
+		{
+			MethodName: "GetRawNote",
+			Handler:    _Keeper_GetRawNote_Handler,
+		},
+		{
+			MethodName: "GetRawNotesList",
+			Handler:    _Keeper_GetRawNotesList_Handler,
+		},
+		{
+			MethodName: "UpdateRawNote",
+			Handler:    _Keeper_UpdateRawNote_Handler,
+		},
+		{
+			MethodName: "DeleteRawNote",
+			Handler:    _Keeper_DeleteRawNote_Handler,
 		},
 		{
 			MethodName: "AddCard",
@@ -562,8 +850,16 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keeper_GetCard_Handler,
 		},
 		{
-			MethodName: "GetCards",
-			Handler:    _Keeper_GetCards_Handler,
+			MethodName: "GetCardsList",
+			Handler:    _Keeper_GetCardsList_Handler,
+		},
+		{
+			MethodName: "UpdateCard",
+			Handler:    _Keeper_UpdateCard_Handler,
+		},
+		{
+			MethodName: "DeleteCard",
+			Handler:    _Keeper_DeleteCard_Handler,
 		},
 		{
 			MethodName: "AddCredentials",
@@ -574,8 +870,8 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Keeper_GetCredentials_Handler,
 		},
 		{
-			MethodName: "GetAllCredentials",
-			Handler:    _Keeper_GetAllCredentials_Handler,
+			MethodName: "GetCredentialsList",
+			Handler:    _Keeper_GetCredentialsList_Handler,
 		},
 		{
 			MethodName: "UpdateCredentials",

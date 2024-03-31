@@ -11,11 +11,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *KeeperServer) GetAllCredentials(
-	ctx context.Context,
-	_ *emptypb.Empty,
-) (*pb.GetAllCredentialsResponse, error) {
-	var response pb.GetAllCredentialsResponse
+func (s *KeeperServer) GetCredentialsList(ctx context.Context, _ *emptypb.Empty) (*pb.GetListResponse, error) {
+	var response pb.GetListResponse
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
@@ -24,15 +21,13 @@ func (s *KeeperServer) GetAllCredentials(
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Credentials = make([]*pb.Credentials, len(creds))
+	response.List = make([]*pb.ListItem, len(creds))
 
 	for i, c := range creds {
-		response.Credentials[i] = &pb.Credentials{
+		response.List[i] = &pb.ListItem{
 			Id:          c.ID,
 			Title:       c.Title,
 			Description: c.Description,
-			Username:    c.Username,
-			Password:    c.Password,
 		}
 	}
 

@@ -7,8 +7,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/entity"
 )
 
-func (a *App) viewAllCredentials() {
-	creds, err := a.keeper.GetAllCredentials()
+func (a *App) viewCredentialsList() {
+	creds, err := a.keeper.GetCredentialsList()
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -56,7 +56,7 @@ func (a *App) viewCredentials(id string) {
 				a.ui.Error(err)
 			}
 
-			a.viewAllCredentials()
+			a.viewCredentialsList()
 			return
 		} else {
 			a.viewCredentials(id)
@@ -78,7 +78,7 @@ func (a *App) viewCredentials(id string) {
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewAllCredentials,
+			Run:   a.viewCredentialsList,
 		},
 	}
 
@@ -99,11 +99,11 @@ func (a *App) addCredentials() {
 		}
 	}
 
-	a.viewAllCredentials()
+	a.viewCredentialsList()
 }
 
 func (a *App) editCredentials(id string) {
-	creds := entity.Credentials{
+	creds := &entity.Credentials{
 		ID: id,
 	}
 
@@ -112,7 +112,7 @@ func (a *App) editCredentials(id string) {
 	creds.Username = a.ui.Input("Username", true)
 	creds.Password = a.ui.Input("Password", true)
 
-	a.keeper.UpdateCredentials(&creds)
+	a.keeper.UpdateCredentials(creds)
 
-	a.viewAllCredentials()
+	a.viewCredentialsList()
 }

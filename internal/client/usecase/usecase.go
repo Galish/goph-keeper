@@ -10,20 +10,27 @@ type User interface {
 }
 
 type Keeper interface {
-	// AddNote(ctx context.Context, note *entity.Note) error
-	// AddCard(ctx context.Context, card *entity.Card) error
+	AddCard(card *entity.Card) error
+	GetCard(id string) (*entity.Card, error)
+	GetCardsList() ([]*entity.Card, error)
+	UpdateCard(creds *entity.Card) error
+	DeleteCard(id string) error
+
 	AddCredentials(creds *entity.Credentials) error
-
-	UpdateCredentials(creds *entity.Credentials) error
-
-	// GetNote(ctx context.Context, user, id string) (*entity.Note, error)
-	// GetCard(ctx context.Context, user, id string) (*entity.Card, error)
 	GetCredentials(id string) (*entity.Credentials, error)
-
-	// GetTextNotes(ctx context.Context, user string) ([]*entity.Note, error)
-	// GetRawNotes(ctx context.Context, user string) ([]*entity.Note, error)
-	// GetCards(ctx context.Context, user string) ([]*entity.Card, error)
-	GetAllCredentials() ([]*entity.Credentials, error)
-
+	GetCredentialsList() ([]*entity.Credentials, error)
+	UpdateCredentials(creds *entity.Credentials) error
 	DeleteCredentials(id string) error
+
+	AddTextNote(creds *entity.TextNote) error
+	GetTextNote(id string) (*entity.TextNote, error)
+	GetTextNotesList() ([]*entity.TextNote, error)
+	UpdateTextNote(creds *entity.TextNote) error
+	DeleteTextNote(id string) error
+
+	AddRawNote(creds *entity.RawNote) error
+	GetRawNote(id string) (*entity.RawNote, error)
+	GetRawNotesList() ([]*entity.RawNote, error)
+	UpdateRawNote(creds *entity.RawNote) error
+	DeleteRawNote(id string) error
 }

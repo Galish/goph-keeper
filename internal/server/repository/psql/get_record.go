@@ -11,6 +11,7 @@ import (
 func (s *psqlStore) GetSecureRecord(
 	ctx context.Context,
 	user, id string,
+	recordType repository.SecureRecordType,
 ) (*repository.SecureRecord, error) {
 	row := s.db.QueryRowContext(
 		ctx,
@@ -37,9 +38,13 @@ func (s *psqlStore) GetSecureRecord(
 				uuid = $1
 				AND
 				created_by = $2
+				AND
+				type = $3
 			;
 		`,
-		id, user,
+		id,
+		user,
+		recordType,
 	)
 
 	var record repository.SecureRecord

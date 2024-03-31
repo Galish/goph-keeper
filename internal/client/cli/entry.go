@@ -36,16 +36,19 @@ func (a *App) selectCategory() {
 		[]*ui.SelectOption{
 			{
 				Label: "Credentials",
-				Run:   a.viewAllCredentials,
-			},
-			{
-				Label: "Text notes",
-			},
-			{
-				Label: "Binary notes",
+				Run:   a.viewCredentialsList,
 			},
 			{
 				Label: "Bank cards",
+				Run:   a.viewCardsList,
+			},
+			{
+				Label: "Text notes",
+				Run:   a.viewTextNotesList,
+			},
+			{
+				Label: "Binary notes",
+				Run:   a.viewRawNotesList,
 			},
 		},
 	)

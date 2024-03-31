@@ -5,6 +5,7 @@ import (
 	"time"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
+
 	"github.com/Galish/goph-keeper/internal/client/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -34,8 +35,8 @@ func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
 	defer cancel()
 
 	req := &pb.UpdateCredentialsRequest{
+		Id: creds.ID,
 		Credentials: &pb.Credentials{
-			Id:          creds.ID,
 			Title:       creds.Title,
 			Description: creds.Description,
 			Username:    creds.Username,
@@ -64,11 +65,32 @@ func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) 
 	}
 
 	creds := &entity.Credentials{
-		ID:          resp.Credentials.GetPassword(),
 		Title:       resp.Credentials.GetTitle(),
 		Description: resp.Credentials.GetDescription(),
 		Username:    resp.Credentials.GetUsername(),
 		Password:    resp.Credentials.GetPassword(),
+	}
+
+	return creds, nil
+}
+
+func (uc *KeeperUseCase) GetCredentialsList() ([]*entity.Credentials, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	resp, err := uc.client.GetCredentialsList(ctx, &emptypb.Empty{})
+	if err != nil {
+		return nil, err
+	}
+
+	var creds = make([]*entity.Credentials, len(resp.GetList()))
+
+	for i, c := range resp.GetList() {
+		creds[i] = &entity.Credentials{
+			ID:          c.GetId(),
+			Title:       c.GetTitle(),
+			Description: c.GetDescription(),
+		}
 	}
 
 	return creds, nil
@@ -88,28 +110,4 @@ func (uc *KeeperUseCase) DeleteCredentials(id string) error {
 	}
 
 	return nil
-}
-
-func (uc *KeeperUseCase) GetAllCredentials() ([]*entity.Credentials, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	resp, err := uc.client.GetAllCredentials(ctx, &emptypb.Empty{})
-	if err != nil {
-		return nil, err
-	}
-
-	var creds = make([]*entity.Credentials, len(resp.Credentials))
-
-	for i, c := range resp.Credentials {
-		creds[i] = &entity.Credentials{
-			ID:          c.GetId(),
-			Title:       c.GetTitle(),
-			Description: c.GetDescription(),
-			Username:    c.GetUsername(),
-			Password:    c.GetPassword(),
-		}
-	}
-
-	return creds, nil
 }
