@@ -5,17 +5,27 @@ import (
 	"os"
 )
 
+type UserInterface interface {
+	Break()
+	Confirm(label string) bool
+	Edit(string, string, bool) string
+	Error(error)
+	Input(string, bool) string
+	InputPassword(string, bool) string
+	Print(string)
+	Retry(err error) bool
+	Select(string, []*SelectOption)
+}
+
 type UI struct {
 	r io.ReadCloser
 	w io.WriteCloser
-	e io.WriteCloser
 }
 
 func New() *UI {
 	return &UI{
 		r: os.Stdin,
 		w: os.Stdout,
-		e: os.Stderr,
 	}
 }
 

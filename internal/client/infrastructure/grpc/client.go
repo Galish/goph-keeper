@@ -15,15 +15,15 @@ import (
 
 type KeeperClient struct {
 	pb.KeeperClient
-	authClient *auth.AuthClient
-	conn       *grpc.ClientConn
+	auth *auth.AuthManager
+	conn *grpc.ClientConn
 }
 
-func NewClient(cfg *config.Config, authClient *auth.AuthClient) *KeeperClient {
+func NewClient(cfg *config.Config, auth *auth.AuthManager) *KeeperClient {
 	conn, err := grpc.Dial(
 		cfg.GRPCServAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.NewAuthInterceptor(authClient)),
+		grpc.WithUnaryInterceptor(interceptors.NewAuthInterceptor(auth)),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -31,7 +31,7 @@ func NewClient(cfg *config.Config, authClient *auth.AuthClient) *KeeperClient {
 
 	client := &KeeperClient{
 		KeeperClient: pb.NewKeeperClient(conn),
-		authClient:   authClient,
+		auth:         auth,
 		conn:         conn,
 	}
 
@@ -44,7 +44,7 @@ func (c *KeeperClient) SignUp(ctx context.Context, in *pb.AuthRequest, opts ...g
 		return nil, err
 	}
 
-	c.authClient.SetToken(resp.AccessToken)
+	c.auth.SetToken(resp.AccessToken)
 
 	return resp, nil
 }
@@ -55,7 +55,7 @@ func (c *KeeperClient) SignIn(ctx context.Context, in *pb.AuthRequest, opts ...g
 		return nil, err
 	}
 
-	c.authClient.SetToken(resp.AccessToken)
+	c.auth.SetToken(resp.AccessToken)
 
 	return resp, nil
 }

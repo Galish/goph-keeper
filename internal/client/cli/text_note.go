@@ -50,31 +50,18 @@ func (a *App) viewTextNote(id string) {
 
 	a.ui.Print(note.String())
 
-	handleDelete := func() {
-		if ok := a.ui.Confirm("Are you sure"); ok {
-			if err := a.keeper.DeleteTextNote(id); err != nil {
-				a.ui.Error(err)
-			}
-
-			a.viewTextNotesList()
-			return
-		} else {
-			a.viewTextNote(id)
-		}
-	}
-
-	handleEdit := func() {
-		a.editTextNote(id)
-	}
-
 	var commands = []*ui.SelectOption{
 		{
 			Label: "Edit",
-			Run:   handleEdit,
+			Run: func() {
+				a.editTextNote(id)
+			},
 		},
 		{
 			Label: "Delete",
-			Run:   handleDelete,
+			Run: func() {
+				a.deleteTextNote(id)
+			},
 		},
 		{
 			Label: "Cancel",
@@ -93,8 +80,11 @@ func (a *App) addTextNote() {
 	note.Value = a.ui.Input("Note", true)
 
 	if ok := a.ui.Confirm("Add text note"); ok {
-		if err := a.keeper.AddTextNote(&note); err != nil {
-			a.ui.Error(err)
+		for {
+			err := a.keeper.AddTextNote(&note)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
 		}
 	}
 
@@ -102,15 +92,43 @@ func (a *App) addTextNote() {
 }
 
 func (a *App) editTextNote(id string) {
-	note := &entity.TextNote{
+	note, err := a.keeper.GetTextNote(id)
+	if err != nil {
+		a.ui.Error(err)
+		return
+	}
+
+	var updated = &entity.TextNote{
 		ID: id,
 	}
 
-	note.Title = a.ui.Input("Title", true)
-	note.Description = a.ui.Input("Description", false)
-	note.Value = a.ui.Input("Note", true)
+	updated.Title = a.ui.Edit("Title", note.Title, true)
+	updated.Description = a.ui.Edit("Description", note.Description, false)
+	updated.Value = a.ui.Edit("Note", note.Value, true)
 
-	a.keeper.UpdateTextNote(note)
+	if ok := a.ui.Confirm("Update text note"); ok {
+		for {
+			err := a.keeper.UpdateTextNote(updated)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
+		}
+	}
 
 	a.viewTextNotesList()
+}
+
+func (a *App) deleteTextNote(id string) {
+	if ok := a.ui.Confirm("Are you sure"); ok {
+		for {
+			err := a.keeper.DeleteTextNote(id)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
+		}
+
+		a.viewTextNotesList()
+	} else {
+		a.viewTextNote(id)
+	}
 }

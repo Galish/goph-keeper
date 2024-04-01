@@ -32,8 +32,8 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 
 func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error) {
 	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeCredentials)
-	if errors.Is(err, repository.ErrNothingFound) {
-		return nil, ErrNothingFound
+	if errors.Is(err, repository.ErrNotFound) {
+		return nil, ErrNotFound
 	}
 
 	if err != nil {
@@ -101,8 +101,8 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 	}
 
 	err := uc.repo.UpdateSecureRecord(ctx, record)
-	if errors.Is(err, repository.ErrNothingFound) {
-		return ErrNothingFound
+	if errors.Is(err, repository.ErrNotFound) {
+		return ErrNotFound
 	}
 
 	return err
@@ -110,8 +110,8 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 
 func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, user, id string) error {
 	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeCredentials)
-	if errors.Is(err, repository.ErrNothingFound) {
-		return ErrNothingFound
+	if errors.Is(err, repository.ErrNotFound) {
+		return ErrNotFound
 	}
 
 	return err

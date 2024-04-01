@@ -8,6 +8,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,11 +26,20 @@ func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCrede
 	}
 
 	err := s.keeper.UpdateCredentials(ctx, creds)
+	if err != nil {
+		logger.
+			WithFields(logger.Fields{
+				"id": in.GetId(),
+			}).
+			WithError(err).
+			Error("unable to update credentials")
+	}
+
 	if errors.Is(err, keeper.ErrInvalidEntity) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	if errors.Is(err, keeper.ErrNothingFound) {
+	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

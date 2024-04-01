@@ -7,20 +7,20 @@ import (
 )
 
 type App struct {
-	authClient *auth.AuthClient
-	user       usecase.User
-	keeper     usecase.Keeper
-	ui         *ui.UI
-	done       chan struct{}
+	auth   *auth.AuthManager
+	user   usecase.User
+	keeper usecase.Keeper
+	ui     ui.UserInterface
+	done   chan struct{}
 }
 
-func NewApp(authClient *auth.AuthClient, user usecase.User, keeper usecase.Keeper) *App {
+func NewApp(ui ui.UserInterface, auth *auth.AuthManager, user usecase.User, keeper usecase.Keeper) *App {
 	return &App{
-		authClient: authClient,
-		user:       user,
-		keeper:     keeper,
-		ui:         ui.New(),
-		done:       make(chan struct{}),
+		auth:   auth,
+		user:   user,
+		keeper: keeper,
+		ui:     ui,
+		done:   make(chan struct{}),
 	}
 }
 
@@ -32,7 +32,7 @@ loop:
 			break loop
 
 		default:
-			if a.authClient.IsAuthorized() {
+			if a.auth.IsAuthorized() {
 				a.selectCategory()
 			} else {
 				a.viewHomeScreen()
@@ -44,5 +44,5 @@ loop:
 func (a *App) Close() error {
 	close(a.done)
 
-	return a.ui.Close()
+	return nil
 }

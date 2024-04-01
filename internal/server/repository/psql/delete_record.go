@@ -36,7 +36,7 @@ func (s *psqlStore) DeleteSecureRecord(
 		return err
 	}
 	if rows != 1 {
-		return repository.ErrNothingFound
+		return repository.ErrNotFound
 	}
 
 	return nil

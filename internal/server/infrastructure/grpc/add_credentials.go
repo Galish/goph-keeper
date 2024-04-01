@@ -25,13 +25,15 @@ func (s *KeeperServer) AddCredentials(ctx context.Context, in *pb.AddCredentials
 	creds.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.keeper.AddCredentials(ctx, creds)
+	if err != nil {
+		logger.WithError(err).Error("unable to add credentials")
+	}
+
 	if errors.Is(err, keeper.ErrInvalidEntity) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	if err != nil {
-		logger.WithError(err).Debug("unable to add the record")
-
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

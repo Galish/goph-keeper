@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -18,6 +19,8 @@ func (s *KeeperServer) GetCredentialsList(ctx context.Context, _ *emptypb.Empty)
 
 	creds, err := s.keeper.GetAllCredentials(ctx, user)
 	if err != nil {
+		logger.WithError(err).Error("unable to get credentials list")
+
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

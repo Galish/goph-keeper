@@ -1,6 +1,11 @@
 package ui
 
-import "github.com/manifoldco/promptui"
+import (
+	"errors"
+	"os"
+
+	"github.com/manifoldco/promptui"
+)
 
 type SelectOption struct {
 	Label string
@@ -11,21 +16,73 @@ func (o *SelectOption) String() string {
 	return o.Label
 }
 
+type selectOptions struct {
+	HideSelected bool
+}
+
 func (ui *UI) Select(label string, items []*SelectOption) {
+	index := ui.promptSelect(
+		label,
+		items,
+		nil,
+	)
+
+	if index >= 0 && items[index].Run != nil {
+		items[index].Run()
+	}
+}
+
+func (ui *UI) Confirm(label string) bool {
+	index := ui.promptSelect(
+		label,
+		[]*SelectOption{
+			{
+				Label: "Yes",
+			},
+			{
+				Label: "No",
+			},
+		},
+		&selectOptions{
+			HideSelected: true,
+		},
+	)
+
+	return index == 0
+}
+
+func (ui *UI) Retry(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	ui.Error(err)
+	ui.Break()
+
+	return ui.Confirm("Want to try again")
+}
+
+func (ui *UI) promptSelect(label string, items []*SelectOption, opts *selectOptions) int {
 	prompt := promptui.Select{
 		Label:    label,
 		Items:    items,
 		HideHelp: true,
-		// HideSelected: true,
-		Stdin:  ui.r,
-		Stdout: ui.w,
+		Stdin:    ui.r,
+		Stdout:   ui.w,
 	}
 
-	index, _, _ := prompt.Run()
-
-	if items[index].Run == nil {
-		return
+	if opts != nil {
+		prompt.HideSelected = opts.HideSelected
 	}
 
-	items[index].Run()
+	index, _, err := prompt.Run()
+	if errors.Is(err, promptui.ErrInterrupt) {
+		os.Exit(0)
+	}
+
+	if err != nil {
+		return -1
+	}
+
+	return index
 }

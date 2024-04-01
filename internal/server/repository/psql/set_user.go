@@ -25,7 +25,7 @@ func (s *psqlStore) SetUser(ctx context.Context, user *entity.User) error {
 
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == errCodeConflict {
-		return repository.ErrUserConflict
+		return repository.ErrConflict
 	}
 	if err != nil {
 		return err

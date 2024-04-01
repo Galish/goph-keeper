@@ -50,31 +50,18 @@ func (a *App) viewCredentials(id string) {
 
 	a.ui.Print(creds.String())
 
-	handleDelete := func() {
-		if ok := a.ui.Confirm("Are you sure"); ok {
-			if err := a.keeper.DeleteCredentials(id); err != nil {
-				a.ui.Error(err)
-			}
-
-			a.viewCredentialsList()
-			return
-		} else {
-			a.viewCredentials(id)
-		}
-	}
-
-	handleEdit := func() {
-		a.editCredentials(id)
-	}
-
 	var commands = []*ui.SelectOption{
 		{
 			Label: "Edit",
-			Run:   handleEdit,
+			Run: func() {
+				a.editCredentials(id)
+			},
 		},
 		{
 			Label: "Delete",
-			Run:   handleDelete,
+			Run: func() {
+				a.deleteCredentials(id)
+			},
 		},
 		{
 			Label: "Cancel",
@@ -94,8 +81,11 @@ func (a *App) addCredentials() {
 	creds.Password = a.ui.Input("Password", true)
 
 	if ok := a.ui.Confirm("Add credentials"); ok {
-		if err := a.keeper.AddCredentials(&creds); err != nil {
-			a.ui.Error(err)
+		for {
+			err := a.keeper.AddCredentials(&creds)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
 		}
 	}
 
@@ -103,16 +93,44 @@ func (a *App) addCredentials() {
 }
 
 func (a *App) editCredentials(id string) {
-	creds := &entity.Credentials{
+	creds, err := a.keeper.GetCredentials(id)
+	if err != nil {
+		a.ui.Error(err)
+		return
+	}
+
+	var updated = &entity.Credentials{
 		ID: id,
 	}
 
-	creds.Title = a.ui.Input("Title", true)
-	creds.Description = a.ui.Input("Description", false)
-	creds.Username = a.ui.Input("Username", true)
-	creds.Password = a.ui.Input("Password", true)
+	updated.Title = a.ui.Edit("Title", creds.Title, true)
+	updated.Description = a.ui.Edit("Description", creds.Description, false)
+	updated.Username = a.ui.Edit("Username", creds.Username, true)
+	updated.Password = a.ui.Edit("Password", creds.Password, true)
 
-	a.keeper.UpdateCredentials(creds)
+	if ok := a.ui.Confirm("Update credentials"); ok {
+		for {
+			err := a.keeper.UpdateCredentials(updated)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
+		}
+	}
 
 	a.viewCredentialsList()
+}
+
+func (a *App) deleteCredentials(id string) {
+	if ok := a.ui.Confirm("Are you sure"); ok {
+		for {
+			err := a.keeper.DeleteCredentials(id)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
+		}
+
+		a.viewCredentialsList()
+	} else {
+		a.viewCredentials(id)
+	}
 }

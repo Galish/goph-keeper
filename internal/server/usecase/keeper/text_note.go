@@ -31,8 +31,8 @@ func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote)
 
 func (uc *KeeperUseCase) GetTextNote(ctx context.Context, user, id string) (*entity.TextNote, error) {
 	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeTextNote)
-	if errors.Is(err, repository.ErrNothingFound) {
-		return nil, ErrNothingFound
+	if errors.Is(err, repository.ErrNotFound) {
+		return nil, ErrNotFound
 	}
 	if err != nil {
 		return nil, err
@@ -96,8 +96,8 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 	}
 
 	err := uc.repo.UpdateSecureRecord(ctx, record)
-	if errors.Is(err, repository.ErrNothingFound) {
-		return ErrNothingFound
+	if errors.Is(err, repository.ErrNotFound) {
+		return ErrNotFound
 	}
 
 	return err
@@ -105,8 +105,8 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 
 func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, user, id string) error {
 	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeTextNote)
-	if errors.Is(err, repository.ErrNothingFound) {
-		return ErrNothingFound
+	if errors.Is(err, repository.ErrNotFound) {
+		return ErrNotFound
 	}
 
 	return err

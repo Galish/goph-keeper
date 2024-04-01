@@ -66,7 +66,7 @@ func (s *psqlStore) GetSecureRecord(
 		&record.LastEditedAt,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, repository.ErrNothingFound
+		return nil, repository.ErrNotFound
 	}
 
 	if err != nil {

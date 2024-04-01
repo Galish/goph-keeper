@@ -9,6 +9,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+	"github.com/Galish/goph-keeper/pkg/logger"
 )
 
 func (s *KeeperServer) GetRawNotesList(ctx context.Context, _ *emptypb.Empty) (*pb.GetListResponse, error) {
@@ -18,6 +19,8 @@ func (s *KeeperServer) GetRawNotesList(ctx context.Context, _ *emptypb.Empty) (*
 
 	notes, err := s.keeper.GetRawNotes(ctx, user)
 	if err != nil {
+		logger.WithError(err).Error("unable to get binary notes")
+
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

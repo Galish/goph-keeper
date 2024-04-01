@@ -1,15 +1,8 @@
 package user
 
 import (
-	"errors"
-
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/pkg/auth"
-)
-
-var (
-	ErrMissingCredentials = errors.New("missing login/password")
-	ErrInvalidCredentials = errors.New("incorrect login/password pair")
 )
 
 type UserUseCase struct {

@@ -17,8 +17,8 @@ func (uc *UserUseCase) SignIn(
 	}
 
 	user, err := uc.repo.GetUserByLogin(ctx, username)
-	if errors.Is(err, repository.ErrUserNotFound) {
-		return "", ErrInvalidCredentials
+	if errors.Is(err, repository.ErrNotFound) {
+		return "", ErrNotFound
 	}
 
 	if err != nil {

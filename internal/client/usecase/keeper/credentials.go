@@ -23,11 +23,9 @@ func (uc *KeeperUseCase) AddCredentials(creds *entity.Credentials) error {
 		},
 	}
 
-	if _, err := uc.client.AddCredentials(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.AddCredentials(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
@@ -44,11 +42,9 @@ func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
 		},
 	}
 
-	if _, err := uc.client.UpdateCredentials(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.UpdateCredentials(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) {
@@ -61,7 +57,7 @@ func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) 
 
 	resp, err := uc.client.GetCredentials(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	creds := &entity.Credentials{
@@ -80,7 +76,7 @@ func (uc *KeeperUseCase) GetCredentialsList() ([]*entity.Credentials, error) {
 
 	resp, err := uc.client.GetCredentialsList(ctx, &emptypb.Empty{})
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	var creds = make([]*entity.Credentials, len(resp.GetList()))
@@ -105,9 +101,6 @@ func (uc *KeeperUseCase) DeleteCredentials(id string) error {
 	}
 
 	_, err := uc.client.DeleteCredentials(ctx, req)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return handleError(err)
 }
