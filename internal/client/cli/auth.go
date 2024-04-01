@@ -2,11 +2,11 @@ package cli
 
 func (a *App) signInUser() {
 	username := a.ui.Input("Enter username", true)
-	password := a.ui.Input("Enter password", true)
+	password := a.ui.InputPassword("Enter password", true)
 
 	if err := a.user.SignIn(username, password); err != nil {
 		a.ui.Error(err)
-		a.ui.LineBreak()
+		a.ui.Break()
 
 		if ok := a.ui.Confirm("Want to try again"); ok {
 			a.signInUser()
@@ -16,7 +16,7 @@ func (a *App) signInUser() {
 
 func (a *App) signUpUser() {
 	username := a.ui.Input("Enter username", true)
-	password := a.ui.Input("Enter password", true)
+	password := a.ui.InputPassword("Enter password", true)
 
 	err := a.user.SignUp(username, password)
 	if err != nil {

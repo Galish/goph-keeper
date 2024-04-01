@@ -5,6 +5,17 @@ import (
 	"os"
 )
 
+type UserInterface interface {
+	Break()
+	Confirm(label string) bool
+	Edit(string, string, bool) string
+	Error(error)
+	Input(string, bool) string
+	InputPassword(string, bool) string
+	Print(string)
+	Select(string, []*SelectOption)
+}
+
 type UI struct {
 	r io.ReadCloser
 	w io.WriteCloser

@@ -16,14 +16,52 @@ func (o *SelectOption) String() string {
 	return o.Label
 }
 
+type selectOptions struct {
+	HideSelected bool
+}
+
 func (ui *UI) Select(label string, items []*SelectOption) {
+	index := ui.promptSelect(
+		label,
+		items,
+		nil,
+	)
+
+	if index >= 0 && items[index].Run != nil {
+		items[index].Run()
+	}
+}
+
+func (ui *UI) Confirm(label string) bool {
+	index := ui.promptSelect(
+		label,
+		[]*SelectOption{
+			{
+				Label: "Yes",
+			},
+			{
+				Label: "No",
+			},
+		},
+		&selectOptions{
+			HideSelected: true,
+		},
+	)
+
+	return index == 0
+}
+
+func (ui *UI) promptSelect(label string, items []*SelectOption, opts *selectOptions) int {
 	prompt := promptui.Select{
 		Label:    label,
 		Items:    items,
 		HideHelp: true,
-		// HideSelected: true,
-		Stdin:  ui.r,
-		Stdout: ui.w,
+		Stdin:    ui.r,
+		Stdout:   ui.w,
+	}
+
+	if opts != nil {
+		prompt.HideSelected = opts.HideSelected
 	}
 
 	index, _, err := prompt.Run()
@@ -31,9 +69,9 @@ func (ui *UI) Select(label string, items []*SelectOption) {
 		os.Exit(0)
 	}
 
-	if err != nil || items[index].Run == nil {
-		return
+	if err != nil {
+		return -1
 	}
 
-	items[index].Run()
+	return index
 }

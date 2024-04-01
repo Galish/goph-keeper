@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func NewAuthInterceptor(authClient *auth.AuthClient) grpc.UnaryClientInterceptor {
+func NewAuthInterceptor(authClient *auth.AuthManager) grpc.UnaryClientInterceptor {
 	return func(
 		ctx context.Context,
 		method string,

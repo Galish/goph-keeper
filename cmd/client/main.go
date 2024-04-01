@@ -7,6 +7,7 @@ import (
 
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/cli"
+	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 	"github.com/Galish/goph-keeper/internal/client/config"
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc"
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
@@ -16,15 +17,18 @@ import (
 func main() {
 	cfg := config.New()
 
-	authClient := auth.New()
+	authManager := auth.New()
 
-	grpcClient := grpc.NewClient(cfg, authClient)
-	defer grpcClient.Close()
+	grpcClient := grpc.NewClient(cfg, authManager)
 
-	userUsecase := user.New(grpcClient)
-	keeperUsecase := keeper.New(grpcClient)
+	appUI := ui.New()
 
-	app := cli.NewApp(authClient, userUsecase, keeperUsecase)
+	app := cli.NewApp(
+		appUI,
+		authManager,
+		user.New(grpcClient),
+		keeper.New(grpcClient),
+	)
 	go app.Run()
 
 	sigs := make(chan os.Signal, 1)
@@ -36,8 +40,8 @@ func main() {
 		syscall.SIGQUIT,
 	)
 
-	// go func() {
 	<-sigs
+	grpcClient.Close()
 	app.Close()
-	// }()
+	appUI.Close()
 }
