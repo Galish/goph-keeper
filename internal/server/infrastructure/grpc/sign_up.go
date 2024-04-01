@@ -19,17 +19,25 @@ func (s *KeeperServer) SignUp(
 	var response pb.AuthResponse
 
 	token, err := s.user.SignUp(ctx, in.GetUsername(), in.GetPassword())
+	if err != nil {
+		logger.
+			WithFields(logger.Fields{
+				"username": in.GetUsername(),
+				"password": in.GetPassword(),
+			}).
+			WithError(err).
+			Error("unable to sign up")
+	}
+
 	if errors.Is(err, user.ErrMissingCredentials) {
-		logger.WithError(err).Debug("unable to create the user")
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
+
 	if errors.Is(err, user.ErrConflict) {
-		logger.WithError(err).Debug("unable to create the user")
 		return nil, status.Errorf(codes.AlreadyExists, err.Error())
 	}
 
 	if err != nil {
-		logger.WithError(err).Debug("unable to create the user")
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

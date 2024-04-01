@@ -51,6 +51,17 @@ func (ui *UI) Confirm(label string) bool {
 	return index == 0
 }
 
+func (ui *UI) Retry(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	ui.Error(err)
+	ui.Break()
+
+	return ui.Confirm("Want to try again")
+}
+
 func (ui *UI) promptSelect(label string, items []*SelectOption, opts *selectOptions) int {
 	prompt := promptui.Select{
 		Label:    label,

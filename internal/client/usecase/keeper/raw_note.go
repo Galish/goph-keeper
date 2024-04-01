@@ -22,11 +22,9 @@ func (uc *KeeperUseCase) AddRawNote(note *entity.RawNote) error {
 		},
 	}
 
-	if _, err := uc.client.AddRawNote(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.AddRawNote(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote) error {
@@ -42,11 +40,9 @@ func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote) error {
 		},
 	}
 
-	if _, err := uc.client.UpdateRawNote(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.UpdateRawNote(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
@@ -59,7 +55,7 @@ func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
 
 	resp, err := uc.client.GetRawNote(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	note := &entity.RawNote{
@@ -71,29 +67,13 @@ func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
 	return note, nil
 }
 
-func (uc *KeeperUseCase) DeleteRawNote(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	req := &pb.DeleteRequest{
-		Id: id,
-	}
-
-	_, err := uc.client.DeleteRawNote(ctx, req)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (uc *KeeperUseCase) GetRawNotesList() ([]*entity.RawNote, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
 	resp, err := uc.client.GetRawNotesList(ctx, &emptypb.Empty{})
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	var notes = make([]*entity.RawNote, len(resp.GetList()))
@@ -107,4 +87,17 @@ func (uc *KeeperUseCase) GetRawNotesList() ([]*entity.RawNote, error) {
 	}
 
 	return notes, nil
+}
+
+func (uc *KeeperUseCase) DeleteRawNote(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	req := &pb.DeleteRequest{
+		Id: id,
+	}
+
+	_, err := uc.client.DeleteRawNote(ctx, req)
+
+	return handleError(err)
 }

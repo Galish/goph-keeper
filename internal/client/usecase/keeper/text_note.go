@@ -22,11 +22,9 @@ func (uc *KeeperUseCase) AddTextNote(note *entity.TextNote) error {
 		},
 	}
 
-	if _, err := uc.client.AddTextNote(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.AddTextNote(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote) error {
@@ -42,11 +40,9 @@ func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote) error {
 		},
 	}
 
-	if _, err := uc.client.UpdateTextNote(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.UpdateTextNote(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
@@ -59,7 +55,7 @@ func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
 
 	resp, err := uc.client.GetTextNote(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	note := &entity.TextNote{
@@ -71,29 +67,13 @@ func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
 	return note, nil
 }
 
-func (uc *KeeperUseCase) DeleteTextNote(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	req := &pb.DeleteRequest{
-		Id: id,
-	}
-
-	_, err := uc.client.DeleteTextNote(ctx, req)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (uc *KeeperUseCase) GetTextNotesList() ([]*entity.TextNote, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
 	resp, err := uc.client.GetTextNotesList(ctx, &emptypb.Empty{})
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	var notes = make([]*entity.TextNote, len(resp.GetList()))
@@ -107,4 +87,17 @@ func (uc *KeeperUseCase) GetTextNotesList() ([]*entity.TextNote, error) {
 	}
 
 	return notes, nil
+}
+
+func (uc *KeeperUseCase) DeleteTextNote(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	req := &pb.DeleteRequest{
+		Id: id,
+	}
+
+	_, err := uc.client.DeleteTextNote(ctx, req)
+
+	return handleError(err)
 }

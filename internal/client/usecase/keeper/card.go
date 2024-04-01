@@ -49,11 +49,9 @@ func (uc *KeeperUseCase) UpdateCard(card *entity.Card) error {
 		},
 	}
 
-	if _, err := uc.client.UpdateCard(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.UpdateCard(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
@@ -66,10 +64,10 @@ func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
 
 	resp, err := uc.client.GetCard(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
-	creds := &entity.Card{
+	card := &entity.Card{
 		Title:       resp.Card.GetTitle(),
 		Description: resp.Card.GetDescription(),
 		Number:      resp.Card.GetNumber(),
@@ -78,7 +76,7 @@ func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
 		Expiry:      resp.Card.GetExpiry().AsTime(),
 	}
 
-	return creds, nil
+	return card, nil
 }
 
 func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
@@ -87,20 +85,20 @@ func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
 
 	resp, err := uc.client.GetCardsList(ctx, &emptypb.Empty{})
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
-	var creds = make([]*entity.Card, len(resp.GetList()))
+	var cards = make([]*entity.Card, len(resp.GetList()))
 
 	for i, c := range resp.GetList() {
-		creds[i] = &entity.Card{
+		cards[i] = &entity.Card{
 			ID:          c.GetId(),
 			Title:       c.GetTitle(),
 			Description: c.GetDescription(),
 		}
 	}
 
-	return creds, nil
+	return cards, nil
 }
 
 func (uc *KeeperUseCase) DeleteCard(id string) error {
@@ -111,10 +109,7 @@ func (uc *KeeperUseCase) DeleteCard(id string) error {
 		Id: id,
 	}
 
-	_, err := uc.client.DeleteCredentials(ctx, req)
-	if err != nil {
-		return err
-	}
+	_, err := uc.client.DeleteCard(ctx, req)
 
-	return nil
+	return handleError(err)
 }

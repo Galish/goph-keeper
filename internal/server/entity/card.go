@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,13 +27,6 @@ func NewCard() *Card {
 }
 
 func (c *Card) IsValid() bool {
-	fmt.Println("+Card+", c, c.Title != "",
-		c.Number != "",
-		c.Holder != "",
-		c.CVC != "",
-		!c.Expiry.IsZero(),
-	)
-
 	return c.Title != "" &&
 		c.Number != "" &&
 		c.Holder != "" &&

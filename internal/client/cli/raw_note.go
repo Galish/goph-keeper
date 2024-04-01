@@ -50,31 +50,18 @@ func (a *App) viewRawNote(id string) {
 
 	a.ui.Print(note.String())
 
-	handleDelete := func() {
-		if ok := a.ui.Confirm("Are you sure"); ok {
-			if err := a.keeper.DeleteRawNote(id); err != nil {
-				a.ui.Error(err)
-			}
-
-			a.viewRawNotesList()
-			return
-		} else {
-			a.viewRawNote(id)
-		}
-	}
-
-	handleEdit := func() {
-		a.editRawNote(id)
-	}
-
 	var commands = []*ui.SelectOption{
 		{
 			Label: "Edit",
-			Run:   handleEdit,
+			Run: func() {
+				a.editRawNote(id)
+			},
 		},
 		{
 			Label: "Delete",
-			Run:   handleDelete,
+			Run: func() {
+				a.deleteRawNote(id)
+			},
 		},
 		{
 			Label: "Cancel",
@@ -96,9 +83,12 @@ func (a *App) addRawNote() {
 		a.ui.Error(err)
 	}
 
-	if ok := a.ui.Confirm("Add text note"); ok {
-		if err := a.keeper.AddRawNote(&note); err != nil {
-			a.ui.Error(err)
+	if ok := a.ui.Confirm("Add binary note"); ok {
+		for {
+			err := a.keeper.AddRawNote(&note)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
 		}
 	}
 
@@ -120,7 +110,29 @@ func (a *App) editRawNote(id string) {
 	updated.Description = a.ui.Edit("Description", note.Description, false)
 	updated.SetValue(a.ui.Edit("Note", note.GetValue(), true))
 
-	a.keeper.UpdateRawNote(note)
+	if ok := a.ui.Confirm("Update binary note"); ok {
+		for {
+			err := a.keeper.UpdateRawNote(updated)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
+		}
+	}
 
 	a.viewRawNotesList()
+}
+
+func (a *App) deleteRawNote(id string) {
+	if ok := a.ui.Confirm("Are you sure"); ok {
+		for {
+			err := a.keeper.DeleteRawNote(id)
+			if ok := a.ui.Retry(err); !ok {
+				break
+			}
+		}
+
+		a.viewRawNotesList()
+	} else {
+		a.viewRawNote(id)
+	}
 }

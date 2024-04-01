@@ -13,6 +13,7 @@ type UserInterface interface {
 	Input(string, bool) string
 	InputPassword(string, bool) string
 	Print(string)
+	Retry(err error) bool
 	Select(string, []*SelectOption)
 }
 

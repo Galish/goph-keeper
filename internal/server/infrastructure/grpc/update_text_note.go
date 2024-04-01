@@ -8,6 +8,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -24,6 +25,15 @@ func (s *KeeperServer) UpdateTextNote(ctx context.Context, in *pb.UpdateTextNote
 	}
 
 	err := s.keeper.UpdateTextNote(ctx, note)
+	if err != nil {
+		logger.
+			WithFields(logger.Fields{
+				"id": in.GetId(),
+			}).
+			WithError(err).
+			Error("unable to update text note")
+	}
+
 	if errors.Is(err, keeper.ErrInvalidEntity) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}

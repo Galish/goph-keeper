@@ -2,10 +2,13 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
+	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +26,16 @@ func (s *KeeperServer) AddCard(ctx context.Context, in *pb.AddCardRequest) (*pb.
 	card.Expiry = in.Card.Expiry.AsTime()
 	card.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
-	if err := s.keeper.AddCard(ctx, card); err != nil {
+	err := s.keeper.AddCard(ctx, card)
+	if err != nil {
+		logger.WithError(err).Error("unable to add card")
+	}
+
+	if errors.Is(err, keeper.ErrInvalidEntity) {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 

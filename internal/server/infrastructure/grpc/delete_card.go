@@ -7,6 +7,7 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,6 +18,15 @@ func (s *KeeperServer) DeleteCard(ctx context.Context, in *pb.DeleteRequest) (*e
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.keeper.DeleteCard(ctx, user, in.GetId())
+	if err != nil {
+		logger.
+			WithFields(logger.Fields{
+				"id": in.GetId(),
+			}).
+			WithError(err).
+			Error("unable to delete card")
+	}
+
 	if errors.Is(err, keeper.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
