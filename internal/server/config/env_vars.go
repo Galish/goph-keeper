@@ -15,6 +15,10 @@ func parseEnvVars(c *Config) {
 		c.GRPCServAddr = grpcAddr
 	}
 
+	if authKey := os.Getenv("SECRET_KEY"); authKey != "" {
+		c.AuthSecretKey = authKey
+	}
+
 	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {
 		c.LogLevel = logLevel
 	}

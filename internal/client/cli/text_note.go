@@ -21,6 +21,7 @@ func (a *App) viewTextNotesList() {
 		},
 		{
 			Label: "  Cancel",
+			Run:   a.selectCategory,
 		},
 	}
 

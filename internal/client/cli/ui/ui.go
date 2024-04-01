@@ -3,6 +3,8 @@ package ui
 import (
 	"io"
 	"os"
+
+	"github.com/Galish/goph-keeper/pkg/logger"
 )
 
 type UserInterface interface {
@@ -30,8 +32,9 @@ func New() *UI {
 }
 
 func (ui *UI) Close() error {
-	err := ui.r.Close()
-	if err != nil {
+	logger.Info("shutting down the CLI application")
+
+	if err := ui.r.Close(); err != nil {
 		return err
 	}
 

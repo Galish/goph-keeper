@@ -11,7 +11,6 @@ type App struct {
 	user   usecase.User
 	keeper usecase.Keeper
 	ui     ui.UserInterface
-	done   chan struct{}
 }
 
 func NewApp(ui ui.UserInterface, auth *auth.AuthManager, user usecase.User, keeper usecase.Keeper) *App {
@@ -20,29 +19,13 @@ func NewApp(ui ui.UserInterface, auth *auth.AuthManager, user usecase.User, keep
 		user:   user,
 		keeper: keeper,
 		ui:     ui,
-		done:   make(chan struct{}),
 	}
 }
 
 func (a *App) Run() {
-loop:
-	for {
-		select {
-		case <-a.done:
-			break loop
-
-		default:
-			if a.auth.IsAuthorized() {
-				a.selectCategory()
-			} else {
-				a.viewHomeScreen()
-			}
-		}
+	if a.auth.IsAuthorized() {
+		a.selectCategory()
+	} else {
+		a.viewAuthScreen()
 	}
-}
-
-func (a *App) Close() error {
-	close(a.done)
-
-	return nil
 }

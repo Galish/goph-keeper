@@ -2,7 +2,7 @@ package ui
 
 import (
 	"errors"
-	"os"
+	"syscall"
 
 	"github.com/manifoldco/promptui"
 )
@@ -80,7 +80,8 @@ func (ui *UI) promptInput(label string, opts *inputOptions) string {
 
 	result, err := prompt.Run()
 	if errors.Is(err, promptui.ErrInterrupt) {
-		os.Exit(0)
+		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+		return ""
 	}
 
 	if err != nil {

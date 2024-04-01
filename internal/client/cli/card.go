@@ -21,6 +21,7 @@ func (a *App) viewCardsList() {
 		},
 		{
 			Label: "  Cancel",
+			Run:   a.selectCategory,
 		},
 	}
 

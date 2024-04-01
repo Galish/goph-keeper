@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-// KeeperServer represents GRPC server.
+// KeeperServer represents gRPC server.
 type KeeperServer struct {
 	pb.UnimplementedKeeperServer
 
@@ -24,7 +24,7 @@ type KeeperServer struct {
 	server *grpc.Server
 }
 
-// NewServer configures and creates a GRPC server.
+// NewServer configures and creates a gRPC server.
 func NewServer(
 	cfg *config.Config,
 	user usecase.User,
@@ -57,14 +57,14 @@ func (s *KeeperServer) Run() error {
 		log.Fatal(err)
 	}
 
-	logger.Info("running GRPC server on ", s.cfg.GRPCServAddr)
+	logger.Info("running gRPC server on ", s.cfg.GRPCServAddr)
 
 	return s.server.Serve(listener)
 }
 
-// Close  is executed to release the memory
+// Close is executed to release the memory
 func (s *KeeperServer) Close() error {
-	logger.Info("shutting down the GRPC server")
+	logger.Info("shutting down the gRPC server")
 
 	s.server.GracefulStop()
 
