@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"os"
+	"syscall"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 )
 
-func (a *App) viewHomeScreen() {
+func (a *App) viewAuthScreen() {
 	a.ui.Select(
 		"You need to log in or sign up before continuing",
 		[]*ui.SelectOption{
@@ -21,7 +21,7 @@ func (a *App) viewHomeScreen() {
 			{
 				Label: "Exit",
 				Run: func() {
-					os.Exit(0)
+					syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 				},
 			},
 		},
@@ -29,8 +29,6 @@ func (a *App) viewHomeScreen() {
 }
 
 func (a *App) selectCategory() {
-	a.ui.Print("Welcome to Goph Keeper!")
-
 	a.ui.Select(
 		"Select category",
 		[]*ui.SelectOption{

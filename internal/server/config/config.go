@@ -1,10 +1,11 @@
 package config
 
 type Config struct {
-	DBAddr       string
-	DBInitPath   string
-	GRPCServAddr string
-	LogLevel     string
+	DBAddr        string
+	DBInitPath    string
+	GRPCServAddr  string
+	AuthSecretKey string
+	LogLevel      string
 }
 
 var defaultConfig = &Config{
@@ -48,6 +49,10 @@ func withConfig(c *Config) func(*Config) {
 
 		if c.GRPCServAddr != "" {
 			cfg.GRPCServAddr = c.GRPCServAddr
+		}
+
+		if c.AuthSecretKey != "" {
+			cfg.AuthSecretKey = c.AuthSecretKey
 		}
 
 		if c.LogLevel != "" {

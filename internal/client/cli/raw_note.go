@@ -21,6 +21,7 @@ func (a *App) viewRawNotesList() {
 		},
 		{
 			Label: "  Cancel",
+			Run:   a.selectCategory,
 		},
 	}
 

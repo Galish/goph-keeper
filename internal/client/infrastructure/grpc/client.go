@@ -8,6 +8,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/config"
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/interceptors"
+	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -61,5 +62,7 @@ func (c *KeeperClient) SignIn(ctx context.Context, in *pb.AuthRequest, opts ...g
 }
 
 func (c *KeeperClient) Close() error {
+	logger.Info("shutting down the gRPC client")
+
 	return c.conn.Close()
 }

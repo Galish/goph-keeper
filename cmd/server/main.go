@@ -8,6 +8,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
 	"github.com/Galish/goph-keeper/pkg/auth"
 	"github.com/Galish/goph-keeper/pkg/logger"
+	"github.com/Galish/goph-keeper/pkg/shutdowner"
 )
 
 func main() {
@@ -17,18 +18,24 @@ func main() {
 
 	logger.SetLevel(cfg.LogLevel)
 
-	repo, err := psql.New(cfg)
+	store, err := psql.New(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	jwtManager := auth.NewJWTManager("secret_key")
+	grpcServer := grpc.NewServer(
+		cfg,
+		user.New(store, auth.NewJWTManager(cfg.AuthSecretKey)),
+		keeper.New(store),
+	)
 
-	userUsecase := user.New(repo, jwtManager)
-	keeperUsecase := keeper.New(repo)
+	sd := shutdowner.New(grpcServer, store)
 
-	grpcServer := grpc.NewServer(cfg, userUsecase, keeperUsecase)
-	if err := grpcServer.Run(); err != nil {
-		panic(err)
-	}
+	go func() {
+		if err := grpcServer.Run(); err != nil {
+			panic(err)
+		}
+	}()
+
+	sd.Wait()
 }

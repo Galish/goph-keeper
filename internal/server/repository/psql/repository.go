@@ -58,5 +58,7 @@ func (s *psqlStore) Bootstrap(filePath string) error {
 }
 
 func (s *psqlStore) Close() error {
+	logger.Info("shutting down the DB server")
+
 	return s.db.Close()
 }

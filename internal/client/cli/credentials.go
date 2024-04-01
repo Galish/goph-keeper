@@ -21,6 +21,7 @@ func (a *App) viewCredentialsList() {
 		},
 		{
 			Label: "  Cancel",
+			Run:   a.selectCategory,
 		},
 	}
 

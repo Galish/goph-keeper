@@ -1,10 +1,6 @@
 package main
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/cli"
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
@@ -12,10 +8,16 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc"
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/client/usecase/user"
+	"github.com/Galish/goph-keeper/pkg/logger"
+	"github.com/Galish/goph-keeper/pkg/shutdowner"
 )
 
 func main() {
+	logger.Init()
+
 	cfg := config.New()
+
+	logger.SetLevel(cfg.LogLevel)
 
 	authManager := auth.New()
 
@@ -29,19 +31,10 @@ func main() {
 		user.New(grpcClient),
 		keeper.New(grpcClient),
 	)
+
+	sd := shutdowner.New(grpcClient, appUI)
+
 	go app.Run()
 
-	sigs := make(chan os.Signal, 1)
-
-	signal.Notify(
-		sigs,
-		syscall.SIGTERM,
-		syscall.SIGINT,
-		syscall.SIGQUIT,
-	)
-
-	<-sigs
-	grpcClient.Close()
-	app.Close()
-	appUI.Close()
+	sd.Wait()
 }
