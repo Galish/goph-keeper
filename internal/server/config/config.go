@@ -5,6 +5,8 @@ type Config struct {
 	DBInitPath    string
 	GRPCServAddr  string
 	AuthSecretKey string
+	CertPath      string
+	KeyPath       string
 	LogLevel      string
 }
 
@@ -53,6 +55,14 @@ func withConfig(c *Config) func(*Config) {
 
 		if c.AuthSecretKey != "" {
 			cfg.AuthSecretKey = c.AuthSecretKey
+		}
+
+		if c.CertPath != "" {
+			cfg.CertPath = c.CertPath
+		}
+
+		if c.KeyPath != "" {
+			cfg.KeyPath = c.KeyPath
 		}
 
 		if c.LogLevel != "" {

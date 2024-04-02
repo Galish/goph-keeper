@@ -19,6 +19,14 @@ func parseEnvVars(c *Config) {
 		c.AuthSecretKey = authKey
 	}
 
+	if certPath := os.Getenv("CERTIFICATE_PATH"); certPath != "" {
+		c.CertPath = certPath
+	}
+
+	if keyPath := os.Getenv("PRIVATE_KEY_PATH"); keyPath != "" {
+		c.KeyPath = keyPath
+	}
+
 	if logLevel := os.Getenv("LOG_LEVEL"); logLevel != "" {
 		c.LogLevel = logLevel
 	}
