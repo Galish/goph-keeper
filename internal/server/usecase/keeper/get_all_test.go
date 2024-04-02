@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"gotest.tools/assert"
 
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"

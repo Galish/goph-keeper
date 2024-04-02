@@ -1,6 +1,6 @@
 package user
 
-import "github.com/Galish/goph-keeper/internal/server/entity"
+import "github.com/Galish/goph-keeper/internal/entity"
 
 func (uc *UserUseCase) Verify(accessToken string) (*entity.User, error) {
 	claims, err := uc.jwtManager.Verify(accessToken)

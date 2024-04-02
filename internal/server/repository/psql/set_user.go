@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 
 	"github.com/jackc/pgx/v5/pgconn"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
-	"github.com/Galish/goph-keeper/internal/client/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (a *App) viewCredentialsList() {

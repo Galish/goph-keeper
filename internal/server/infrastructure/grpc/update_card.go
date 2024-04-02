@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 	"github.com/Galish/goph-keeper/pkg/logger"

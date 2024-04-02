@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Galish/goph-keeper/internal/server/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 

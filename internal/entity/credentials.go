@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,4 +29,14 @@ func (c *Credentials) IsValid() bool {
 	return c.Title != "" &&
 		c.Username != "" &&
 		c.Password != ""
+}
+
+func (c *Credentials) String() string {
+	return fmt.Sprintf(
+		"Title: %s\nDescription: %s\nUsername: %s\nPassword: %s\n",
+		c.Title,
+		c.Description,
+		c.Username,
+		c.Password,
+	)
 }
