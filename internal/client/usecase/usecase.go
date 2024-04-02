@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/Galish/goph-keeper/internal/client/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 type User interface {

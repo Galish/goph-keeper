@@ -3,18 +3,38 @@ package entity
 import (
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const expiryDateLayout = "02/06"
 
 type Card struct {
-	ID          string
-	Title       string
-	Description string
-	Number      string
-	Holder      string
-	CVC         string
-	Expiry      time.Time
+	ID           string
+	Title        string
+	Description  string
+	Number       string
+	Holder       string
+	CVC          string
+	Expiry       time.Time
+	CreatedBy    string
+	CreatedAt    time.Time
+	LastEditedAt time.Time
+}
+
+func NewCard() *Card {
+	return &Card{
+		ID:        uuid.NewString(),
+		CreatedAt: time.Now(),
+	}
+}
+
+func (c *Card) IsValid() bool {
+	return c.Title != "" &&
+		c.Number != "" &&
+		c.Holder != "" &&
+		c.CVC != "" &&
+		!c.Expiry.IsZero()
 }
 
 func (c *Card) String() string {

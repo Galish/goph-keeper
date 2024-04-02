@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,4 +27,13 @@ func NewTextNote() *TextNote {
 func (n *TextNote) IsValid() bool {
 	return n.Title != "" &&
 		n.Value != ""
+}
+
+func (n *TextNote) String() string {
+	return fmt.Sprintf(
+		"Title: %s\nDescription: %s\nNote: %s\n",
+		n.Title,
+		n.Description,
+		n.Value,
+	)
 }

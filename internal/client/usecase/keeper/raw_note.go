@@ -6,7 +6,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
-	"github.com/Galish/goph-keeper/internal/client/entity"
+	"github.com/Galish/goph-keeper/internal/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

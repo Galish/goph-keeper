@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	entity "github.com/Galish/goph-keeper/internal/server/entity"
+	entity "github.com/Galish/goph-keeper/internal/entity"
 	gomock "github.com/golang/mock/gomock"
 )
 
