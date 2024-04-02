@@ -2,6 +2,7 @@ package config
 
 type Config struct {
 	GRPCServAddr string
+	CertPath     string
 	LogLevel     string
 }
 
@@ -38,6 +39,10 @@ func withConfig(c *Config) func(*Config) {
 	return func(cfg *Config) {
 		if c.GRPCServAddr != "" {
 			cfg.GRPCServAddr = c.GRPCServAddr
+		}
+
+		if c.CertPath != "" {
+			cfg.CertPath = c.CertPath
 		}
 
 		if c.LogLevel != "" {

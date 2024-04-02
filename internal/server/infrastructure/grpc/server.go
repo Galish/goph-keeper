@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"crypto/tls"
 	"log"
 	"net"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -30,12 +32,21 @@ func NewServer(
 	user usecase.User,
 	keeper usecase.Keeper,
 ) *KeeperServer {
-	s := grpc.NewServer(
+	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
 			interceptors.NewAuthInterceptor(user).Unary(),
 			interceptors.LoggerInterceptor,
 		),
-	)
+	}
+
+	cert, err := tls.LoadX509KeyPair(cfg.CertPath, cfg.KeyPath)
+	if err != nil {
+		logger.WithError(err).Debug("error initializing server credentials")
+	} else {
+		opts = append(opts, grpc.Creds(credentials.NewServerTLSFromCert(&cert)))
+	}
+
+	s := grpc.NewServer(opts...)
 	reflection.Register(s)
 
 	server := &KeeperServer{
