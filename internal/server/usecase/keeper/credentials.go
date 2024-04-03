@@ -50,6 +50,7 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*
 
 		CreatedAt:    record.CreatedAt,
 		LastEditedAt: record.LastEditedAt,
+		Version:      record.Version,
 	}
 
 	return &creds, nil
@@ -82,7 +83,11 @@ func (uc *KeeperUseCase) GetAllCredentials(ctx context.Context, user string) ([]
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials) error {
+func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
+	if !overwrite && creds.Version == 0 {
+		return ErrVersionRequired
+	}
+
 	if creds == nil || creds.ID == "" || !creds.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -100,7 +105,15 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 		LastEditedAt: time.Now(),
 	}
 
+	if !overwrite {
+		record.Version = creds.Version
+	}
+
 	err := uc.repo.UpdateSecureRecord(ctx, record)
+	if errors.Is(err, repository.ErrVersionConflict) {
+		return ErrVersionConflict
+	}
+
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

@@ -14,8 +14,6 @@ import (
 )
 
 func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*pb.GetCredentialsResponse, error) {
-	var response pb.GetCredentialsResponse
-
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	creds, err := s.keeper.GetCredentials(ctx, user, in.GetId())
@@ -36,12 +34,15 @@ func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Credentials = &pb.Credentials{
-		Title:       creds.Title,
-		Description: creds.Description,
-		Username:    creds.Username,
-		Password:    creds.Password,
+	resp := pb.GetCredentialsResponse{
+		Credentials: &pb.Credentials{
+			Title:       creds.Title,
+			Description: creds.Description,
+			Username:    creds.Username,
+			Password:    creds.Password,
+		},
+		Version: creds.Version,
 	}
 
-	return &response, nil
+	return &resp, nil
 }

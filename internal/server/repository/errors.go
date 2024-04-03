@@ -3,6 +3,7 @@ package repository
 import "errors"
 
 var (
-	ErrNotFound = errors.New("nothing was found")
-	ErrConflict = errors.New("record id already exists")
+	ErrConflict        = errors.New("record id already exists")
+	ErrNotFound        = errors.New("nothing was found")
+	ErrVersionConflict = errors.New("record version conflict")
 )

@@ -53,6 +53,7 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.
 
 		CreatedAt:    record.CreatedAt,
 		LastEditedAt: record.LastEditedAt,
+		Version:      record.Version,
 	}
 
 	return &card, nil
@@ -87,7 +88,11 @@ func (uc *KeeperUseCase) GetCards(ctx context.Context, user string) ([]*entity.C
 	return cards, nil
 }
 
-func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card) error {
+func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
+	if !overwrite && card.Version == 0 {
+		return ErrVersionRequired
+	}
+
 	if card == nil || card.ID == "" || !card.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -107,7 +112,15 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card) erro
 		LastEditedAt: time.Now(),
 	}
 
+	if !overwrite {
+		record.Version = card.Version
+	}
+
 	err := uc.repo.UpdateSecureRecord(ctx, record)
+	if errors.Is(err, repository.ErrVersionConflict) {
+		return ErrVersionConflict
+	}
+
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

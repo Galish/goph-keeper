@@ -15,8 +15,6 @@ import (
 )
 
 func (s *KeeperServer) AddTextNote(ctx context.Context, in *pb.AddTextNoteRequest) (*pb.AddTextNoteResponse, error) {
-	var response pb.AddTextNoteResponse
-
 	note := entity.NewTextNote()
 	note.Title = in.Note.GetTitle()
 	note.Description = in.Note.GetDescription()
@@ -36,7 +34,9 @@ func (s *KeeperServer) AddTextNote(ctx context.Context, in *pb.AddTextNoteReques
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Id = note.ID
+	resp := &pb.AddTextNoteResponse{
+		Id: note.ID,
+	}
 
-	return &response, nil
+	return resp, nil
 }

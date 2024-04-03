@@ -15,8 +15,6 @@ import (
 )
 
 func (s *KeeperServer) AddCredentials(ctx context.Context, in *pb.AddCredentialsRequest) (*pb.AddCredentialsResponse, error) {
-	var response pb.AddCredentialsResponse
-
 	creds := entity.NewCredentials()
 	creds.Title = in.Credentials.GetTitle()
 	creds.Description = in.Credentials.GetDescription()
@@ -37,7 +35,9 @@ func (s *KeeperServer) AddCredentials(ctx context.Context, in *pb.AddCredentials
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Id = creds.ID
+	resp := &pb.AddCredentialsResponse{
+		Id: creds.ID,
+	}
 
-	return &response, nil
+	return resp, nil
 }

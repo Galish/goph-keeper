@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS secure_notes (
 	type NUMERIC DEFAULT 0,
 	title VARCHAR(250) NOT NULL,
 	description VARCHAR(250),
-
 	username VARCHAR(250),
 	password VARCHAR(250),
 	text_note VARCHAR(250),
@@ -25,6 +24,6 @@ CREATE TABLE IF NOT EXISTS secure_notes (
 	card_expiry TIMESTAMPTZ NOT NULL,
 	created_by VARCHAR(36) NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL,
-
-	last_edited_at TIMESTAMPTZ
+	last_edited_at TIMESTAMPTZ,
+	version INTEGER DEFAULT 0
 );

@@ -15,6 +15,7 @@ type TextNote struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+	Version      int32
 }
 
 func NewTextNote() *TextNote {

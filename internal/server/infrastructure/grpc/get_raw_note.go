@@ -14,8 +14,6 @@ import (
 )
 
 func (s *KeeperServer) GetRawNote(ctx context.Context, in *pb.GetRequest) (*pb.GetRawNoteResponse, error) {
-	var response pb.GetRawNoteResponse
-
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	note, err := s.keeper.GetRawNote(ctx, user, in.Id)
@@ -36,11 +34,14 @@ func (s *KeeperServer) GetRawNote(ctx context.Context, in *pb.GetRequest) (*pb.G
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Note = &pb.RawNote{
-		Title:       note.Title,
-		Description: note.Description,
-		Value:       note.Value,
+	resp := pb.GetRawNoteResponse{
+		Note: &pb.RawNote{
+			Title:       note.Title,
+			Description: note.Description,
+			Value:       note.Value,
+		},
+		Version: note.Version,
 	}
 
-	return &response, nil
+	return &resp, nil
 }

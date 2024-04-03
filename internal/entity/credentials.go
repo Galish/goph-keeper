@@ -16,6 +16,7 @@ type Credentials struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+	Version      int32
 }
 
 func NewCredentials() *Credentials {

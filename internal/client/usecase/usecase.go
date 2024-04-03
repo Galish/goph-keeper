@@ -10,27 +10,27 @@ type User interface {
 }
 
 type Keeper interface {
-	AddCard(card *entity.Card) error
-	GetCard(id string) (*entity.Card, error)
+	AddCard(*entity.Card) error
+	GetCard(string) (*entity.Card, error)
 	GetCardsList() ([]*entity.Card, error)
-	UpdateCard(creds *entity.Card) error
-	DeleteCard(id string) error
+	UpdateCard(*entity.Card, bool) error
+	DeleteCard(string) error
 
-	AddCredentials(creds *entity.Credentials) error
-	GetCredentials(id string) (*entity.Credentials, error)
+	AddCredentials(*entity.Credentials) error
+	GetCredentials(string) (*entity.Credentials, error)
 	GetCredentialsList() ([]*entity.Credentials, error)
-	UpdateCredentials(creds *entity.Credentials) error
-	DeleteCredentials(id string) error
+	UpdateCredentials(*entity.Credentials, bool) error
+	DeleteCredentials(string) error
 
-	AddTextNote(creds *entity.TextNote) error
-	GetTextNote(id string) (*entity.TextNote, error)
+	AddTextNote(*entity.TextNote) error
+	GetTextNote(string) (*entity.TextNote, error)
 	GetTextNotesList() ([]*entity.TextNote, error)
-	UpdateTextNote(creds *entity.TextNote) error
-	DeleteTextNote(id string) error
+	UpdateTextNote(*entity.TextNote, bool) error
+	DeleteTextNote(string) error
 
-	AddRawNote(creds *entity.RawNote) error
-	GetRawNote(id string) (*entity.RawNote, error)
+	AddRawNote(*entity.RawNote) error
+	GetRawNote(string) (*entity.RawNote, error)
 	GetRawNotesList() ([]*entity.RawNote, error)
-	UpdateRawNote(creds *entity.RawNote) error
-	DeleteRawNote(id string) error
+	UpdateRawNote(*entity.RawNote, bool) error
+	DeleteRawNote(string) error
 }

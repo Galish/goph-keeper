@@ -22,9 +22,10 @@ func (s *KeeperServer) UpdateTextNote(ctx context.Context, in *pb.UpdateTextNote
 		Description: in.Note.GetDescription(),
 		Value:       in.Note.GetValue(),
 		CreatedBy:   ctx.Value(interceptors.UserContextKey).(string),
+		Version:     in.GetVersion(),
 	}
 
-	err := s.keeper.UpdateTextNote(ctx, note)
+	err := s.keeper.UpdateTextNote(ctx, note, in.GetOverwrite())
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{
@@ -34,8 +35,13 @@ func (s *KeeperServer) UpdateTextNote(ctx context.Context, in *pb.UpdateTextNote
 			Error("unable to update text note")
 	}
 
-	if errors.Is(err, keeper.ErrInvalidEntity) {
+	if errors.Is(err, keeper.ErrInvalidEntity) ||
+		errors.Is(err, keeper.ErrVersionRequired) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	if errors.Is(err, keeper.ErrVersionConflict) {
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 
 	if errors.Is(err, keeper.ErrNotFound) {

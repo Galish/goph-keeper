@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
@@ -100,9 +102,13 @@ func (a *App) editCredentials(id string) {
 		return
 	}
 
-	var updated = &entity.Credentials{
-		ID: id,
-	}
+	var (
+		overwrite bool
+		updated   = &entity.Credentials{
+			ID:      id,
+			Version: creds.Version + 1,
+		}
+	)
 
 	updated.Title = a.ui.Edit("Title", creds.Title, true)
 	updated.Description = a.ui.Edit("Description", creds.Description, false)
@@ -111,7 +117,16 @@ func (a *App) editCredentials(id string) {
 
 	if ok := a.ui.Confirm("Update credentials"); ok {
 		for {
-			err := a.keeper.UpdateCredentials(updated)
+			err := a.keeper.UpdateCredentials(updated, overwrite)
+			if errors.Is(err, keeper.ErrVersionConflict) {
+				if ok := a.ui.Confirm("Credentials have already been updated. Want to overwrite"); ok {
+					overwrite = true
+					continue
+				}
+
+				break
+			}
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *KeeperServer) GetCredentialsList(ctx context.Context, _ *emptypb.Empty) (*pb.GetListResponse, error) {
@@ -28,9 +29,11 @@ func (s *KeeperServer) GetCredentialsList(ctx context.Context, _ *emptypb.Empty)
 
 	for i, c := range creds {
 		response.List[i] = &pb.ListItem{
-			Id:          c.ID,
-			Title:       c.Title,
-			Description: c.Description,
+			Id:           c.ID,
+			Title:        c.Title,
+			Description:  c.Description,
+			CreatedAt:    timestamppb.New(c.CreatedAt),
+			LastEditedAt: timestamppb.New(c.LastEditedAt),
 		}
 	}
 

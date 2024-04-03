@@ -20,7 +20,7 @@ var errorMap = map[codes.Code]error{
 	codes.InvalidArgument: ErrInvalidCredentials,
 	codes.NotFound:        ErrNotFound,
 	codes.AlreadyExists:   ErrAlreadyExists,
-	// codes.Unavailable:     ErrNoConnection,
+	codes.Unavailable:     ErrNoConnection,
 }
 
 func handleError(err error) error {

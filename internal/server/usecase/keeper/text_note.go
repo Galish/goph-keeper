@@ -47,6 +47,7 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, user, id string) (*ent
 
 		CreatedAt:    record.CreatedAt,
 		LastEditedAt: record.LastEditedAt,
+		Version:      record.Version,
 	}
 
 	return &note, nil
@@ -78,7 +79,11 @@ func (uc *KeeperUseCase) GetTextNotes(ctx context.Context, user string) ([]*enti
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote) error {
+func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote, overwrite bool) error {
+	if !overwrite && note.Version == 0 {
+		return ErrVersionRequired
+	}
+
 	if note == nil || note.ID == "" || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -95,7 +100,15 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 		LastEditedAt: time.Now(),
 	}
 
+	if !overwrite {
+		record.Version = note.Version
+	}
+
 	err := uc.repo.UpdateSecureRecord(ctx, record)
+	if errors.Is(err, repository.ErrVersionConflict) {
+		return ErrVersionConflict
+	}
+
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

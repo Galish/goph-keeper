@@ -20,6 +20,7 @@ type Card struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+	Version      int32
 }
 
 func NewCard() *Card {

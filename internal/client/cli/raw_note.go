@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
@@ -103,9 +105,13 @@ func (a *App) editRawNote(id string) {
 		return
 	}
 
-	var updated = &entity.RawNote{
-		ID: id,
-	}
+	var (
+		overwrite bool
+		updated   = &entity.RawNote{
+			ID:      id,
+			Version: note.Version + 1,
+		}
+	)
 
 	updated.Title = a.ui.Edit("Title", note.Title, true)
 	updated.Description = a.ui.Edit("Description", note.Description, false)
@@ -113,7 +119,16 @@ func (a *App) editRawNote(id string) {
 
 	if ok := a.ui.Confirm("Update binary note"); ok {
 		for {
-			err := a.keeper.UpdateRawNote(updated)
+			err := a.keeper.UpdateRawNote(updated, overwrite)
+			if errors.Is(err, keeper.ErrVersionConflict) {
+				if ok := a.ui.Confirm("Binary note has already been updated. Want to overwrite"); ok {
+					overwrite = true
+					continue
+				}
+
+				break
+			}
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
