@@ -15,8 +15,6 @@ import (
 )
 
 func (s *KeeperServer) GetCard(ctx context.Context, in *pb.GetRequest) (*pb.GetCardResponse, error) {
-	var response pb.GetCardResponse
-
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	card, err := s.keeper.GetCard(ctx, user, in.GetId())
@@ -37,14 +35,17 @@ func (s *KeeperServer) GetCard(ctx context.Context, in *pb.GetRequest) (*pb.GetC
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Card = &pb.Card{
-		Title:       card.Title,
-		Description: card.Description,
-		Number:      card.Number,
-		Holder:      card.Holder,
-		Cvc:         card.CVC,
-		Expiry:      timestamppb.New(card.Expiry),
+	resp := pb.GetCardResponse{
+		Card: &pb.Card{
+			Title:       card.Title,
+			Description: card.Description,
+			Number:      card.Number,
+			Holder:      card.Holder,
+			Cvc:         card.CVC,
+			Expiry:      timestamppb.New(card.Expiry),
+		},
+		Version: card.Version,
 	}
 
-	return &response, nil
+	return &resp, nil
 }

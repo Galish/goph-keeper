@@ -15,8 +15,6 @@ import (
 )
 
 func (s *KeeperServer) AddCard(ctx context.Context, in *pb.AddCardRequest) (*pb.AddCardResponse, error) {
-	var response pb.AddCardResponse
-
 	card := entity.NewCard()
 	card.Title = in.Card.GetTitle()
 	card.Description = in.Card.GetDescription()
@@ -39,7 +37,9 @@ func (s *KeeperServer) AddCard(ctx context.Context, in *pb.AddCardRequest) (*pb.
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Id = card.ID
+	resp := &pb.AddCardResponse{
+		Id: card.ID,
+	}
 
-	return &response, nil
+	return resp, nil
 }

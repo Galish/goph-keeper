@@ -29,7 +29,8 @@ func (s *psqlStore) GetSecureRecords(
 				card_expiry,
 				created_by,
 				created_at,
-				last_edited_at
+				last_edited_at,
+				version
 			FROM
 				secure_notes
 			WHERE
@@ -66,6 +67,7 @@ func (s *psqlStore) GetSecureRecords(
 			&record.CreatedBy,
 			&record.CreatedAt,
 			&record.LastEditedAt,
+			&record.Version,
 		); err != nil {
 			return nil, err
 		}

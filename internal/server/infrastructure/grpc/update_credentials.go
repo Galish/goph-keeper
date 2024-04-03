@@ -23,9 +23,10 @@ func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCrede
 		Username:    in.Credentials.GetUsername(),
 		Password:    in.Credentials.GetPassword(),
 		CreatedBy:   ctx.Value(interceptors.UserContextKey).(string),
+		Version:     in.GetVersion(),
 	}
 
-	err := s.keeper.UpdateCredentials(ctx, creds)
+	err := s.keeper.UpdateCredentials(ctx, creds, in.GetOverwrite())
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{
@@ -35,8 +36,13 @@ func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCrede
 			Error("unable to update credentials")
 	}
 
-	if errors.Is(err, keeper.ErrInvalidEntity) {
+	if errors.Is(err, keeper.ErrInvalidEntity) ||
+		errors.Is(err, keeper.ErrVersionRequired) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	if errors.Is(err, keeper.ErrVersionConflict) {
+		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 
 	if errors.Is(err, keeper.ErrNotFound) {

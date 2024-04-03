@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"time"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
@@ -12,7 +11,7 @@ import (
 )
 
 func (uc *KeeperUseCase) AddCard(card *entity.Card) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.AddCardRequest{
@@ -33,8 +32,8 @@ func (uc *KeeperUseCase) AddCard(card *entity.Card) error {
 	return nil
 }
 
-func (uc *KeeperUseCase) UpdateCard(card *entity.Card) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+func (uc *KeeperUseCase) UpdateCard(card *entity.Card, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.UpdateCardRequest{
@@ -47,6 +46,8 @@ func (uc *KeeperUseCase) UpdateCard(card *entity.Card) error {
 			Cvc:         card.CVC,
 			Expiry:      timestamppb.New(card.Expiry),
 		},
+		Version:   card.Version,
+		Overwrite: overwrite,
 	}
 
 	_, err := uc.client.UpdateCard(ctx, req)
@@ -55,7 +56,7 @@ func (uc *KeeperUseCase) UpdateCard(card *entity.Card) error {
 }
 
 func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -74,13 +75,14 @@ func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
 		Holder:      resp.Card.GetHolder(),
 		CVC:         resp.Card.GetCvc(),
 		Expiry:      resp.Card.GetExpiry().AsTime(),
+		Version:     resp.GetVersion(),
 	}
 
 	return card, nil
 }
 
 func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	resp, err := uc.client.GetCardsList(ctx, &emptypb.Empty{})
@@ -102,7 +104,7 @@ func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
 }
 
 func (uc *KeeperUseCase) DeleteCard(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

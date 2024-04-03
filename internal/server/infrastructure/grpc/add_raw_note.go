@@ -15,8 +15,6 @@ import (
 )
 
 func (s *KeeperServer) AddRawNote(ctx context.Context, in *pb.AddRawNoteRequest) (*pb.AddRawNoteResponse, error) {
-	var response pb.AddRawNoteResponse
-
 	note := entity.NewRawNote()
 	note.Title = in.Note.GetTitle()
 	note.Description = in.Note.GetDescription()
@@ -36,7 +34,9 @@ func (s *KeeperServer) AddRawNote(ctx context.Context, in *pb.AddRawNoteRequest)
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Id = note.ID
+	resp := &pb.AddRawNoteResponse{
+		Id: note.ID,
+	}
 
-	return &response, nil
+	return resp, nil
 }

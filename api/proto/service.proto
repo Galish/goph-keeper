@@ -30,6 +30,8 @@ message ListItem {
   string id = 1;
   string title = 2;
   string description = 3;
+  google.protobuf.Timestamp createdAt = 4;
+  google.protobuf.Timestamp lastEditedAt = 5;
 }
 
 message GetListResponse {
@@ -54,10 +56,13 @@ message AddTextNoteResponse {
 message UpdateTextNoteRequest {
   string id = 1;
   TextNote note = 2;
+  int32 version = 3;
+  bool overwrite = 4;
 }
 
 message GetTextNoteResponse {
   TextNote note = 1;
+  int32 version = 2;
 }
 
 
@@ -78,10 +83,13 @@ message AddRawNoteResponse {
 message UpdateRawNoteRequest {
   string id = 1;
   RawNote note = 2;
+  int32 version = 3;
+  bool overwrite = 4;
 }
 
 message GetRawNoteResponse {
   RawNote note = 1;
+  int32 version = 2;
 }
 
 
@@ -105,10 +113,13 @@ message AddCardResponse {
 message UpdateCardRequest {
   string id = 1;
   Card card = 2;
+  int32 version = 3;
+  bool overwrite = 4;
 }
 
 message GetCardResponse {
   Card card = 1;
+  int32 version = 2;
 }
 
 
@@ -130,10 +141,13 @@ message AddCredentialsResponse {
 message UpdateCredentialsRequest {
   string id = 1;
   Credentials credentials = 2;
+  int32 version = 3;
+  bool overwrite = 4;
 }
 
 message GetCredentialsResponse {
   Credentials credentials = 1;
+  int32 version = 2;
 }
 
 

@@ -38,4 +38,5 @@ type SecureRecord struct {
 	CreatedBy    string
 	CreatedAt    time.Time
 	LastEditedAt time.Time
+	Version      int32
 }

@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"time"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func (uc *KeeperUseCase) AddRawNote(note *entity.RawNote) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.AddRawNoteRequest{
@@ -27,8 +26,8 @@ func (uc *KeeperUseCase) AddRawNote(note *entity.RawNote) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.UpdateRawNoteRequest{
@@ -38,6 +37,8 @@ func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote) error {
 			Description: note.Description,
 			Value:       note.Value,
 		},
+		Version:   note.Version,
+		Overwrite: overwrite,
 	}
 
 	_, err := uc.client.UpdateRawNote(ctx, req)
@@ -46,7 +47,7 @@ func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote) error {
 }
 
 func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -62,13 +63,14 @@ func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
 		Title:       resp.Note.GetTitle(),
 		Description: resp.Note.GetDescription(),
 		Value:       resp.Note.GetValue(),
+		Version:     resp.GetVersion(),
 	}
 
 	return note, nil
 }
 
 func (uc *KeeperUseCase) GetRawNotesList() ([]*entity.RawNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	resp, err := uc.client.GetRawNotesList(ctx, &emptypb.Empty{})
@@ -90,7 +92,7 @@ func (uc *KeeperUseCase) GetRawNotesList() ([]*entity.RawNote, error) {
 }
 
 func (uc *KeeperUseCase) DeleteRawNote(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

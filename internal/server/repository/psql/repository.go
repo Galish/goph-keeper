@@ -35,7 +35,7 @@ func New(cfg *config.Config) (*psqlStore, error) {
 	store := psqlStore{db}
 
 	if err := store.Bootstrap(cfg.DBInitPath); err != nil {
-		logger.WithError(err).Debug("database initialization error")
+		logger.WithError(err).Fatal("database initialization error")
 	}
 
 	return &store, nil

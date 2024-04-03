@@ -14,8 +14,6 @@ import (
 )
 
 func (s *KeeperServer) GetTextNote(ctx context.Context, in *pb.GetRequest) (*pb.GetTextNoteResponse, error) {
-	var response pb.GetTextNoteResponse
-
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
 	note, err := s.keeper.GetTextNote(ctx, user, in.Id)
@@ -36,11 +34,14 @@ func (s *KeeperServer) GetTextNote(ctx context.Context, in *pb.GetRequest) (*pb.
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	response.Note = &pb.TextNote{
-		Title:       note.Title,
-		Description: note.Description,
-		Value:       note.Value,
+	resp := pb.GetTextNoteResponse{
+		Note: &pb.TextNote{
+			Title:       note.Title,
+			Description: note.Description,
+			Value:       note.Value,
+		},
+		Version: note.Version,
 	}
 
-	return &response, nil
+	return &resp, nil
 }

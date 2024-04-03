@@ -47,6 +47,7 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*enti
 
 		CreatedAt:    record.CreatedAt,
 		LastEditedAt: record.LastEditedAt,
+		Version:      record.Version,
 	}
 
 	return &note, nil
@@ -78,7 +79,11 @@ func (uc *KeeperUseCase) GetRawNotes(ctx context.Context, user string) ([]*entit
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote) error {
+func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
+	if !overwrite && note.Version == 0 {
+		return ErrVersionRequired
+	}
+
 	if note == nil || note.ID == "" || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -95,7 +100,15 @@ func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote
 		LastEditedAt: time.Now(),
 	}
 
+	if !overwrite {
+		record.Version = note.Version
+	}
+
 	err := uc.repo.UpdateSecureRecord(ctx, record)
+	if errors.Is(err, repository.ErrVersionConflict) {
+		return ErrVersionConflict
+	}
+
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

@@ -8,22 +8,13 @@ import (
 )
 
 var (
-	// ErrAlreadyExists      = errors.New("user already exists")
-	// ErrInvalidCredentials = errors.New("incorrect login/password pair")
-
-	ErrNoConnection = errors.New("check your connection and try again")
-	// Error: rpc error: code = InvalidArgument desc = failed entity validation
-
-	// ErrNoPassword         = errors.New("password not specified")
-	// ErrNoUsername         = errors.New("username not specified")
-	// ErrNotFound           = errors.New("user not found")
+	ErrNoConnection    = errors.New("check your connection and try again")
+	ErrVersionConflict = errors.New("version conflict")
 )
 
 var errorMap = map[codes.Code]error{
-	// codes.InvalidArgument: ErrInvalidCredentials,
-	// codes.NotFound:        ErrNotFound,
-	// codes.AlreadyExists:   ErrAlreadyExists,
-	codes.Unavailable: ErrNoConnection,
+	codes.FailedPrecondition: ErrVersionConflict,
+	codes.Unavailable:        ErrNoConnection,
 }
 
 func handleError(err error) error {

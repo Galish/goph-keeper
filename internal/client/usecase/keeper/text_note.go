@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"time"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func (uc *KeeperUseCase) AddTextNote(note *entity.TextNote) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.AddTextNoteRequest{
@@ -27,8 +26,8 @@ func (uc *KeeperUseCase) AddTextNote(note *entity.TextNote) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.UpdateTextNoteRequest{
@@ -38,6 +37,8 @@ func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote) error {
 			Description: note.Description,
 			Value:       note.Value,
 		},
+		Version:   note.Version,
+		Overwrite: overwrite,
 	}
 
 	_, err := uc.client.UpdateTextNote(ctx, req)
@@ -46,7 +47,7 @@ func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote) error {
 }
 
 func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -62,13 +63,14 @@ func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
 		Title:       resp.Note.GetTitle(),
 		Description: resp.Note.GetDescription(),
 		Value:       resp.Note.GetValue(),
+		Version:     resp.GetVersion(),
 	}
 
 	return note, nil
 }
 
 func (uc *KeeperUseCase) GetTextNotesList() ([]*entity.TextNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	resp, err := uc.client.GetTextNotesList(ctx, &emptypb.Empty{})
@@ -90,7 +92,7 @@ func (uc *KeeperUseCase) GetTextNotesList() ([]*entity.TextNote, error) {
 }
 
 func (uc *KeeperUseCase) DeleteTextNote(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

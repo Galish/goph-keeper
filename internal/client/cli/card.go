@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
@@ -102,9 +104,13 @@ func (a *App) editCard(id string) {
 		return
 	}
 
-	var updated = &entity.Card{
-		ID: id,
-	}
+	var (
+		overwrite bool
+		updated   = &entity.Card{
+			ID:      id,
+			Version: card.Version + 1,
+		}
+	)
 
 	updated.Title = a.ui.Edit("Title", card.Title, true)
 	updated.Description = a.ui.Edit("Description", card.Description, false)
@@ -115,7 +121,16 @@ func (a *App) editCard(id string) {
 
 	if ok := a.ui.Confirm("Update card details"); ok {
 		for {
-			err := a.keeper.UpdateCard(updated)
+			err := a.keeper.UpdateCard(updated, overwrite)
+			if errors.Is(err, keeper.ErrVersionConflict) {
+				if ok := a.ui.Confirm("Card details have already been updated. Do you want to overwrite"); ok {
+					overwrite = true
+					continue
+				}
+
+				break
+			}
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

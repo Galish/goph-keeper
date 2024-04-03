@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"time"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
@@ -11,7 +10,7 @@ import (
 )
 
 func (uc *KeeperUseCase) AddCredentials(creds *entity.Credentials) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.AddCredentialsRequest{
@@ -28,8 +27,8 @@ func (uc *KeeperUseCase) AddCredentials(creds *entity.Credentials) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.UpdateCredentialsRequest{
@@ -40,6 +39,8 @@ func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
 			Username:    creds.Username,
 			Password:    creds.Password,
 		},
+		Version:   creds.Version,
+		Overwrite: overwrite,
 	}
 
 	_, err := uc.client.UpdateCredentials(ctx, req)
@@ -48,7 +49,7 @@ func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials) error {
 }
 
 func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -65,13 +66,14 @@ func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) 
 		Description: resp.Credentials.GetDescription(),
 		Username:    resp.Credentials.GetUsername(),
 		Password:    resp.Credentials.GetPassword(),
+		Version:     resp.GetVersion(),
 	}
 
 	return creds, nil
 }
 
 func (uc *KeeperUseCase) GetCredentialsList() ([]*entity.Credentials, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	resp, err := uc.client.GetCredentialsList(ctx, &emptypb.Empty{})
@@ -93,7 +95,7 @@ func (uc *KeeperUseCase) GetCredentialsList() ([]*entity.Credentials, error) {
 }
 
 func (uc *KeeperUseCase) DeleteCredentials(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
 	defer cancel()
 
 	req := &pb.DeleteRequest{
