@@ -123,7 +123,7 @@ func (a *App) editCard(id string) {
 		for {
 			err := a.keeper.UpdateCard(updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
-				if ok := a.ui.Confirm("Card details have already been updated. Do you want to overwrite"); ok {
+				if ok := a.ui.Confirm("Card details have already been updated. Want to overwrite"); ok {
 					overwrite = true
 					continue
 				}

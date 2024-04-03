@@ -117,7 +117,7 @@ func (a *App) editTextNote(id string) {
 		for {
 			err := a.keeper.UpdateTextNote(updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
-				if ok := a.ui.Confirm("Text note have already been updated. Do you want to overwrite"); ok {
+				if ok := a.ui.Confirm("Text note has already been updated. Want to overwrite"); ok {
 					overwrite = true
 					continue
 				}

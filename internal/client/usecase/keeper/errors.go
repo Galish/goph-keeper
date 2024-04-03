@@ -10,10 +10,12 @@ import (
 var (
 	ErrNoConnection    = errors.New("check your connection and try again")
 	ErrVersionConflict = errors.New("version conflict")
+	ErrNotFound        = errors.New("record not found")
 )
 
 var errorMap = map[codes.Code]error{
 	codes.FailedPrecondition: ErrVersionConflict,
+	codes.NotFound:           ErrNotFound,
 	codes.Unavailable:        ErrNoConnection,
 }
 

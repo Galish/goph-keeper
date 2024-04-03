@@ -121,7 +121,7 @@ func (a *App) editRawNote(id string) {
 		for {
 			err := a.keeper.UpdateRawNote(updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
-				if ok := a.ui.Confirm("Binary note have already been updated. Do you want to overwrite"); ok {
+				if ok := a.ui.Confirm("Binary note has already been updated. Want to overwrite"); ok {
 					overwrite = true
 					continue
 				}
