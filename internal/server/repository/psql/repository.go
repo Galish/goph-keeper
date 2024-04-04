@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/Galish/goph-keeper/internal/server/config"
+	"github.com/Galish/goph-keeper/pkg/encryption"
 	"github.com/Galish/goph-keeper/pkg/logger"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -17,7 +18,8 @@ const (
 )
 
 type psqlStore struct {
-	db *sql.DB
+	db  *sql.DB
+	enc encryption.Encryptor
 }
 
 func New(cfg *config.Config) (*psqlStore, error) {
@@ -32,13 +34,16 @@ func New(cfg *config.Config) (*psqlStore, error) {
 		return nil, err
 	}
 
-	store := psqlStore{db}
+	store := &psqlStore{
+		db:  db,
+		enc: encryption.NewAESEncryptor([]byte("pqssjyEpfbwxyAqTPJdP28ueaVmrjEjV")), // TODO: move to config
+	}
 
 	if err := store.Bootstrap(cfg.DBInitPath); err != nil {
 		logger.WithError(err).Fatal("database initialization error")
 	}
 
-	return &store, nil
+	return store, nil
 }
 
 func (s *psqlStore) Bootstrap(filePath string) error {

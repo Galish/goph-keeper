@@ -4,11 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
 func (s *psqlStore) UpdateSecureRecord(ctx context.Context, record *repository.SecureRecord) error {
+	protected, err := s.encrypt(record)
+	if err != nil {
+		return fmt.Errorf("encryption failed: %v", err)
+	}
+
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -17,41 +23,28 @@ func (s *psqlStore) UpdateSecureRecord(ctx context.Context, record *repository.S
 	row := tx.QueryRow(
 		`
 			UPDATE secure_notes
-			SET title = $3,
-				description = $4,
-				username = $5,
-				password = $6,
-				text_note = $7,
-				raw_note = $8,
-				card_number = $9,
-				card_holder = $10,
-				card_cvc = $11,
-				card_expiry = $12,
-				last_edited_at = $14,
+			SET
+				title = $1,
+				description = $2,
+				protected_data = $3,
+				last_edited_at = $4,
 				version = version + 1
-			WHERE uuid = $1
-				AND type = $2
-				AND created_by = $13
+			WHERE
+				uuid = $5
+				AND type = $6
+				AND created_by = $7
 			RETURNING version
 		`,
-		record.ID,
-		record.Type,
 		record.Title,
 		record.Description,
-		record.Username,
-		record.Password,
-		record.TextNote,
-		record.RawNote,
-		record.CardNumber,
-		record.CardHolder,
-		record.CardCVC,
-		record.CardExpiry,
-		record.CreatedBy,
+		protected,
 		record.LastEditedAt,
+		record.ID,
+		record.Type,
+		record.CreatedBy,
 	)
 
 	var version int32
-
 	err = row.Scan(&version)
 	if errors.Is(err, sql.ErrNoRows) {
 		return repository.ErrNotFound
