@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const expiryDateLayout = "02/06"
+const expiryDateLayout = "01/06"
 
 type Card struct {
 	ID           string

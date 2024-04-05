@@ -2,6 +2,7 @@ package psql
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
@@ -19,14 +20,7 @@ func (s *psqlStore) GetSecureRecords(
 				type,
 				title,
 				description,
-				username,
-				password,
-				text_note,
-				raw_note,
-				card_number,
-				card_holder,
-				card_cvc,
-				card_expiry,
+				protected_data,
 				created_by,
 				created_at,
 				last_edited_at,
@@ -47,7 +41,11 @@ func (s *psqlStore) GetSecureRecords(
 
 	defer rows.Close()
 
-	var records []*repository.SecureRecord
+	var (
+		records   []*repository.SecureRecord
+		protected string
+	)
+
 	for rows.Next() {
 		var record repository.SecureRecord
 
@@ -56,20 +54,17 @@ func (s *psqlStore) GetSecureRecords(
 			&record.Type,
 			&record.Title,
 			&record.Description,
-			&record.Username,
-			&record.Password,
-			&record.TextNote,
-			&record.RawNote,
-			&record.CardNumber,
-			&record.CardHolder,
-			&record.CardCVC,
-			&record.CardExpiry,
+			&protected,
 			&record.CreatedBy,
 			&record.CreatedAt,
 			&record.LastEditedAt,
 			&record.Version,
 		); err != nil {
 			return nil, err
+		}
+
+		if err := s.decrypt(protected, &record); err != nil {
+			return nil, fmt.Errorf("decryption failed: %v", err)
 		}
 
 		records = append(records, &record)

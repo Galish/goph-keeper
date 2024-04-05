@@ -3,16 +3,19 @@ package psql
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (s *psqlStore) AddSecureRecord(
-	ctx context.Context,
-	record *repository.SecureRecord,
-) error {
-	_, err := s.db.ExecContext(
+func (s *psqlStore) AddSecureRecord(ctx context.Context, record *repository.SecureRecord) error {
+	protected, err := s.encrypt(record)
+	if err != nil {
+		return fmt.Errorf("encryption failed: %v", err)
+	}
+
+	_, err = s.db.ExecContext(
 		ctx,
 		`
 			INSERT INTO secure_notes (
@@ -20,34 +23,20 @@ func (s *psqlStore) AddSecureRecord(
 				type,
 				title,
 				description,
-				username,
-				password,
-				text_note,
-				raw_note,
-				card_number,
-				card_holder,
-				card_cvc,
-				card_expiry,
+				protected_data,
 				created_by,
 				created_at,
 				last_edited_at
 			)
 			VALUES (
-				$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+				$1, $2, $3, $4, $5, $6, $7, $8
 			)
 		`,
 		record.ID,
 		record.Type,
 		record.Title,
 		record.Description,
-		record.Username,
-		record.Password,
-		record.TextNote,
-		record.RawNote,
-		record.CardNumber,
-		record.CardHolder,
-		record.CardCVC,
-		record.CardExpiry,
+		protected,
 		record.CreatedBy,
 		record.CreatedAt,
 		record.LastEditedAt,
