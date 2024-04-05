@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (uc *KeeperUseCase) AddRawNote(note *entity.RawNote) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.AddRawNoteRequest{
@@ -26,8 +26,8 @@ func (uc *KeeperUseCase) AddRawNote(note *entity.RawNote) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote, overwrite bool) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.UpdateRawNoteRequest{
@@ -46,8 +46,8 @@ func (uc *KeeperUseCase) UpdateRawNote(note *entity.RawNote, overwrite bool) err
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetRawNote(ctx context.Context, id string) (*entity.RawNote, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -69,8 +69,8 @@ func (uc *KeeperUseCase) GetRawNote(id string) (*entity.RawNote, error) {
 	return note, nil
 }
 
-func (uc *KeeperUseCase) GetRawNotesList() ([]*entity.RawNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetRawNotesList(ctx context.Context) ([]*entity.RawNote, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	resp, err := uc.client.GetRawNotesList(ctx, &emptypb.Empty{})
@@ -91,8 +91,8 @@ func (uc *KeeperUseCase) GetRawNotesList() ([]*entity.RawNote, error) {
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) DeleteRawNote(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) DeleteRawNote(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

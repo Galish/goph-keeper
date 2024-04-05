@@ -11,7 +11,7 @@ import (
 )
 
 func (a *App) viewCardsList(ctx context.Context) {
-	cards, err := a.keeper.GetCardsList()
+	cards, err := a.keeper.GetCardsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -50,7 +50,7 @@ func (a *App) viewCardsList(ctx context.Context) {
 }
 
 func (a *App) viewCard(ctx context.Context, id string) {
-	card, err := a.keeper.GetCard(id)
+	card, err := a.keeper.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -94,7 +94,7 @@ func (a *App) addCard(ctx context.Context) {
 
 	if ok := a.ui.Confirm("Add card details"); ok {
 		for {
-			err := a.keeper.AddCard(&card)
+			err := a.keeper.AddCard(ctx, &card)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -105,7 +105,7 @@ func (a *App) addCard(ctx context.Context) {
 }
 
 func (a *App) editCard(ctx context.Context, id string) {
-	card, err := a.keeper.GetCard(id)
+	card, err := a.keeper.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -128,7 +128,7 @@ func (a *App) editCard(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Update card details"); ok {
 		for {
-			err := a.keeper.UpdateCard(updated, overwrite)
+			err := a.keeper.UpdateCard(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Card details have already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -150,7 +150,7 @@ func (a *App) editCard(ctx context.Context, id string) {
 func (a *App) deleteCard(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteCard(id)
+			err := a.keeper.DeleteCard(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

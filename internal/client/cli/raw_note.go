@@ -11,7 +11,7 @@ import (
 )
 
 func (a *App) viewRawNotesList(ctx context.Context) {
-	notes, err := a.keeper.GetRawNotesList()
+	notes, err := a.keeper.GetRawNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -50,7 +50,7 @@ func (a *App) viewRawNotesList(ctx context.Context) {
 }
 
 func (a *App) viewRawNote(ctx context.Context, id string) {
-	note, err := a.keeper.GetRawNote(id)
+	note, err := a.keeper.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -92,7 +92,7 @@ func (a *App) addRawNote(ctx context.Context) {
 
 	if ok := a.ui.Confirm("Add binary note"); ok {
 		for {
-			err := a.keeper.AddRawNote(&note)
+			err := a.keeper.AddRawNote(ctx, &note)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -103,7 +103,7 @@ func (a *App) addRawNote(ctx context.Context) {
 }
 
 func (a *App) editRawNote(ctx context.Context, id string) {
-	note, err := a.keeper.GetRawNote(id)
+	note, err := a.keeper.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -128,7 +128,7 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Update binary note"); ok {
 		for {
-			err := a.keeper.UpdateRawNote(updated, overwrite)
+			err := a.keeper.UpdateRawNote(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Binary note has already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -150,7 +150,7 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 func (a *App) deleteRawNote(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteRawNote(id)
+			err := a.keeper.DeleteRawNote(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

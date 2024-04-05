@@ -11,7 +11,7 @@ import (
 )
 
 func (a *App) viewCredentialsList(ctx context.Context) {
-	creds, err := a.keeper.GetCredentialsList()
+	creds, err := a.keeper.GetCredentialsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -50,7 +50,7 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 }
 
 func (a *App) viewCredentials(ctx context.Context, id string) {
-	creds, err := a.keeper.GetCredentials(id)
+	creds, err := a.keeper.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -92,7 +92,7 @@ func (a *App) addCredentials(ctx context.Context) {
 
 	if ok := a.ui.Confirm("Add credentials"); ok {
 		for {
-			err := a.keeper.AddCredentials(&creds)
+			err := a.keeper.AddCredentials(ctx, &creds)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -103,7 +103,7 @@ func (a *App) addCredentials(ctx context.Context) {
 }
 
 func (a *App) editCredentials(ctx context.Context, id string) {
-	creds, err := a.keeper.GetCredentials(id)
+	creds, err := a.keeper.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -124,7 +124,7 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Update credentials"); ok {
 		for {
-			err := a.keeper.UpdateCredentials(updated, overwrite)
+			err := a.keeper.UpdateCredentials(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Credentials have already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -146,7 +146,7 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 func (a *App) deleteCredentials(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteCredentials(id)
+			err := a.keeper.DeleteCredentials(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

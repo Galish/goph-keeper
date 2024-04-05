@@ -6,7 +6,7 @@ func (a *App) signInUser(ctx context.Context) {
 	username := a.ui.Input("Enter username", true)
 	password := a.ui.InputPassword("Enter password", true)
 
-	err := a.user.SignIn(username, password)
+	err := a.user.SignIn(ctx, username, password)
 	if ok := a.ui.Retry(err); ok {
 		a.signInUser(ctx)
 	}
@@ -24,7 +24,7 @@ func (a *App) signUpUser(ctx context.Context) {
 	username := a.ui.Input("Enter username", true)
 	password := a.ui.InputPassword("Enter password", true)
 
-	err := a.user.SignUp(username, password)
+	err := a.user.SignUp(ctx, username, password)
 	if ok := a.ui.Retry(err); ok {
 		a.signUpUser(ctx)
 	}

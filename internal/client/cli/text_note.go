@@ -11,7 +11,7 @@ import (
 )
 
 func (a *App) viewTextNotesList(ctx context.Context) {
-	notes, err := a.keeper.GetTextNotesList()
+	notes, err := a.keeper.GetTextNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -50,7 +50,7 @@ func (a *App) viewTextNotesList(ctx context.Context) {
 }
 
 func (a *App) viewTextNote(ctx context.Context, id string) {
-	note, err := a.keeper.GetTextNote(id)
+	note, err := a.keeper.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -91,7 +91,7 @@ func (a *App) addTextNote(ctx context.Context) {
 
 	if ok := a.ui.Confirm("Add text note"); ok {
 		for {
-			err := a.keeper.AddTextNote(&note)
+			err := a.keeper.AddTextNote(ctx, &note)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -102,7 +102,7 @@ func (a *App) addTextNote(ctx context.Context) {
 }
 
 func (a *App) editTextNote(ctx context.Context, id string) {
-	note, err := a.keeper.GetTextNote(id)
+	note, err := a.keeper.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -122,7 +122,7 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Update text note"); ok {
 		for {
-			err := a.keeper.UpdateTextNote(updated, overwrite)
+			err := a.keeper.UpdateTextNote(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Text note has already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -144,7 +144,7 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 func (a *App) deleteTextNote(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteTextNote(id)
+			err := a.keeper.DeleteTextNote(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

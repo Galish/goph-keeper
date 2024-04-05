@@ -6,7 +6,7 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 )
 
-var timeoutDefault = 1 * time.Minute
+var defaultTimeout = 1 * time.Minute
 
 type KeeperUseCase struct {
 	client pb.KeeperClient
