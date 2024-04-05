@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewRawNotesList() {
+func (a *App) viewRawNotesList(ctx context.Context) {
 	notes, err := a.keeper.GetRawNotesList()
 	if err != nil {
 		a.ui.Error(err)
@@ -19,11 +20,15 @@ func (a *App) viewRawNotesList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addRawNote,
+			Run: func() {
+				a.addRawNote(ctx)
+			},
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.selectCategory,
+			Run: func() {
+				a.selectCategory(ctx)
+			},
 		},
 	}
 
@@ -35,7 +40,7 @@ func (a *App) viewRawNotesList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, n.Title, n.Description),
 				Run: func() {
-					a.viewRawNote(id)
+					a.viewRawNote(ctx, id)
 				},
 			},
 		)
@@ -44,7 +49,7 @@ func (a *App) viewRawNotesList() {
 	a.ui.Select("Add new binary note or select existing", commands)
 }
 
-func (a *App) viewRawNote(id string) {
+func (a *App) viewRawNote(ctx context.Context, id string) {
 	note, err := a.keeper.GetRawNote(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -58,25 +63,27 @@ func (a *App) viewRawNote(id string) {
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editRawNote(id)
+				a.editRawNote(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteRawNote(id)
+				a.deleteRawNote(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewRawNotesList,
+			Run: func() {
+				a.viewRawNotesList(ctx)
+			},
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addRawNote() {
+func (a *App) addRawNote(ctx context.Context) {
 	note := entity.RawNote{}
 
 	note.Title = a.ui.Input("Title", true)
@@ -92,10 +99,10 @@ func (a *App) addRawNote() {
 		}
 	}
 
-	a.viewRawNotesList()
+	a.viewRawNotesList(ctx)
 }
 
-func (a *App) editRawNote(id string) {
+func (a *App) editRawNote(ctx context.Context, id string) {
 	note, err := a.keeper.GetRawNote(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -137,10 +144,10 @@ func (a *App) editRawNote(id string) {
 		}
 	}
 
-	a.viewRawNotesList()
+	a.viewRawNotesList(ctx)
 }
 
-func (a *App) deleteRawNote(id string) {
+func (a *App) deleteRawNote(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteRawNote(id)
@@ -149,8 +156,8 @@ func (a *App) deleteRawNote(id string) {
 			}
 		}
 
-		a.viewRawNotesList()
+		a.viewRawNotesList(ctx)
 	} else {
-		a.viewRawNote(id)
+		a.viewRawNote(ctx, id)
 	}
 }

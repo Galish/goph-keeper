@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewTextNotesList() {
+func (a *App) viewTextNotesList(ctx context.Context) {
 	notes, err := a.keeper.GetTextNotesList()
 	if err != nil {
 		a.ui.Error(err)
@@ -19,11 +20,15 @@ func (a *App) viewTextNotesList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addTextNote,
+			Run: func() {
+				a.addTextNote(ctx)
+			},
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.selectCategory,
+			Run: func() {
+				a.selectCategory(ctx)
+			},
 		},
 	}
 
@@ -35,7 +40,7 @@ func (a *App) viewTextNotesList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, n.Title, n.Description),
 				Run: func() {
-					a.viewTextNote(id)
+					a.viewTextNote(ctx, id)
 				},
 			},
 		)
@@ -44,7 +49,7 @@ func (a *App) viewTextNotesList() {
 	a.ui.Select("Add new text note or select existing", commands)
 }
 
-func (a *App) viewTextNote(id string) {
+func (a *App) viewTextNote(ctx context.Context, id string) {
 	note, err := a.keeper.GetTextNote(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -57,25 +62,27 @@ func (a *App) viewTextNote(id string) {
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editTextNote(id)
+				a.editTextNote(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteTextNote(id)
+				a.deleteTextNote(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewTextNotesList,
+			Run: func() {
+				a.viewTextNotesList(ctx)
+			},
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addTextNote() {
+func (a *App) addTextNote(ctx context.Context) {
 	note := entity.TextNote{}
 
 	note.Title = a.ui.Input("Title", true)
@@ -91,10 +98,10 @@ func (a *App) addTextNote() {
 		}
 	}
 
-	a.viewTextNotesList()
+	a.viewTextNotesList(ctx)
 }
 
-func (a *App) editTextNote(id string) {
+func (a *App) editTextNote(ctx context.Context, id string) {
 	note, err := a.keeper.GetTextNote(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -131,10 +138,10 @@ func (a *App) editTextNote(id string) {
 		}
 	}
 
-	a.viewTextNotesList()
+	a.viewTextNotesList(ctx)
 }
 
-func (a *App) deleteTextNote(id string) {
+func (a *App) deleteTextNote(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteTextNote(id)
@@ -143,8 +150,8 @@ func (a *App) deleteTextNote(id string) {
 			}
 		}
 
-		a.viewTextNotesList()
+		a.viewTextNotesList(ctx)
 	} else {
-		a.viewTextNote(id)
+		a.viewTextNote(ctx, id)
 	}
 }

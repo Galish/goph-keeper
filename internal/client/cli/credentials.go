@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewCredentialsList() {
+func (a *App) viewCredentialsList(ctx context.Context) {
 	creds, err := a.keeper.GetCredentialsList()
 	if err != nil {
 		a.ui.Error(err)
@@ -19,11 +20,15 @@ func (a *App) viewCredentialsList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addCredentials,
+			Run: func() {
+				a.addCredentials(ctx)
+			},
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.selectCategory,
+			Run: func() {
+				a.selectCategory(ctx)
+			},
 		},
 	}
 
@@ -35,7 +40,7 @@ func (a *App) viewCredentialsList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
-					a.viewCredentials(id)
+					a.viewCredentials(ctx, id)
 				},
 			},
 		)
@@ -44,7 +49,7 @@ func (a *App) viewCredentialsList() {
 	a.ui.Select("Add new credentials or select existing", commands)
 }
 
-func (a *App) viewCredentials(id string) {
+func (a *App) viewCredentials(ctx context.Context, id string) {
 	creds, err := a.keeper.GetCredentials(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -57,25 +62,27 @@ func (a *App) viewCredentials(id string) {
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editCredentials(id)
+				a.editCredentials(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteCredentials(id)
+				a.deleteCredentials(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewCredentialsList,
+			Run: func() {
+				a.viewCredentialsList(ctx)
+			},
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addCredentials() {
+func (a *App) addCredentials(ctx context.Context) {
 	creds := entity.Credentials{}
 
 	creds.Title = a.ui.Input("Title", true)
@@ -92,10 +99,10 @@ func (a *App) addCredentials() {
 		}
 	}
 
-	a.viewCredentialsList()
+	a.viewCredentialsList(ctx)
 }
 
-func (a *App) editCredentials(id string) {
+func (a *App) editCredentials(ctx context.Context, id string) {
 	creds, err := a.keeper.GetCredentials(id)
 	if err != nil {
 		a.ui.Error(err)
@@ -133,10 +140,10 @@ func (a *App) editCredentials(id string) {
 		}
 	}
 
-	a.viewCredentialsList()
+	a.viewCredentialsList(ctx)
 }
 
-func (a *App) deleteCredentials(id string) {
+func (a *App) deleteCredentials(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteCredentials(id)
@@ -145,8 +152,8 @@ func (a *App) deleteCredentials(id string) {
 			}
 		}
 
-		a.viewCredentialsList()
+		a.viewCredentialsList(ctx)
 	} else {
-		a.viewCredentials(id)
+		a.viewCredentials(ctx, id)
 	}
 }

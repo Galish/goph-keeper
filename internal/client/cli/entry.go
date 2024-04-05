@@ -1,22 +1,27 @@
 package cli
 
 import (
+	"context"
 	"syscall"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 )
 
-func (a *App) viewAuthScreen() {
+func (a *App) viewAuthScreen(ctx context.Context) {
 	a.ui.Select(
 		"You need to log in or sign up before continuing",
 		[]*ui.SelectOption{
 			{
 				Label: "Already have an account? Log in",
-				Run:   a.signInUser,
+				Run: func() {
+					a.signInUser(ctx)
+				},
 			},
 			{
 				Label: "Create account",
-				Run:   a.signUpUser,
+				Run: func() {
+					a.signUpUser(ctx)
+				},
 			},
 			{
 				Label: "Exit",
@@ -28,25 +33,33 @@ func (a *App) viewAuthScreen() {
 	)
 }
 
-func (a *App) selectCategory() {
+func (a *App) selectCategory(ctx context.Context) {
 	a.ui.Select(
 		"Select category",
 		[]*ui.SelectOption{
 			{
 				Label: "Credentials",
-				Run:   a.viewCredentialsList,
+				Run: func() {
+					a.viewCredentialsList(ctx)
+				},
 			},
 			{
 				Label: "Bank cards",
-				Run:   a.viewCardsList,
+				Run: func() {
+					a.viewCardsList(ctx)
+				},
 			},
 			{
 				Label: "Text notes",
-				Run:   a.viewTextNotesList,
+				Run: func() {
+					a.viewTextNotesList(ctx)
+				},
 			},
 			{
 				Label: "Binary notes",
-				Run:   a.viewRawNotesList,
+				Run: func() {
+					a.viewRawNotesList(ctx)
+				},
 			},
 		},
 	)
