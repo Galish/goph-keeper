@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
@@ -53,6 +54,17 @@ func (a *App) viewRawNote(id string) {
 
 	a.ui.Print(note.String())
 
+	for {
+		filePath := a.ui.Input("Enter the path to save the file", true)
+
+		if err := os.WriteFile(filePath, note.Value, 0666); err != nil {
+			a.ui.Error(err)
+			continue
+		}
+
+		break
+	}
+
 	var commands = []*ui.SelectOption{
 		{
 			Label: "Edit",
@@ -81,9 +93,17 @@ func (a *App) addRawNote() {
 	note.Title = a.ui.Input("Title", true)
 	note.Description = a.ui.Input("Description", false)
 
-	value := a.ui.Input("Note", true)
-	if err := note.SetValue(value); err != nil {
-		a.ui.Error(err)
+	filePath := a.ui.Input("File path", true)
+
+	var err error
+	for {
+		note.Value, err = os.ReadFile(filePath)
+		if err != nil {
+			a.ui.Error(err)
+			continue
+		}
+
+		break
 	}
 
 	if ok := a.ui.Confirm("Add binary note"); ok {
@@ -115,7 +135,22 @@ func (a *App) editRawNote(id string) {
 
 	updated.Title = a.ui.Edit("Title", note.Title, true)
 	updated.Description = a.ui.Edit("Description", note.Description, false)
-	updated.SetValue(a.ui.Edit("Note", note.GetValue(), true))
+
+	filePath := a.ui.Input("File path", false)
+	for {
+		if filePath == "" {
+			updated.Value = note.Value
+			break
+		}
+
+		updated.Value, err = os.ReadFile(filePath)
+		if err != nil {
+			a.ui.Error(err)
+			continue
+		}
+
+		break
+	}
 
 	if ok := a.ui.Confirm("Update binary note"); ok {
 		for {
