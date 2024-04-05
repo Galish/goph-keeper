@@ -52,6 +52,7 @@ func (a *App) viewRawNote(id string) {
 	}
 
 	a.ui.Print(note.String())
+	a.ui.WriteFile("Enter the path to save the file", note.Value, false)
 
 	var commands = []*ui.SelectOption{
 		{
@@ -80,11 +81,7 @@ func (a *App) addRawNote() {
 
 	note.Title = a.ui.Input("Title", true)
 	note.Description = a.ui.Input("Description", false)
-
-	value := a.ui.Input("Note", true)
-	if err := note.SetValue(value); err != nil {
-		a.ui.Error(err)
-	}
+	note.Value = a.ui.ReadFile("Enter file path", true)
 
 	if ok := a.ui.Confirm("Add binary note"); ok {
 		for {
@@ -115,7 +112,12 @@ func (a *App) editRawNote(id string) {
 
 	updated.Title = a.ui.Edit("Title", note.Title, true)
 	updated.Description = a.ui.Edit("Description", note.Description, false)
-	updated.SetValue(a.ui.Edit("Note", note.GetValue(), true))
+
+	if value := a.ui.ReadFile("Enter file path", false); value != nil {
+		updated.Value = value
+	} else {
+		updated.Value = note.Value
+	}
 
 	if ok := a.ui.Confirm("Update binary note"); ok {
 		for {

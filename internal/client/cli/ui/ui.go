@@ -9,14 +9,16 @@ import (
 
 type UserInterface interface {
 	Break()
-	Confirm(label string) bool
+	Confirm(string) bool
 	Edit(string, string, bool) string
 	Error(error)
 	Input(string, bool) string
 	InputPassword(string, bool) string
 	Print(string)
-	Retry(err error) bool
+	Retry(error) bool
 	Select(string, []*SelectOption)
+	ReadFile(string, bool) []byte
+	WriteFile(string, []byte, bool)
 }
 
 type UI struct {
