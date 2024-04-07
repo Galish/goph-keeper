@@ -31,6 +31,10 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 }
 
 func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error) {
+	if id == "" || user == "" {
+		return nil, ErrMissingArgument
+	}
+
 	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeCredentials)
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
@@ -57,6 +61,10 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*
 }
 
 func (uc *KeeperUseCase) GetAllCredentials(ctx context.Context, user string) ([]*entity.Credentials, error) {
+	if user == "" {
+		return nil, ErrMissingArgument
+	}
+
 	records, err := uc.repo.GetSecureRecords(ctx, user, repository.TypeCredentials)
 	if err != nil {
 		return nil, err
@@ -84,12 +92,12 @@ func (uc *KeeperUseCase) GetAllCredentials(ctx context.Context, user string) ([]
 }
 
 func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
-	if !overwrite && creds.Version == 0 {
-		return ErrVersionRequired
-	}
-
 	if creds == nil || creds.ID == "" || !creds.IsValid() {
 		return ErrInvalidEntity
+	}
+
+	if !overwrite && creds.Version == 0 {
+		return ErrVersionRequired
 	}
 
 	record := &repository.SecureRecord{
@@ -122,6 +130,10 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 }
 
 func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, user, id string) error {
+	if id == "" || user == "" {
+		return ErrMissingArgument
+	}
+
 	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeCredentials)
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound

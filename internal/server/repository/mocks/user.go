@@ -35,6 +35,20 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 	return m.recorder
 }
 
+// AddUser mocks base method.
+func (m *MockUserRepository) AddUser(arg0 context.Context, arg1 *entity.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddUser", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddUser indicates an expected call of AddUser.
+func (mr *MockUserRepositoryMockRecorder) AddUser(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddUser", reflect.TypeOf((*MockUserRepository)(nil).AddUser), arg0, arg1)
+}
+
 // GetUserByLogin mocks base method.
 func (m *MockUserRepository) GetUserByLogin(arg0 context.Context, arg1 string) (*entity.User, error) {
 	m.ctrl.T.Helper()
@@ -48,18 +62,4 @@ func (m *MockUserRepository) GetUserByLogin(arg0 context.Context, arg1 string) (
 func (mr *MockUserRepositoryMockRecorder) GetUserByLogin(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByLogin", reflect.TypeOf((*MockUserRepository)(nil).GetUserByLogin), arg0, arg1)
-}
-
-// SetUser mocks base method.
-func (m *MockUserRepository) SetUser(arg0 context.Context, arg1 *entity.User) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetUser", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetUser indicates an expected call of SetUser.
-func (mr *MockUserRepositoryMockRecorder) SetUser(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUser", reflect.TypeOf((*MockUserRepository)(nil).SetUser), arg0, arg1)
 }

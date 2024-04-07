@@ -33,6 +33,10 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 }
 
 func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.Card, error) {
+	if id == "" || user == "" {
+		return nil, ErrMissingArgument
+	}
+
 	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeCard)
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
@@ -60,6 +64,10 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.
 }
 
 func (uc *KeeperUseCase) GetCards(ctx context.Context, user string) ([]*entity.Card, error) {
+	if user == "" {
+		return nil, ErrMissingArgument
+	}
+
 	records, err := uc.repo.GetSecureRecords(ctx, user, repository.TypeCard)
 	if err != nil {
 		return nil, err
@@ -89,12 +97,12 @@ func (uc *KeeperUseCase) GetCards(ctx context.Context, user string) ([]*entity.C
 }
 
 func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
-	if !overwrite && card.Version == 0 {
-		return ErrVersionRequired
-	}
-
 	if card == nil || card.ID == "" || !card.IsValid() {
 		return ErrInvalidEntity
+	}
+
+	if !overwrite && card.Version == 0 {
+		return ErrVersionRequired
 	}
 
 	record := &repository.SecureRecord{
@@ -129,6 +137,10 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, over
 }
 
 func (uc *KeeperUseCase) DeleteCard(ctx context.Context, user, id string) error {
+	if id == "" || user == "" {
+		return ErrMissingArgument
+	}
+
 	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeCard)
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound

@@ -26,7 +26,7 @@ func TestSignUp(t *testing.T) {
 	m := mocks.NewMockUserRepository(ctrl)
 
 	m.EXPECT().
-		SetUser(gomock.Any(), gomock.Any()).
+		AddUser(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(_ context.Context, user *entity.User) error {
 			switch user.Login {
 			case "john.doe":

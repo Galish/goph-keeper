@@ -6,11 +6,11 @@ import (
 )
 
 type KeeperRepository interface {
-	AddSecureRecord(context.Context, *SecureRecord) error
-	UpdateSecureRecord(context.Context, *SecureRecord) error
-	DeleteSecureRecord(context.Context, string, string, SecureRecordType) error
-	GetSecureRecord(context.Context, string, string, SecureRecordType) (*SecureRecord, error)
-	GetSecureRecords(context.Context, string, SecureRecordType) ([]*SecureRecord, error)
+	AddSecureRecord(ctx context.Context, record *SecureRecord) error
+	UpdateSecureRecord(ctx context.Context, record *SecureRecord) error
+	DeleteSecureRecord(ctx context.Context, user, id string, recordType SecureRecordType) error
+	GetSecureRecord(ctx context.Context, user, id string, recordType SecureRecordType) (*SecureRecord, error)
+	GetSecureRecords(ctx context.Context, user string, recordType SecureRecordType) ([]*SecureRecord, error)
 }
 
 const (

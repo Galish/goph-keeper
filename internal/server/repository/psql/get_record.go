@@ -9,11 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) GetSecureRecord(
-	ctx context.Context,
-	user, id string,
-	recordType repository.SecureRecordType,
-) (*repository.SecureRecord, error) {
+func (s *psqlStore) GetSecureRecord(ctx context.Context, user, id string, recordType repository.SecureRecordType) (*repository.SecureRecord, error) {
 	row := s.db.QueryRowContext(
 		ctx,
 		`

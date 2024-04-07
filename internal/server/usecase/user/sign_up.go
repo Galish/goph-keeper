@@ -27,7 +27,7 @@ func (uc *UserUseCase) SignUp(
 	user.Login = username
 	user.Password = string(bytes)
 
-	err = uc.repo.SetUser(ctx, user)
+	err = uc.repo.AddUser(ctx, user)
 	if errors.Is(err, repository.ErrConflict) {
 		return "", ErrConflict
 	}

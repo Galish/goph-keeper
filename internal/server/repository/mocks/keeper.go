@@ -35,60 +35,74 @@ func (m *MockKeeperRepository) EXPECT() *MockKeeperRepositoryMockRecorder {
 	return m.recorder
 }
 
-// DeleteSecureRecord mocks base method.
-func (m *MockKeeperRepository) DeleteSecureRecord(arg0 context.Context, arg1, arg2 string, arg3 repository.SecureRecordType) error {
+// AddSecureRecord mocks base method.
+func (m *MockKeeperRepository) AddSecureRecord(ctx context.Context, record *repository.SecureRecord) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteSecureRecord", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "AddSecureRecord", ctx, record)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddSecureRecord indicates an expected call of AddSecureRecord.
+func (mr *MockKeeperRepositoryMockRecorder) AddSecureRecord(ctx, record interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).AddSecureRecord), ctx, record)
+}
+
+// DeleteSecureRecord mocks base method.
+func (m *MockKeeperRepository) DeleteSecureRecord(ctx context.Context, user, id string, recordType repository.SecureRecordType) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteSecureRecord", ctx, user, id, recordType)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteSecureRecord indicates an expected call of DeleteSecureRecord.
-func (mr *MockKeeperRepositoryMockRecorder) DeleteSecureRecord(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
+func (mr *MockKeeperRepositoryMockRecorder) DeleteSecureRecord(ctx, user, id, recordType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).DeleteSecureRecord), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).DeleteSecureRecord), ctx, user, id, recordType)
 }
 
 // GetSecureRecord mocks base method.
-func (m *MockKeeperRepository) GetSecureRecord(arg0 context.Context, arg1, arg2 string) (*repository.SecureRecord, error) {
+func (m *MockKeeperRepository) GetSecureRecord(ctx context.Context, user, id string, recordType repository.SecureRecordType) (*repository.SecureRecord, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSecureRecord", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetSecureRecord", ctx, user, id, recordType)
 	ret0, _ := ret[0].(*repository.SecureRecord)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetSecureRecord indicates an expected call of GetSecureRecord.
-func (mr *MockKeeperRepositoryMockRecorder) GetSecureRecord(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockKeeperRepositoryMockRecorder) GetSecureRecord(ctx, user, id, recordType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).GetSecureRecord), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).GetSecureRecord), ctx, user, id, recordType)
 }
 
 // GetSecureRecords mocks base method.
-func (m *MockKeeperRepository) GetSecureRecords(arg0 context.Context, arg1 string, arg2 repository.SecureRecordType) ([]*repository.SecureRecord, error) {
+func (m *MockKeeperRepository) GetSecureRecords(ctx context.Context, user string, recordType repository.SecureRecordType) ([]*repository.SecureRecord, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSecureRecords", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetSecureRecords", ctx, user, recordType)
 	ret0, _ := ret[0].([]*repository.SecureRecord)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetSecureRecords indicates an expected call of GetSecureRecords.
-func (mr *MockKeeperRepositoryMockRecorder) GetSecureRecords(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockKeeperRepositoryMockRecorder) GetSecureRecords(ctx, user, recordType interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecureRecords", reflect.TypeOf((*MockKeeperRepository)(nil).GetSecureRecords), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSecureRecords", reflect.TypeOf((*MockKeeperRepository)(nil).GetSecureRecords), ctx, user, recordType)
 }
 
-// SetSecureRecord mocks base method.
-func (m *MockKeeperRepository) SetSecureRecord(arg0 context.Context, arg1 *repository.SecureRecord) error {
+// UpdateSecureRecord mocks base method.
+func (m *MockKeeperRepository) UpdateSecureRecord(ctx context.Context, record *repository.SecureRecord) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetSecureRecord", arg0, arg1)
+	ret := m.ctrl.Call(m, "UpdateSecureRecord", ctx, record)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetSecureRecord indicates an expected call of SetSecureRecord.
-func (mr *MockKeeperRepositoryMockRecorder) SetSecureRecord(arg0, arg1 interface{}) *gomock.Call {
+// UpdateSecureRecord indicates an expected call of UpdateSecureRecord.
+func (mr *MockKeeperRepositoryMockRecorder) UpdateSecureRecord(ctx, record interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).SetSecureRecord), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSecureRecord", reflect.TypeOf((*MockKeeperRepository)(nil).UpdateSecureRecord), ctx, record)
 }

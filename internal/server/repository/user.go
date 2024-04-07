@@ -7,6 +7,6 @@ import (
 )
 
 type UserRepository interface {
-	SetUser(context.Context, *entity.User) error
+	AddUser(context.Context, *entity.User) error
 	GetUserByLogin(context.Context, string) (*entity.User, error)
 }
