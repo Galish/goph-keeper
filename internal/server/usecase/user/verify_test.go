@@ -1,6 +1,18 @@
 package user_test
 
-/*
+import (
+	"errors"
+	"testing"
+
+	"github.com/Galish/goph-keeper/internal/entity"
+	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
+	"github.com/Galish/goph-keeper/internal/server/usecase/user"
+	"github.com/Galish/goph-keeper/pkg/auth"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+)
+
 func TestVerify(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -19,55 +31,37 @@ func TestVerify(t *testing.T) {
 		token string
 		want  *want
 	}{
-		// {
-		// 	"missing credentials",
-		// 	"",
-		// 	"",
-		// 	user.ErrMissingCredentials,
-		// },
-		// {
-		// 	"missing username",
-		// 	"",
-		// 	"qwe123456",
-		// 	user.ErrMissingCredentials,
-		// },
-		// {
-		// 	"missing password",
-		// 	"john.doe",
-		// 	"",
-		// 	user.ErrMissingCredentials,
-		// },
-		// {
-		// 	"user already exists",
-		// 	"johnn.doe",
-		// 	"qwe123456",
-		// 	user.ErrConflict,
-		// },
-		// {
-		// 	"valid credentials",
-		// 	"john.doe",
-		// 	"qwe123456",
-		// 	nil,
-		// },
-		// {
-		// 	"write to repo error",
-		// 	"johny.doe",
-		// 	"qwe123456",
-		// 	errWriteToRepo,
-		// },
+		{
+			"missing token",
+			"",
+			&want{
+				err: errors.New("token contains an invalid number of segments"),
+			},
+		},
+		{
+			"invalid token",
+			"asdjhd871ije1o9j0assdj",
+			&want{
+				err: errors.New("token contains an invalid number of segments"),
+			},
+		},
+		{
+			"valid token",
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiIjMTIzNDUifQ.FnPcRyLXm11AqObgLd1HR-OB7FmsPtcbsUg31IUW6Ss",
+			&want{
+				&entity.User{
+					ID: "#12345",
+				},
+				errors.New("token contains an invalid number of segments"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			token, err := uc.Verify(tt.token)
+			user, err := uc.Verify(tt.token)
 
-			assert.Equal(t, tt.err, err)
-
-			if tt.err == nil {
-				_, err := uc.Verify(token)
-
-				require.NoError(t, err)
-			}
+			assert.Equal(t, tt.want.user, user)
+			assert.Error(t, tt.want.err, err)
 		})
 	}
 }
-*/
