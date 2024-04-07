@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (uc *KeeperUseCase) AddTextNote(note *entity.TextNote) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.AddTextNoteRequest{
@@ -26,8 +26,8 @@ func (uc *KeeperUseCase) AddTextNote(note *entity.TextNote) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote, overwrite bool) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.UpdateTextNoteRequest{
@@ -46,8 +46,8 @@ func (uc *KeeperUseCase) UpdateTextNote(note *entity.TextNote, overwrite bool) e
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.TextNote, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -69,8 +69,8 @@ func (uc *KeeperUseCase) GetTextNote(id string) (*entity.TextNote, error) {
 	return note, nil
 }
 
-func (uc *KeeperUseCase) GetTextNotesList() ([]*entity.TextNote, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNote, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	resp, err := uc.client.GetTextNotesList(ctx, &emptypb.Empty{})
@@ -91,8 +91,8 @@ func (uc *KeeperUseCase) GetTextNotesList() ([]*entity.TextNote, error) {
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) DeleteTextNote(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

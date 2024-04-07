@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,8 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewCredentialsList() {
-	creds, err := a.keeper.GetCredentialsList()
+func (a *App) viewCredentialsList(ctx context.Context) {
+	creds, err := a.keeper.GetCredentialsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -19,11 +20,15 @@ func (a *App) viewCredentialsList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addCredentials,
+			Run: func() {
+				a.addCredentials(ctx)
+			},
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.selectCategory,
+			Run: func() {
+				a.selectCategory(ctx)
+			},
 		},
 	}
 
@@ -35,7 +40,7 @@ func (a *App) viewCredentialsList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
-					a.viewCredentials(id)
+					a.viewCredentials(ctx, id)
 				},
 			},
 		)
@@ -44,8 +49,8 @@ func (a *App) viewCredentialsList() {
 	a.ui.Select("Add new credentials or select existing", commands)
 }
 
-func (a *App) viewCredentials(id string) {
-	creds, err := a.keeper.GetCredentials(id)
+func (a *App) viewCredentials(ctx context.Context, id string) {
+	creds, err := a.keeper.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -57,25 +62,27 @@ func (a *App) viewCredentials(id string) {
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editCredentials(id)
+				a.editCredentials(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteCredentials(id)
+				a.deleteCredentials(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewCredentialsList,
+			Run: func() {
+				a.viewCredentialsList(ctx)
+			},
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addCredentials() {
+func (a *App) addCredentials(ctx context.Context) {
 	creds := entity.Credentials{}
 
 	creds.Title = a.ui.Input("Title", true)
@@ -85,18 +92,18 @@ func (a *App) addCredentials() {
 
 	if ok := a.ui.Confirm("Add credentials"); ok {
 		for {
-			err := a.keeper.AddCredentials(&creds)
+			err := a.keeper.AddCredentials(ctx, &creds)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 	}
 
-	a.viewCredentialsList()
+	a.viewCredentialsList(ctx)
 }
 
-func (a *App) editCredentials(id string) {
-	creds, err := a.keeper.GetCredentials(id)
+func (a *App) editCredentials(ctx context.Context, id string) {
+	creds, err := a.keeper.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -117,7 +124,7 @@ func (a *App) editCredentials(id string) {
 
 	if ok := a.ui.Confirm("Update credentials"); ok {
 		for {
-			err := a.keeper.UpdateCredentials(updated, overwrite)
+			err := a.keeper.UpdateCredentials(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Credentials have already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -133,20 +140,20 @@ func (a *App) editCredentials(id string) {
 		}
 	}
 
-	a.viewCredentialsList()
+	a.viewCredentialsList(ctx)
 }
 
-func (a *App) deleteCredentials(id string) {
+func (a *App) deleteCredentials(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteCredentials(id)
+			err := a.keeper.DeleteCredentials(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 
-		a.viewCredentialsList()
+		a.viewCredentialsList(ctx)
 	} else {
-		a.viewCredentials(id)
+		a.viewCredentials(ctx, id)
 	}
 }

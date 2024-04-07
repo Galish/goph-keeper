@@ -1,9 +1,10 @@
 package main
 
 import (
+	"context"
+
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/cli"
-	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 	"github.com/Galish/goph-keeper/internal/client/config"
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc"
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
@@ -23,18 +24,15 @@ func main() {
 
 	grpcClient := grpc.NewClient(cfg, authManager)
 
-	appUI := ui.New()
-
 	app := cli.NewApp(
-		appUI,
 		authManager,
 		user.New(grpcClient),
 		keeper.New(grpcClient),
 	)
 
-	sd := shutdowner.New(grpcClient, appUI)
+	sd := shutdowner.New(grpcClient, app)
 
-	go app.Run()
+	go app.Run(context.Background())
 
 	sd.Wait()
 }

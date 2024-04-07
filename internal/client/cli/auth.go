@@ -1,37 +1,39 @@
 package cli
 
-func (a *App) signInUser() {
+import "context"
+
+func (a *App) signInUser(ctx context.Context) {
 	username := a.ui.Input("Enter username", true)
 	password := a.ui.InputPassword("Enter password", true)
 
-	err := a.user.SignIn(username, password)
+	err := a.user.SignIn(ctx, username, password)
 	if ok := a.ui.Retry(err); ok {
-		a.signInUser()
+		a.signInUser(ctx)
 	}
 
 	if err != nil {
-		a.viewAuthScreen()
+		a.viewAuthScreen(ctx)
 		return
 	}
 
 	a.ui.Print("\nWelcome to Goph Keeper!\n\n")
-	a.selectCategory()
+	a.selectCategory(ctx)
 }
 
-func (a *App) signUpUser() {
+func (a *App) signUpUser(ctx context.Context) {
 	username := a.ui.Input("Enter username", true)
 	password := a.ui.InputPassword("Enter password", true)
 
-	err := a.user.SignUp(username, password)
+	err := a.user.SignUp(ctx, username, password)
 	if ok := a.ui.Retry(err); ok {
-		a.signUpUser()
+		a.signUpUser(ctx)
 	}
 
 	if err != nil {
-		a.viewAuthScreen()
+		a.viewAuthScreen(ctx)
 		return
 	}
 
 	a.ui.Print("\nWelcome to Goph Keeper!\n\n")
-	a.selectCategory()
+	a.selectCategory(ctx)
 }

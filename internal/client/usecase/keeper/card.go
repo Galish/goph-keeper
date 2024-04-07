@@ -10,8 +10,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (uc *KeeperUseCase) AddCard(card *entity.Card) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.AddCardRequest{
@@ -32,8 +32,8 @@ func (uc *KeeperUseCase) AddCard(card *entity.Card) error {
 	return nil
 }
 
-func (uc *KeeperUseCase) UpdateCard(card *entity.Card, overwrite bool) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.UpdateCardRequest{
@@ -55,8 +55,8 @@ func (uc *KeeperUseCase) UpdateCard(card *entity.Card, overwrite bool) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetCard(ctx context.Context, id string) (*entity.Card, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -81,8 +81,8 @@ func (uc *KeeperUseCase) GetCard(id string) (*entity.Card, error) {
 	return card, nil
 }
 
-func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetCardsList(ctx context.Context) ([]*entity.Card, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	resp, err := uc.client.GetCardsList(ctx, &emptypb.Empty{})
@@ -103,8 +103,8 @@ func (uc *KeeperUseCase) GetCardsList() ([]*entity.Card, error) {
 	return cards, nil
 }
 
-func (uc *KeeperUseCase) DeleteCard(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) DeleteCard(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (uc *KeeperUseCase) AddCredentials(creds *entity.Credentials) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.AddCredentialsRequest{
@@ -27,8 +27,8 @@ func (uc *KeeperUseCase) AddCredentials(creds *entity.Credentials) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials, overwrite bool) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.UpdateCredentialsRequest{
@@ -48,8 +48,8 @@ func (uc *KeeperUseCase) UpdateCredentials(creds *entity.Credentials, overwrite 
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetCredentials(ctx context.Context, id string) (*entity.Credentials, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.GetRequest{
@@ -72,8 +72,8 @@ func (uc *KeeperUseCase) GetCredentials(id string) (*entity.Credentials, error) 
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) GetCredentialsList() ([]*entity.Credentials, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) GetCredentialsList(ctx context.Context) ([]*entity.Credentials, error) {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	resp, err := uc.client.GetCredentialsList(ctx, &emptypb.Empty{})
@@ -94,8 +94,8 @@ func (uc *KeeperUseCase) GetCredentialsList() ([]*entity.Credentials, error) {
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) DeleteCredentials(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutDefault)
+func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
 	req := &pb.DeleteRequest{

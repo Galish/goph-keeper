@@ -6,7 +6,10 @@ import (
 	grpc "github.com/Galish/goph-keeper/api/proto"
 )
 
-func (uc *UserUseCase) SignUp(username, password string) error {
+func (uc *UserUseCase) SignUp(ctx context.Context, username, password string) error {
+	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
+	defer cancel()
+
 	if username == "" || password == "" {
 		return ErrInvalidCredentials
 	}
@@ -16,7 +19,7 @@ func (uc *UserUseCase) SignUp(username, password string) error {
 		Password: password,
 	}
 
-	_, err := uc.client.SignUp(context.Background(), req)
+	_, err := uc.client.SignUp(ctx, req)
 
 	return handleError(err)
 }

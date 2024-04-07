@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,8 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewTextNotesList() {
-	notes, err := a.keeper.GetTextNotesList()
+func (a *App) viewTextNotesList(ctx context.Context) {
+	notes, err := a.keeper.GetTextNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -19,11 +20,15 @@ func (a *App) viewTextNotesList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addTextNote,
+			Run: func() {
+				a.addTextNote(ctx)
+			},
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.selectCategory,
+			Run: func() {
+				a.selectCategory(ctx)
+			},
 		},
 	}
 
@@ -35,7 +40,7 @@ func (a *App) viewTextNotesList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, n.Title, n.Description),
 				Run: func() {
-					a.viewTextNote(id)
+					a.viewTextNote(ctx, id)
 				},
 			},
 		)
@@ -44,8 +49,8 @@ func (a *App) viewTextNotesList() {
 	a.ui.Select("Add new text note or select existing", commands)
 }
 
-func (a *App) viewTextNote(id string) {
-	note, err := a.keeper.GetTextNote(id)
+func (a *App) viewTextNote(ctx context.Context, id string) {
+	note, err := a.keeper.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -57,25 +62,27 @@ func (a *App) viewTextNote(id string) {
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editTextNote(id)
+				a.editTextNote(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteTextNote(id)
+				a.deleteTextNote(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewTextNotesList,
+			Run: func() {
+				a.viewTextNotesList(ctx)
+			},
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addTextNote() {
+func (a *App) addTextNote(ctx context.Context) {
 	note := entity.TextNote{}
 
 	note.Title = a.ui.Input("Title", true)
@@ -84,18 +91,18 @@ func (a *App) addTextNote() {
 
 	if ok := a.ui.Confirm("Add text note"); ok {
 		for {
-			err := a.keeper.AddTextNote(&note)
+			err := a.keeper.AddTextNote(ctx, &note)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 	}
 
-	a.viewTextNotesList()
+	a.viewTextNotesList(ctx)
 }
 
-func (a *App) editTextNote(id string) {
-	note, err := a.keeper.GetTextNote(id)
+func (a *App) editTextNote(ctx context.Context, id string) {
+	note, err := a.keeper.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -115,7 +122,7 @@ func (a *App) editTextNote(id string) {
 
 	if ok := a.ui.Confirm("Update text note"); ok {
 		for {
-			err := a.keeper.UpdateTextNote(updated, overwrite)
+			err := a.keeper.UpdateTextNote(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Text note has already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -131,20 +138,20 @@ func (a *App) editTextNote(id string) {
 		}
 	}
 
-	a.viewTextNotesList()
+	a.viewTextNotesList(ctx)
 }
 
-func (a *App) deleteTextNote(id string) {
+func (a *App) deleteTextNote(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteTextNote(id)
+			err := a.keeper.DeleteTextNote(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 
-		a.viewTextNotesList()
+		a.viewTextNotesList(ctx)
 	} else {
-		a.viewTextNote(id)
+		a.viewTextNote(ctx, id)
 	}
 }

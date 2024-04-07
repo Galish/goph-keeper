@@ -1,36 +1,38 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 type User interface {
-	SignUp(string, string) error
-	SignIn(string, string) error
+	SignUp(context.Context, string, string) error
+	SignIn(context.Context, string, string) error
 }
 
 type Keeper interface {
-	AddCard(*entity.Card) error
-	GetCard(string) (*entity.Card, error)
-	GetCardsList() ([]*entity.Card, error)
-	UpdateCard(*entity.Card, bool) error
-	DeleteCard(string) error
+	AddCard(context.Context, *entity.Card) error
+	GetCard(context.Context, string) (*entity.Card, error)
+	GetCardsList(context.Context) ([]*entity.Card, error)
+	UpdateCard(context.Context, *entity.Card, bool) error
+	DeleteCard(context.Context, string) error
 
-	AddCredentials(*entity.Credentials) error
-	GetCredentials(string) (*entity.Credentials, error)
-	GetCredentialsList() ([]*entity.Credentials, error)
-	UpdateCredentials(*entity.Credentials, bool) error
-	DeleteCredentials(string) error
+	AddCredentials(context.Context, *entity.Credentials) error
+	GetCredentials(context.Context, string) (*entity.Credentials, error)
+	GetCredentialsList(context.Context) ([]*entity.Credentials, error)
+	UpdateCredentials(context.Context, *entity.Credentials, bool) error
+	DeleteCredentials(context.Context, string) error
 
-	AddTextNote(*entity.TextNote) error
-	GetTextNote(string) (*entity.TextNote, error)
-	GetTextNotesList() ([]*entity.TextNote, error)
-	UpdateTextNote(*entity.TextNote, bool) error
-	DeleteTextNote(string) error
+	AddTextNote(context.Context, *entity.TextNote) error
+	GetTextNote(context.Context, string) (*entity.TextNote, error)
+	GetTextNotesList(context.Context) ([]*entity.TextNote, error)
+	UpdateTextNote(context.Context, *entity.TextNote, bool) error
+	DeleteTextNote(context.Context, string) error
 
-	AddRawNote(*entity.RawNote) error
-	GetRawNote(string) (*entity.RawNote, error)
-	GetRawNotesList() ([]*entity.RawNote, error)
-	UpdateRawNote(*entity.RawNote, bool) error
-	DeleteRawNote(string) error
+	AddRawNote(context.Context, *entity.RawNote) error
+	GetRawNote(context.Context, string) (*entity.RawNote, error)
+	GetRawNotesList(context.Context) ([]*entity.RawNote, error)
+	UpdateRawNote(context.Context, *entity.RawNote, bool) error
+	DeleteRawNote(context.Context, string) error
 }

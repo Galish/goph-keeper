@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -9,8 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewCardsList() {
-	cards, err := a.keeper.GetCardsList()
+func (a *App) viewCardsList(ctx context.Context) {
+	cards, err := a.keeper.GetCardsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -19,11 +20,15 @@ func (a *App) viewCardsList() {
 	commands := []*ui.SelectOption{
 		{
 			Label: "+ Add new",
-			Run:   a.addCard,
+			Run: func() {
+				a.addCard(ctx)
+			},
 		},
 		{
 			Label: "  Cancel",
-			Run:   a.selectCategory,
+			Run: func() {
+				a.selectCategory(ctx)
+			},
 		},
 	}
 
@@ -35,7 +40,7 @@ func (a *App) viewCardsList() {
 			&ui.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
-					a.viewCard(id)
+					a.viewCard(ctx, id)
 				},
 			},
 		)
@@ -44,8 +49,8 @@ func (a *App) viewCardsList() {
 	a.ui.Select("Add new card details or select existing", commands)
 }
 
-func (a *App) viewCard(id string) {
-	card, err := a.keeper.GetCard(id)
+func (a *App) viewCard(ctx context.Context, id string) {
+	card, err := a.keeper.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -57,25 +62,27 @@ func (a *App) viewCard(id string) {
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editCard(id)
+				a.editCard(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteCard(id)
+				a.deleteCard(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
-			Run:   a.viewCardsList,
+			Run: func() {
+				a.viewCardsList(ctx)
+			},
 		},
 	}
 
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addCard() {
+func (a *App) addCard(ctx context.Context) {
 	card := entity.Card{}
 
 	card.Title = a.ui.Input("Title", true)
@@ -87,18 +94,18 @@ func (a *App) addCard() {
 
 	if ok := a.ui.Confirm("Add card details"); ok {
 		for {
-			err := a.keeper.AddCard(&card)
+			err := a.keeper.AddCard(ctx, &card)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 	}
 
-	a.viewCardsList()
+	a.viewCardsList(ctx)
 }
 
-func (a *App) editCard(id string) {
-	card, err := a.keeper.GetCard(id)
+func (a *App) editCard(ctx context.Context, id string) {
+	card, err := a.keeper.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -121,7 +128,7 @@ func (a *App) editCard(id string) {
 
 	if ok := a.ui.Confirm("Update card details"); ok {
 		for {
-			err := a.keeper.UpdateCard(updated, overwrite)
+			err := a.keeper.UpdateCard(ctx, updated, overwrite)
 			if errors.Is(err, keeper.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Card details have already been updated. Want to overwrite"); ok {
 					overwrite = true
@@ -137,20 +144,20 @@ func (a *App) editCard(id string) {
 		}
 	}
 
-	a.viewCardsList()
+	a.viewCardsList(ctx)
 }
 
-func (a *App) deleteCard(id string) {
+func (a *App) deleteCard(ctx context.Context, id string) {
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteCard(id)
+			err := a.keeper.DeleteCard(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 
-		a.viewCardsList()
+		a.viewCardsList(ctx)
 	} else {
-		a.viewCard(id)
+		a.viewCard(ctx, id)
 	}
 }
