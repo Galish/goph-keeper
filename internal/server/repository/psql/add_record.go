@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/jackc/pgx/v5/pgconn"
+
+	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
 func (s *psqlStore) AddSecureRecord(ctx context.Context, record *repository.SecureRecord) error {

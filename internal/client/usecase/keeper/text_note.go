@@ -5,8 +5,9 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
-	"github.com/Galish/goph-keeper/internal/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote) error {

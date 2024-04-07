@@ -5,9 +5,10 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
-	"github.com/Galish/goph-keeper/internal/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {

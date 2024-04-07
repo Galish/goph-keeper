@@ -8,8 +8,9 @@ import (
 	context "context"
 	reflect "reflect"
 
-	repository "github.com/Galish/goph-keeper/internal/server/repository"
 	gomock "github.com/golang/mock/gomock"
+
+	repository "github.com/Galish/goph-keeper/internal/server/repository"
 )
 
 // MockKeeperRepository is a mock of KeeperRepository interface.

@@ -5,14 +5,15 @@ import (
 	"errors"
 	"testing"
 
-	pb "github.com/Galish/goph-keeper/api/proto"
-	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
-	"github.com/Galish/goph-keeper/internal/client/usecase/user"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	pb "github.com/Galish/goph-keeper/api/proto"
+	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
+	"github.com/Galish/goph-keeper/internal/client/usecase/user"
 )
 
 var (

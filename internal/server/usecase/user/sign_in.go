@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/Galish/goph-keeper/internal/server/repository"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
 func (uc *UserUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
