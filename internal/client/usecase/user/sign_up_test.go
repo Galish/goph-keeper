@@ -9,10 +9,10 @@ import (
 	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
 	"github.com/Galish/goph-keeper/internal/client/usecase/user"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gotest.tools/assert"
 )
 
 var (
@@ -113,7 +113,7 @@ func TestSignUp(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}

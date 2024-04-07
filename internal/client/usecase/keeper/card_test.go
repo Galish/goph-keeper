@@ -11,10 +11,10 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"gotest.tools/assert"
 )
 
 var (
@@ -114,7 +114,7 @@ func TestAddCard(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -272,7 +272,7 @@ func TestUpdateCard(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -374,12 +374,12 @@ func TestGetCard(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			card, err := uc.GetCard(context.Background(), tt.id)
 
-			assert.DeepEqual(t, tt.want.card, card)
+			assert.Equal(t, tt.want.card, card)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -476,12 +476,12 @@ func TestGetCardsList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cards, err := uc.GetCardsList(context.Background())
 
-			assert.DeepEqual(t, tt.want.cards, cards)
+			assert.Equal(t, tt.want.cards, cards)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -550,7 +550,7 @@ func TestDeleteCard(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}

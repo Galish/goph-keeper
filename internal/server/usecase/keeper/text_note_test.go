@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 	"github.com/golang/mock/gomock"
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAddTextNote(t *testing.T) {
@@ -177,7 +177,7 @@ func TestGetTextNote(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			note, err := uc.GetTextNote(context.Background(), tt.user, tt.id)
 
-			assert.DeepEqual(t, tt.want.note, note)
+			assert.Equal(t, tt.want.note, note)
 			assert.Equal(t, tt.want.err, err)
 		})
 	}
@@ -277,7 +277,7 @@ func TestGetTextNotes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			notes, err := uc.GetTextNotes(context.Background(), tt.user)
 
-			assert.DeepEqual(t, tt.want.notes, notes)
+			assert.Equal(t, tt.want.notes, notes)
 			assert.Equal(t, tt.want.err, err)
 		})
 	}

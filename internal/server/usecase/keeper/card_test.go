@@ -11,7 +11,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 	"github.com/golang/mock/gomock"
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -221,7 +221,7 @@ func TestGetCard(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			card, err := uc.GetCard(context.Background(), tt.user, tt.id)
 
-			assert.DeepEqual(t, tt.want.card, card)
+			assert.Equal(t, tt.want.card, card)
 			assert.Equal(t, tt.want.err, err)
 		})
 	}
@@ -333,7 +333,7 @@ func TestGetCards(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cards, err := uc.GetCards(context.Background(), tt.user)
 
-			assert.DeepEqual(t, tt.want.cards, cards)
+			assert.Equal(t, tt.want.cards, cards)
 			assert.Equal(t, tt.want.err, err)
 		})
 	}

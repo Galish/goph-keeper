@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
 	"github.com/golang/mock/gomock"
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAddCredentials(t *testing.T) {
@@ -174,7 +174,7 @@ func TestGetCredentials(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			creds, err := uc.GetCredentials(context.Background(), tt.user, tt.id)
 
-			assert.DeepEqual(t, tt.want.creds, creds)
+			assert.Equal(t, tt.want.creds, creds)
 			assert.Equal(t, tt.want.err, err)
 		})
 	}
@@ -278,7 +278,7 @@ func TestGetAllCredentials(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			creds, err := uc.GetAllCredentials(context.Background(), tt.user)
 
-			assert.DeepEqual(t, tt.want.creds, creds)
+			assert.Equal(t, tt.want.creds, creds)
 			assert.Equal(t, tt.want.err, err)
 		})
 	}

@@ -10,9 +10,9 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gotest.tools/assert"
 )
 
 func TestAddRawNote(t *testing.T) {
@@ -95,7 +95,7 @@ func TestAddRawNote(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -232,7 +232,7 @@ func TestUpdateRawNote(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -328,12 +328,12 @@ func TestGetRawNote(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			RawNote, err := uc.GetRawNote(context.Background(), tt.id)
 
-			assert.DeepEqual(t, tt.want.RawNote, RawNote)
+			assert.Equal(t, tt.want.RawNote, RawNote)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -430,12 +430,12 @@ func TestGetRawNotesList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			RawNotes, err := uc.GetRawNotesList(context.Background())
 
-			assert.DeepEqual(t, tt.want.RawNotes, RawNotes)
+			assert.Equal(t, tt.want.RawNotes, RawNotes)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -504,7 +504,7 @@ func TestDeleteRawNote(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}

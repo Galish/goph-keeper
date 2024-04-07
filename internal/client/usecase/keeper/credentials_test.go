@@ -10,9 +10,9 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gotest.tools/assert"
 )
 
 func TestAddCredentials(t *testing.T) {
@@ -99,7 +99,7 @@ func TestAddCredentials(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -243,7 +243,7 @@ func TestUpdateCredentials(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -341,12 +341,12 @@ func TestGetCredentials(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			Credentials, err := uc.GetCredentials(context.Background(), tt.id)
 
-			assert.DeepEqual(t, tt.want.Credentials, Credentials)
+			assert.Equal(t, tt.want.Credentials, Credentials)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -443,12 +443,12 @@ func TestGetCredentialsList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			Credentialss, err := uc.GetCredentialsList(context.Background())
 
-			assert.DeepEqual(t, tt.want.Credentialss, Credentialss)
+			assert.Equal(t, tt.want.Credentialss, Credentialss)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -517,7 +517,7 @@ func TestDeleteCredentials(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}

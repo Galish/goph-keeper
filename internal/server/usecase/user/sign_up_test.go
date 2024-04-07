@@ -3,13 +3,14 @@ package user_test
 import (
 	"context"
 	"errors"
+	"regexp"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/require"
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/Galish/goph-keeper/internal/entity"
+	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
 	"github.com/Galish/goph-keeper/pkg/auth"
@@ -31,6 +32,10 @@ func TestSignUp(t *testing.T) {
 			switch user.Login {
 			case "john.doe":
 				return nil
+
+			case "johnn.doe":
+				return repository.ErrConflict
+
 			default:
 				return errWriteToRepo
 			}
@@ -40,7 +45,8 @@ func TestSignUp(t *testing.T) {
 	uc := user.New(m, auth.NewJWTManager(secretKey))
 
 	type want struct {
-		err error
+		token string
+		err   error
 	}
 
 	tests := []struct {
@@ -54,6 +60,7 @@ func TestSignUp(t *testing.T) {
 			"",
 			"",
 			&want{
+				"",
 				user.ErrMissingCredentials,
 			},
 		},
@@ -62,6 +69,7 @@ func TestSignUp(t *testing.T) {
 			"",
 			"qwe123456",
 			&want{
+				"",
 				user.ErrMissingCredentials,
 			},
 		},
@@ -70,7 +78,17 @@ func TestSignUp(t *testing.T) {
 			"john.doe",
 			"",
 			&want{
+				"",
 				user.ErrMissingCredentials,
+			},
+		},
+		{
+			"user already exists",
+			"johnn.doe",
+			"qwe123456",
+			&want{
+				"",
+				user.ErrConflict,
 			},
 		},
 		{
@@ -78,6 +96,7 @@ func TestSignUp(t *testing.T) {
 			"john.doe",
 			"qwe123456",
 			&want{
+				"",
 				nil,
 			},
 		},
@@ -86,21 +105,27 @@ func TestSignUp(t *testing.T) {
 			"johny.doe",
 			"qwe123456",
 			&want{
+				"",
 				errWriteToRepo,
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			token, err := uc.SignUp(context.Background(), tt.username, tt.password)
 
-			assert.Equal(t, tt.want.err, err)
-
-			if tt.want.err == nil {
-				_, err := uc.Verify(token)
-
-				require.NoError(t, err)
+			if err != nil {
+				assert.Error(t, err, tt.want.err.Error())
+				return
 			}
+
+			assert.Regexp(
+				t,
+				regexp.MustCompile("^[A-Za-z0-9-_]*.[A-Za-z0-9-_]*.[A-Za-z0-9-_]*$"),
+				token,
+			)
+			assert.NoError(t, err)
 		})
 	}
 }

@@ -10,9 +10,9 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gotest.tools/assert"
 )
 
 func TestAddTextNote(t *testing.T) {
@@ -95,7 +95,7 @@ func TestAddTextNote(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -232,7 +232,7 @@ func TestUpdateTextNote(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -328,12 +328,12 @@ func TestGetTextNote(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			TextNote, err := uc.GetTextNote(context.Background(), tt.id)
 
-			assert.DeepEqual(t, tt.want.TextNote, TextNote)
+			assert.Equal(t, tt.want.TextNote, TextNote)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -430,12 +430,12 @@ func TestGetTextNotesList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			TextNotes, err := uc.GetTextNotesList(context.Background())
 
-			assert.DeepEqual(t, tt.want.TextNotes, TextNotes)
+			assert.Equal(t, tt.want.TextNotes, TextNotes)
 
 			if err != nil {
 				assert.Error(t, err, tt.want.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -504,7 +504,7 @@ func TestDeleteTextNote(t *testing.T) {
 			if err != nil {
 				assert.Error(t, err, tt.err.Error())
 			} else {
-				assert.NilError(t, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
