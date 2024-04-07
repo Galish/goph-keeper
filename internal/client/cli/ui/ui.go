@@ -9,15 +9,16 @@ import (
 
 type UserInterface interface {
 	Break()
+	Close() error
 	Confirm(string) bool
 	Edit(string, string, bool) string
 	Error(error)
 	Input(string, bool) string
 	InputPassword(string, bool) string
 	Print(string)
+	ReadFile(string, bool) []byte
 	Retry(error) bool
 	Select(string, []*SelectOption)
-	ReadFile(string, bool) []byte
 	WriteFile(string, []byte, bool)
 }
 
