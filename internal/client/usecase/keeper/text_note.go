@@ -10,6 +10,10 @@ import (
 )
 
 func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote) error {
+	if note == nil || !note.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -27,6 +31,10 @@ func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote)
 }
 
 func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote, overwrite bool) error {
+	if note == nil || note.ID == "" || !note.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -47,6 +55,10 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 }
 
 func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.TextNote, error) {
+	if id == "" {
+		return nil, ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -60,9 +72,9 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.Te
 	}
 
 	note := &entity.TextNote{
-		Title:       resp.Note.GetTitle(),
-		Description: resp.Note.GetDescription(),
-		Value:       resp.Note.GetValue(),
+		Title:       resp.GetNote().GetTitle(),
+		Description: resp.GetNote().GetDescription(),
+		Value:       resp.GetNote().GetValue(),
 		Version:     resp.GetVersion(),
 	}
 
@@ -92,6 +104,10 @@ func (uc *KeeperUseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNo
 }
 
 func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, id string) error {
+	if id == "" {
+		return ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 

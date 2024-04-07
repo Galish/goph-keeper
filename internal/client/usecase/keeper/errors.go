@@ -8,13 +8,16 @@ import (
 )
 
 var (
+	ErrInvalidEntity   = errors.New("failed entity validation")
+	ErrMissingArgument = errors.New("missing required argument")
 	ErrNoConnection    = errors.New("check your connection and try again")
-	ErrVersionConflict = errors.New("version conflict")
 	ErrNotFound        = errors.New("record not found")
+	ErrVersionConflict = errors.New("version conflict")
 )
 
 var errorMap = map[codes.Code]error{
 	codes.FailedPrecondition: ErrVersionConflict,
+	codes.InvalidArgument:    ErrInvalidEntity,
 	codes.NotFound:           ErrNotFound,
 	codes.Unavailable:        ErrNoConnection,
 }
@@ -27,6 +30,10 @@ func handleError(err error) error {
 	e, ok := status.FromError(err)
 	if !ok {
 		return err
+	}
+
+	if e.Code() == codes.Internal {
+		return errors.New(e.Message())
 	}
 
 	custom, ok := errorMap[e.Code()]

@@ -8,10 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (uc *UserUseCase) SignIn(
-	ctx context.Context,
-	username, password string,
-) (string, error) {
+func (uc *UserUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
 	if username == "" || password == "" {
 		return "", ErrMissingCredentials
 	}
