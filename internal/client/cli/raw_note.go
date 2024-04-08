@@ -11,6 +11,8 @@ import (
 )
 
 func (a *App) viewRawNotesList(ctx context.Context) {
+	a.ui.Break()
+
 	notes, err := a.keeper.GetRawNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
@@ -25,7 +27,7 @@ func (a *App) viewRawNotesList(ctx context.Context) {
 			},
 		},
 		{
-			Label: "  Cancel",
+			Label: "x Cancel",
 			Run: func() {
 				a.selectCategory(ctx)
 			},
@@ -50,6 +52,8 @@ func (a *App) viewRawNotesList(ctx context.Context) {
 }
 
 func (a *App) viewRawNote(ctx context.Context, id string) {
+	a.ui.Break()
+
 	note, err := a.keeper.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -58,6 +62,7 @@ func (a *App) viewRawNote(ctx context.Context, id string) {
 
 	a.ui.Print(note.String())
 	a.ui.WriteFile("Enter the path to save the file", note.Value, false)
+	a.ui.Break()
 
 	var commands = []*ui.SelectOption{
 		{
@@ -84,15 +89,19 @@ func (a *App) viewRawNote(ctx context.Context, id string) {
 }
 
 func (a *App) addRawNote(ctx context.Context) {
-	note := entity.RawNote{}
+	a.ui.Break()
+
+	var note = new(entity.RawNote)
 
 	note.Title = a.ui.Input("Title", true)
 	note.Description = a.ui.Input("Description", false)
 	note.Value = a.ui.ReadFile("Enter file path", true)
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Add binary note"); ok {
 		for {
-			err := a.keeper.AddRawNote(ctx, &note)
+			err := a.keeper.AddRawNote(ctx, note)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -103,6 +112,8 @@ func (a *App) addRawNote(ctx context.Context) {
 }
 
 func (a *App) editRawNote(ctx context.Context, id string) {
+	a.ui.Break()
+
 	note, err := a.keeper.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -126,6 +137,8 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 		updated.Value = note.Value
 	}
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Update binary note"); ok {
 		for {
 			err := a.keeper.UpdateRawNote(ctx, updated, overwrite)
@@ -138,6 +151,8 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 				break
 			}
 
+			a.ui.Break()
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -148,6 +163,8 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 }
 
 func (a *App) deleteRawNote(ctx context.Context, id string) {
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteRawNote(ctx, id)
@@ -157,7 +174,8 @@ func (a *App) deleteRawNote(ctx context.Context, id string) {
 		}
 
 		a.viewRawNotesList(ctx)
-	} else {
-		a.viewRawNote(ctx, id)
+		return
 	}
+
+	a.viewRawNote(ctx, id)
 }

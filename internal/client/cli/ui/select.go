@@ -43,9 +43,7 @@ func (ui *UI) Confirm(label string) bool {
 				Label: "No",
 			},
 		},
-		&selectOptions{
-			HideSelected: true,
-		},
+		nil,
 	)
 
 	return index == 0
@@ -76,6 +74,7 @@ func (ui *UI) promptSelect(label string, items []*SelectOption, opts *selectOpti
 	}
 
 	index, _, err := prompt.Run()
+
 	if errors.Is(err, promptui.ErrInterrupt) {
 		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 		return -1

@@ -3,6 +3,8 @@ package cli
 import "context"
 
 func (a *App) signInUser(ctx context.Context) {
+	a.ui.Break()
+
 	username := a.ui.Input("Enter username", true)
 	password := a.ui.InputPassword("Enter password", true)
 
@@ -16,11 +18,14 @@ func (a *App) signInUser(ctx context.Context) {
 		return
 	}
 
-	a.ui.Print("\nWelcome to Goph Keeper!\n\n")
+	a.ui.Print("\nWelcome to Goph Keeper!\n")
+
 	a.selectCategory(ctx)
 }
 
 func (a *App) signUpUser(ctx context.Context) {
+	a.ui.Break()
+
 	username := a.ui.Input("Enter username", true)
 	password := a.ui.InputPassword("Enter password", true)
 
@@ -34,6 +39,7 @@ func (a *App) signUpUser(ctx context.Context) {
 		return
 	}
 
-	a.ui.Print("\nWelcome to Goph Keeper!\n\n")
+	a.ui.Print("\nWelcome to Goph Keeper!\n")
+
 	a.selectCategory(ctx)
 }

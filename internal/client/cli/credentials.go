@@ -11,6 +11,8 @@ import (
 )
 
 func (a *App) viewCredentialsList(ctx context.Context) {
+	a.ui.Break()
+
 	creds, err := a.keeper.GetCredentialsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
@@ -25,7 +27,7 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 			},
 		},
 		{
-			Label: "  Cancel",
+			Label: "x Cancel",
 			Run: func() {
 				a.selectCategory(ctx)
 			},
@@ -50,12 +52,15 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 }
 
 func (a *App) viewCredentials(ctx context.Context, id string) {
+	a.ui.Break()
+
 	creds, err := a.keeper.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
 	}
 
+	a.ui.Break()
 	a.ui.Print(creds.String())
 
 	var commands = []*ui.SelectOption{
@@ -83,16 +88,20 @@ func (a *App) viewCredentials(ctx context.Context, id string) {
 }
 
 func (a *App) addCredentials(ctx context.Context) {
-	creds := entity.Credentials{}
+	a.ui.Break()
+
+	var creds = new(entity.Credentials)
 
 	creds.Title = a.ui.Input("Title", true)
 	creds.Description = a.ui.Input("Description", false)
 	creds.Username = a.ui.Input("Username", true)
 	creds.Password = a.ui.Input("Password", true)
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Add credentials"); ok {
 		for {
-			err := a.keeper.AddCredentials(ctx, &creds)
+			err := a.keeper.AddCredentials(ctx, creds)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -103,6 +112,8 @@ func (a *App) addCredentials(ctx context.Context) {
 }
 
 func (a *App) editCredentials(ctx context.Context, id string) {
+	a.ui.Break()
+
 	creds, err := a.keeper.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -122,6 +133,8 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 	updated.Username = a.ui.Edit("Username", creds.Username, true)
 	updated.Password = a.ui.Edit("Password", creds.Password, true)
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Update credentials"); ok {
 		for {
 			err := a.keeper.UpdateCredentials(ctx, updated, overwrite)
@@ -134,6 +147,8 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 				break
 			}
 
+			a.ui.Break()
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -144,6 +159,8 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 }
 
 func (a *App) deleteCredentials(ctx context.Context, id string) {
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteCredentials(ctx, id)
@@ -153,7 +170,8 @@ func (a *App) deleteCredentials(ctx context.Context, id string) {
 		}
 
 		a.viewCredentialsList(ctx)
-	} else {
-		a.viewCredentials(ctx, id)
+		return
 	}
+
+	a.viewCredentials(ctx, id)
 }
