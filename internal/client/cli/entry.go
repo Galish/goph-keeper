@@ -8,6 +8,8 @@ import (
 )
 
 func (a *App) viewAuthScreen(ctx context.Context) {
+	a.ui.Break()
+
 	a.ui.Select(
 		"You need to log in or sign up before continuing",
 		[]*ui.SelectOption{
@@ -34,6 +36,8 @@ func (a *App) viewAuthScreen(ctx context.Context) {
 }
 
 func (a *App) selectCategory(ctx context.Context) {
+	a.ui.Break()
+
 	a.ui.Select(
 		"Select category",
 		[]*ui.SelectOption{

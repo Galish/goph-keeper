@@ -11,6 +11,8 @@ import (
 )
 
 func (a *App) viewCardsList(ctx context.Context) {
+	a.ui.Break()
+
 	cards, err := a.keeper.GetCardsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
@@ -25,7 +27,7 @@ func (a *App) viewCardsList(ctx context.Context) {
 			},
 		},
 		{
-			Label: "  Cancel",
+			Label: "x Cancel",
 			Run: func() {
 				a.selectCategory(ctx)
 			},
@@ -50,6 +52,8 @@ func (a *App) viewCardsList(ctx context.Context) {
 }
 
 func (a *App) viewCard(ctx context.Context, id string) {
+	a.ui.Break()
+
 	card, err := a.keeper.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -57,6 +61,7 @@ func (a *App) viewCard(ctx context.Context, id string) {
 	}
 
 	a.ui.Print(card.String())
+	a.ui.Break()
 
 	var commands = []*ui.SelectOption{
 		{
@@ -83,7 +88,9 @@ func (a *App) viewCard(ctx context.Context, id string) {
 }
 
 func (a *App) addCard(ctx context.Context) {
-	card := entity.Card{}
+	a.ui.Break()
+
+	var card = new(entity.Card)
 
 	card.Title = a.ui.Input("Title", true)
 	card.Description = a.ui.Input("Description", false)
@@ -92,9 +99,11 @@ func (a *App) addCard(ctx context.Context) {
 	card.CVC = a.ui.Input("CVC code", true)
 	card.SetExpiry(a.ui.Input("Expiration date", true))
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Add card details"); ok {
 		for {
-			err := a.keeper.AddCard(ctx, &card)
+			err := a.keeper.AddCard(ctx, card)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -105,6 +114,8 @@ func (a *App) addCard(ctx context.Context) {
 }
 
 func (a *App) editCard(ctx context.Context, id string) {
+	a.ui.Break()
+
 	card, err := a.keeper.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -126,6 +137,8 @@ func (a *App) editCard(ctx context.Context, id string) {
 	updated.CVC = a.ui.Edit("CVC code", card.CVC, true)
 	updated.SetExpiry(a.ui.Edit("Expiration date", card.GetExpiry(), true))
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Update card details"); ok {
 		for {
 			err := a.keeper.UpdateCard(ctx, updated, overwrite)
@@ -138,6 +151,8 @@ func (a *App) editCard(ctx context.Context, id string) {
 				break
 			}
 
+			a.ui.Break()
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -148,6 +163,8 @@ func (a *App) editCard(ctx context.Context, id string) {
 }
 
 func (a *App) deleteCard(ctx context.Context, id string) {
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteCard(ctx, id)
@@ -157,7 +174,8 @@ func (a *App) deleteCard(ctx context.Context, id string) {
 		}
 
 		a.viewCardsList(ctx)
-	} else {
-		a.viewCard(ctx, id)
+		return
 	}
+
+	a.viewCard(ctx, id)
 }

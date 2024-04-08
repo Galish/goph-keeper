@@ -11,6 +11,8 @@ import (
 )
 
 func (a *App) viewTextNotesList(ctx context.Context) {
+	a.ui.Break()
+
 	notes, err := a.keeper.GetTextNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
@@ -25,7 +27,7 @@ func (a *App) viewTextNotesList(ctx context.Context) {
 			},
 		},
 		{
-			Label: "  Cancel",
+			Label: "x Cancel",
 			Run: func() {
 				a.selectCategory(ctx)
 			},
@@ -50,6 +52,8 @@ func (a *App) viewTextNotesList(ctx context.Context) {
 }
 
 func (a *App) viewTextNote(ctx context.Context, id string) {
+	a.ui.Break()
+
 	note, err := a.keeper.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -57,6 +61,7 @@ func (a *App) viewTextNote(ctx context.Context, id string) {
 	}
 
 	a.ui.Print(note.String())
+	a.ui.Break()
 
 	var commands = []*ui.SelectOption{
 		{
@@ -83,15 +88,19 @@ func (a *App) viewTextNote(ctx context.Context, id string) {
 }
 
 func (a *App) addTextNote(ctx context.Context) {
-	note := entity.TextNote{}
+	a.ui.Break()
+
+	var note = new(entity.TextNote)
 
 	note.Title = a.ui.Input("Title", true)
 	note.Description = a.ui.Input("Description", false)
 	note.Value = a.ui.Input("Note", true)
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Add text note"); ok {
 		for {
-			err := a.keeper.AddTextNote(ctx, &note)
+			err := a.keeper.AddTextNote(ctx, note)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -102,6 +111,8 @@ func (a *App) addTextNote(ctx context.Context) {
 }
 
 func (a *App) editTextNote(ctx context.Context, id string) {
+	a.ui.Break()
+
 	note, err := a.keeper.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
@@ -120,6 +131,8 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 	updated.Description = a.ui.Edit("Description", note.Description, false)
 	updated.Value = a.ui.Edit("Note", note.Value, true)
 
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Update text note"); ok {
 		for {
 			err := a.keeper.UpdateTextNote(ctx, updated, overwrite)
@@ -132,6 +145,8 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 				break
 			}
 
+			a.ui.Break()
+
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -142,6 +157,8 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 }
 
 func (a *App) deleteTextNote(ctx context.Context, id string) {
+	a.ui.Break()
+
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
 			err := a.keeper.DeleteTextNote(ctx, id)
@@ -151,7 +168,8 @@ func (a *App) deleteTextNote(ctx context.Context, id string) {
 		}
 
 		a.viewTextNotesList(ctx)
-	} else {
-		a.viewTextNote(ctx, id)
+		return
 	}
+
+	a.viewTextNote(ctx, id)
 }
