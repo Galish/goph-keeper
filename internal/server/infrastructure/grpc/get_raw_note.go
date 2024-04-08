@@ -6,7 +6,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
@@ -16,7 +16,7 @@ import (
 func (s *KeeperServer) GetRawNote(ctx context.Context, in *pb.GetRequest) (*pb.GetRawNoteResponse, error) {
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	note, err := s.keeper.GetRawNote(ctx, user, in.Id)
+	note, err := s.notes.GetRawNote(ctx, user, in.Id)
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{
@@ -26,7 +26,7 @@ func (s *KeeperServer) GetRawNote(ctx context.Context, in *pb.GetRequest) (*pb.G
 			Error("unable to get binary note")
 	}
 
-	if errors.Is(err, keeper.ErrNotFound) {
+	if errors.Is(err, notes.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

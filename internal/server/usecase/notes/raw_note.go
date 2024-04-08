@@ -1,4 +1,4 @@
-package keeper
+package notes
 
 import (
 	"context"
@@ -9,24 +9,24 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) error {
-	if note == nil || !note.IsValid() {
+func (uc *KeeperUseCase) AddRawNote(ctx context.Context, rawNote *entity.RawNote) error {
+	if rawNote == nil || !rawNote.IsValid() {
 		return ErrInvalidEntity
 	}
 
-	record := &repository.SecureRecord{
-		ID:          note.ID,
+	note := &repository.SecureNote{
+		ID:          rawNote.ID,
 		Type:        repository.TypeRawNote,
-		Title:       note.Title,
-		Description: note.Description,
+		Title:       rawNote.Title,
+		Description: rawNote.Description,
 
-		RawNote: note.Value,
+		RawNote: rawNote.Value,
 
-		CreatedBy: note.CreatedBy,
+		CreatedBy: rawNote.CreatedBy,
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.AddSecureRecord(ctx, record)
+	return uc.repo.AddSecureNote(ctx, note)
 }
 
 func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*entity.RawNote, error) {
@@ -34,7 +34,7 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*enti
 		return nil, ErrMissingArgument
 	}
 
-	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeRawNote)
+	note, err := uc.repo.GetSecureNote(ctx, user, id, repository.TypeRawNote)
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}
@@ -42,19 +42,19 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*enti
 		return nil, err
 	}
 
-	note := entity.RawNote{
-		ID:          record.ID,
-		Title:       record.Title,
-		Description: record.Description,
+	rawNote := entity.RawNote{
+		ID:          note.ID,
+		Title:       note.Title,
+		Description: note.Description,
 
-		Value: record.RawNote,
+		Value: note.RawNote,
 
-		CreatedAt:    record.CreatedAt,
-		LastEditedAt: record.LastEditedAt,
-		Version:      record.Version,
+		CreatedAt:    note.CreatedAt,
+		LastEditedAt: note.LastEditedAt,
+		Version:      note.Version,
 	}
 
-	return &note, nil
+	return &rawNote, nil
 }
 
 func (uc *KeeperUseCase) GetRawNotes(ctx context.Context, user string) ([]*entity.RawNote, error) {
@@ -62,14 +62,14 @@ func (uc *KeeperUseCase) GetRawNotes(ctx context.Context, user string) ([]*entit
 		return nil, ErrMissingArgument
 	}
 
-	records, err := uc.repo.GetSecureRecords(ctx, user, repository.TypeRawNote)
+	notes, err := uc.repo.GetSecureNotes(ctx, user, repository.TypeRawNote)
 	if err != nil {
 		return nil, err
 	}
 
-	var notes = make([]*entity.RawNote, len(records))
+	var rawNotes = make([]*entity.RawNote, len(notes))
 
-	for i, r := range records {
+	for i, r := range notes {
 		note := &entity.RawNote{
 			ID:          r.ID,
 			Title:       r.Title,
@@ -81,38 +81,38 @@ func (uc *KeeperUseCase) GetRawNotes(ctx context.Context, user string) ([]*entit
 			LastEditedAt: r.LastEditedAt,
 		}
 
-		notes[i] = note
+		rawNotes[i] = note
 	}
 
-	return notes, nil
+	return rawNotes, nil
 }
 
-func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
-	if note == nil || note.ID == "" || !note.IsValid() {
+func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, rawNote *entity.RawNote, overwrite bool) error {
+	if rawNote == nil || rawNote.ID == "" || !rawNote.IsValid() {
 		return ErrInvalidEntity
 	}
 
-	if !overwrite && note.Version == 0 {
+	if !overwrite && rawNote.Version == 0 {
 		return ErrVersionRequired
 	}
 
-	record := &repository.SecureRecord{
-		ID:          note.ID,
+	note := &repository.SecureNote{
+		ID:          rawNote.ID,
 		Type:        repository.TypeRawNote,
-		Title:       note.Title,
-		Description: note.Description,
+		Title:       rawNote.Title,
+		Description: rawNote.Description,
 
-		RawNote: note.Value,
+		RawNote: rawNote.Value,
 
-		CreatedBy:    note.CreatedBy,
+		CreatedBy:    rawNote.CreatedBy,
 		LastEditedAt: time.Now(),
 	}
 
 	if !overwrite {
-		record.Version = note.Version
+		note.Version = rawNote.Version
 	}
 
-	err := uc.repo.UpdateSecureRecord(ctx, record)
+	err := uc.repo.UpdateSecureNote(ctx, note)
 	if errors.Is(err, repository.ErrVersionConflict) {
 		return ErrVersionConflict
 	}
@@ -129,7 +129,7 @@ func (uc *KeeperUseCase) DeleteRawNote(ctx context.Context, user, id string) err
 		return ErrMissingArgument
 	}
 
-	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeRawNote)
+	err := uc.repo.DeleteSecureNote(ctx, user, id, repository.TypeRawNote)
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

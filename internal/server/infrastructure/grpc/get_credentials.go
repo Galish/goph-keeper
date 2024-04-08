@@ -6,7 +6,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
@@ -16,7 +16,7 @@ import (
 func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*pb.GetCredentialsResponse, error) {
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	creds, err := s.keeper.GetCredentials(ctx, user, in.GetId())
+	creds, err := s.notes.GetCredentials(ctx, user, in.GetId())
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{
@@ -26,7 +26,7 @@ func (s *KeeperServer) GetCredentials(ctx context.Context, in *pb.GetRequest) (*
 			Error("unable to get credentials")
 	}
 
-	if errors.Is(err, keeper.ErrNotFound) {
+	if errors.Is(err, notes.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

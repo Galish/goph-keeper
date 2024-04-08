@@ -1,89 +1,108 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func TestAddRawNote(t *testing.T) {
+var (
+	errWriteToRepo  = errors.New("failed to write to repo")
+	errReadFromRepo = errors.New("failed to read from repo")
+)
+
+func TestAddCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		AddRawNote(gomock.Any(), gomock.Any()).
+		AddCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
-		AddRawNote(gomock.Any(), gomock.Any()).
+		AddCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errors.New("failed to write to repo").Error()))
 
 	m.EXPECT().
-		AddRawNote(gomock.Any(), gomock.Any()).
+		AddCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		AddRawNote(gomock.Any(), gomock.Any()).
-		Return(&pb.AddRawNoteResponse{Id: "#12345"}, nil)
+		AddCard(gomock.Any(), gomock.Any()).
+		Return(&pb.AddCardResponse{Id: "#12345"}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
-		name    string
-		RawNote *entity.RawNote
-		err     error
+		name string
+		card *entity.Card
+		err  error
 	}{
 		{
 			"missing entity",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.RawNote{},
-			keeper.ErrInvalidEntity,
+			&entity.Card{},
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
-			&entity.RawNote{
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"writing to repo error",
-			&entity.RawNote{
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			errWriteToRepo,
 		},
 		{
 			"no internet connection",
-			&entity.RawNote{
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
-			&entity.RawNote{
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			nil,
 		},
@@ -91,7 +110,7 @@ func TestAddRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.AddRawNote(context.Background(), tt.RawNote)
+			err := uc.AddCard(context.Background(), tt.card)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -102,41 +121,41 @@ func TestAddRawNote(t *testing.T) {
 	}
 }
 
-func TestUpdateRawNote(t *testing.T) {
+func TestUpdateCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		UpdateRawNote(gomock.Any(), gomock.Any()).
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
-		UpdateRawNote(gomock.Any(), gomock.Any()).
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
 
 	m.EXPECT().
-		UpdateRawNote(gomock.Any(), gomock.Any()).
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
-		UpdateRawNote(gomock.Any(), gomock.Any()).
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errors.New("failed to write to repo").Error()))
 
 	m.EXPECT().
-		UpdateRawNote(gomock.Any(), gomock.Any()).
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		UpdateRawNote(gomock.Any(), gomock.Any()).
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name      string
-		RawNote   *entity.RawNote
+		card      *entity.Card
 		overwrite bool
 		err       error
 	}{
@@ -144,82 +163,103 @@ func TestUpdateRawNote(t *testing.T) {
 			"missing entity",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.RawNote{
+			&entity.Card{
 				ID:    "#12345678",
-				Title: "Credit RawNote",
+				Title: "Credit card",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"missing id",
-			&entity.RawNote{
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
-			&entity.RawNote{
-				ID:    "#12345678",
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			true,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"version conflict",
-			&entity.RawNote{
-				ID:    "#12345678",
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"nothing found",
-			&entity.RawNote{
-				ID:    "#12345678",
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"writing to repo error",
-			&entity.RawNote{
-				ID:    "#12345678",
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			true,
 			errWriteToRepo,
 		},
 		{
 			"no internet connection",
-			&entity.RawNote{
-				ID:    "#12345678",
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
-			&entity.RawNote{
-				ID:    "#12345678",
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			true,
 			nil,
@@ -228,7 +268,7 @@ func TestUpdateRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.UpdateRawNote(context.Background(), tt.RawNote, tt.overwrite)
+			err := uc.UpdateCard(context.Background(), tt.card, tt.overwrite)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -239,39 +279,42 @@ func TestUpdateRawNote(t *testing.T) {
 	}
 }
 
-func TestGetRawNote(t *testing.T) {
+func TestGetCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		GetRawNote(gomock.Any(), gomock.Any()).
+		GetCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
-		GetRawNote(gomock.Any(), gomock.Any()).
+		GetCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errReadFromRepo.Error()))
 
 	m.EXPECT().
-		GetRawNote(gomock.Any(), gomock.Any()).
+		GetCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		GetRawNote(gomock.Any(), gomock.Any()).
-		Return(&pb.GetRawNoteResponse{
-			Note: &pb.RawNote{
-				Title: "Secret file",
-				Value: []byte("Hello world!"),
+		GetCard(gomock.Any(), gomock.Any()).
+		Return(&pb.GetCardResponse{
+			Card: &pb.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				Cvc:    "123",
+				Expiry: timestamppb.New(time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC)),
 			},
 			Version: 10,
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
-		RawNote *entity.RawNote
-		err     error
+		card *entity.Card
+		err  error
 	}
 
 	tests := []struct {
@@ -284,7 +327,7 @@ func TestGetRawNote(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -292,7 +335,7 @@ func TestGetRawNote(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -308,16 +351,19 @@ func TestGetRawNote(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
 			"valid entity",
 			"#12345",
 			&want{
-				&entity.RawNote{
-					Title:   "Secret file",
-					Value:   []byte("Hello world!"),
+				&entity.Card{
+					Title:   "Credit card",
+					Number:  "1234 5678 9012 4453",
+					Holder:  "John Daw",
+					CVC:     "123",
+					Expiry:  time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 					Version: 10,
 				},
 				nil,
@@ -327,9 +373,9 @@ func TestGetRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			RawNote, err := uc.GetRawNote(context.Background(), tt.id)
+			card, err := uc.GetCard(context.Background(), tt.id)
 
-			assert.Equal(t, tt.want.RawNote, RawNote)
+			assert.Equal(t, tt.want.card, card)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -340,46 +386,46 @@ func TestGetRawNote(t *testing.T) {
 	}
 }
 
-func TestGetRawNotesList(t *testing.T) {
+func TestGetCardsList(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		GetRawNotesList(gomock.Any(), gomock.Any()).
+		GetCardsList(gomock.Any(), gomock.Any()).
 		Return(&pb.GetListResponse{}, nil)
 
 	m.EXPECT().
-		GetRawNotesList(gomock.Any(), gomock.Any()).
+		GetCardsList(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errReadFromRepo.Error()))
 
 	m.EXPECT().
-		GetRawNotesList(gomock.Any(), gomock.Any()).
+		GetCardsList(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		GetRawNotesList(gomock.Any(), gomock.Any()).
+		GetCardsList(gomock.Any(), gomock.Any()).
 		Return(&pb.GetListResponse{
 			List: []*pb.ListItem{
 				{
 					Id:          "#12345",
-					Title:       "Secret file",
-					Description: "",
+					Title:       "Sberbank",
+					Description: "Credit card",
 				},
 				{
 					Id:          "#23456",
-					Title:       "Another file",
-					Description: "Super secret file",
+					Title:       "Tinkoff",
+					Description: "Debit card",
 				},
 			},
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
-		RawNotes []*entity.RawNote
-		err      error
+		cards []*entity.Card
+		err   error
 	}
 
 	tests := []struct {
@@ -389,7 +435,7 @@ func TestGetRawNotesList(t *testing.T) {
 		{
 			"nothing found",
 			&want{
-				[]*entity.RawNote{},
+				[]*entity.Card{},
 				nil,
 			},
 		},
@@ -404,22 +450,22 @@ func TestGetRawNotesList(t *testing.T) {
 			"no internet connection",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
 			"valid entity",
 			&want{
-				[]*entity.RawNote{
+				[]*entity.Card{
 					{
 						ID:          "#12345",
-						Title:       "Secret file",
-						Description: "",
+						Title:       "Sberbank",
+						Description: "Credit card",
 					},
 					{
 						ID:          "#23456",
-						Title:       "Another file",
-						Description: "Super secret file",
+						Title:       "Tinkoff",
+						Description: "Debit card",
 					},
 				},
 				nil,
@@ -429,9 +475,9 @@ func TestGetRawNotesList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			RawNotes, err := uc.GetRawNotesList(context.Background())
+			cards, err := uc.GetCardsList(context.Background())
 
-			assert.Equal(t, tt.want.RawNotes, RawNotes)
+			assert.Equal(t, tt.want.cards, cards)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -442,29 +488,29 @@ func TestGetRawNotesList(t *testing.T) {
 	}
 }
 
-func TestDeleteRawNote(t *testing.T) {
+func TestDeleteCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		DeleteRawNote(gomock.Any(), gomock.Any()).
+		DeleteCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
-		DeleteRawNote(gomock.Any(), gomock.Any()).
+		DeleteCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errReadFromRepo.Error()))
 
 	m.EXPECT().
-		DeleteRawNote(gomock.Any(), gomock.Any()).
+		DeleteCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		DeleteRawNote(gomock.Any(), gomock.Any()).
+		DeleteCard(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -474,12 +520,12 @@ func TestDeleteRawNote(t *testing.T) {
 		{
 			"missing argument",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"reading from repo error",
@@ -489,7 +535,7 @@ func TestDeleteRawNote(t *testing.T) {
 		{
 			"no internet connection",
 			"#12345",
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"successfully deleted",
@@ -500,7 +546,7 @@ func TestDeleteRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.DeleteRawNote(context.Background(), tt.id)
+			err := uc.DeleteCard(context.Background(), tt.id)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)

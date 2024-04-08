@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -10,18 +10,18 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 )
 
-func TestAddTextNote(t *testing.T) {
+func TestAddRawNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		AddSecureRecord(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
+		AddSecureNote(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureNote) error {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}
@@ -29,78 +29,70 @@ func TestAddTextNote(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
-		note *entity.TextNote
+		note *entity.RawNote
 		err  error
 	}{
 		{
 			"empty input",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.TextNote{
-				Value: "Text note...",
+			&entity.RawNote{
+				Value: []byte("Hello world!"),
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"valid entity",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#12345",
-				Title: "Text note",
-				Value: "Text note...",
+				Title: "Binary note",
+				Value: []byte("Hello world!"),
 			},
 			nil,
 		},
 		{
 			"write to repo error",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#765432",
 				Title: "Text note",
-				Value: "Text note...",
+				Value: []byte("Hello world!"),
 			},
 			errWriteToRepo,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.AddTextNote(context.Background(), tt.note)
+			err := uc.AddRawNote(context.Background(), tt.note)
 
 			assert.Equal(t, tt.err, err)
 		})
 	}
 }
 
-func TestGetTextNote(t *testing.T) {
+func TestGetRawNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		GetSecureRecord(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeTextNote)).
-		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureRecordType) (*repository.SecureRecord, error) {
+		GetSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
+		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureNoteType) (*repository.SecureNote, error) {
 			switch id {
-			case "#12345":
-				return &repository.SecureRecord{
-					ID:       "#12345",
-					Type:     repository.TypeTextNote,
-					Title:    "Text note",
-					TextNote: "Text note...",
+			case "#23456":
+				return &repository.SecureNote{
+					ID:      "#23456",
+					Type:    repository.TypeRawNote,
+					Title:   "Binary note",
+					RawNote: []byte("Hello world!"),
 				}, nil
-
-			// case "#23456":
-			// 	return &repository.SecureRecord{
-			// 		ID:      "#23456",
-			// 		Type:    repository.TypeTextNote,
-			// 		Title:   "Binary note",
-			// 		TextNote: []byte("Binary note..."),
-			// 	}, nil
 
 			case "#34567":
 				return nil, repository.ErrNotFound
@@ -111,10 +103,10 @@ func TestGetTextNote(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
-		note *entity.TextNote
+		note *entity.RawNote
 		err  error
 	}
 
@@ -130,7 +122,7 @@ func TestGetTextNote(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -139,7 +131,7 @@ func TestGetTextNote(t *testing.T) {
 			"#34567",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -148,18 +140,18 @@ func TestGetTextNote(t *testing.T) {
 			"#34567",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
-			"valid text note",
+			"valid binary note",
 			"user#12345",
-			"#12345",
+			"#23456",
 			&want{
-				&entity.TextNote{
-					ID:    "#12345",
-					Title: "Text note",
-					Value: "Text note...",
+				&entity.RawNote{
+					ID:    "#23456",
+					Title: "Binary note",
+					Value: []byte("Hello world!"),
 				},
 				nil,
 			},
@@ -176,7 +168,7 @@ func TestGetTextNote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			note, err := uc.GetTextNote(context.Background(), tt.user, tt.id)
+			note, err := uc.GetRawNote(context.Background(), tt.user, tt.id)
 
 			assert.Equal(t, tt.want.note, note)
 			assert.Equal(t, tt.want.err, err)
@@ -184,44 +176,44 @@ func TestGetTextNote(t *testing.T) {
 	}
 }
 
-func TestGetTextNotes(t *testing.T) {
+func TestGetRawNotes(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeTextNote)).
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
 		Return(nil, nil).
 		Times(1)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeTextNote)).
-		Return([]*repository.SecureRecord{
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
+		Return([]*repository.SecureNote{
 			{
-				ID:       "#12345",
-				Type:     repository.TypeTextNote,
-				Title:    "Text note",
-				TextNote: "Text note...",
+				ID:      "#12345",
+				Type:    repository.TypeRawNote,
+				Title:   "Binary note",
+				RawNote: []byte("Binary note..."),
 			},
 			{
-				ID:       "#23456",
-				Type:     repository.TypeTextNote,
-				Title:    "Another text note",
-				TextNote: "Another text note...",
+				ID:      "#23456",
+				Type:    repository.TypeRawNote,
+				Title:   "Another binary note",
+				RawNote: []byte("Another binary note..."),
 			},
 		}, nil).
 		Times(1)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeTextNote)).
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
 		Return(nil, errReadFromRepo).
 		Times(1)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
-		notes []*entity.TextNote
+		notes []*entity.RawNote
 		err   error
 	}
 
@@ -235,14 +227,14 @@ func TestGetTextNotes(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
 			"empty list",
 			"user#12345",
 			&want{
-				[]*entity.TextNote{},
+				[]*entity.RawNote{},
 				nil,
 			},
 		},
@@ -250,16 +242,16 @@ func TestGetTextNotes(t *testing.T) {
 			"list of notes",
 			"user#12345",
 			&want{
-				[]*entity.TextNote{
+				[]*entity.RawNote{
 					{
 						ID:    "#12345",
-						Title: "Text note",
-						Value: "Text note...",
+						Title: "Binary note",
+						Value: []byte("Binary note..."),
 					},
 					{
 						ID:    "#23456",
-						Title: "Another text note",
-						Value: "Another text note...",
+						Title: "Another binary note",
+						Value: []byte("Another binary note..."),
 					},
 				},
 				nil,
@@ -276,7 +268,7 @@ func TestGetTextNotes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			notes, err := uc.GetTextNotes(context.Background(), tt.user)
+			notes, err := uc.GetRawNotes(context.Background(), tt.user)
 
 			assert.Equal(t, tt.want.notes, notes)
 			assert.Equal(t, tt.want.err, err)
@@ -284,15 +276,15 @@ func TestGetTextNotes(t *testing.T) {
 	}
 }
 
-func TestUpdateTextNote(t *testing.T) {
+func TestUpdateRawNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		UpdateSecureRecord(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
+		UpdateSecureNote(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureNote) error {
 			switch r.ID {
 			case "#12345":
 				return repository.ErrNotFound
@@ -309,11 +301,11 @@ func TestUpdateTextNote(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name      string
-		TextNote  *entity.TextNote
+		RawNote   *entity.RawNote
 		overwrite bool
 		err       error
 	}{
@@ -321,60 +313,60 @@ func TestUpdateTextNote(t *testing.T) {
 			"empty input",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID: "#12345",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#12345",
-				Title: "Text note",
+				Title: "Binary note",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#12345",
-				Value: "Text note...",
+				Value: []byte("Hello world!"),
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"nothing found",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#12345",
-				Title: "Text note",
-				Value: "Text note...",
+				Title: "Binary note",
+				Value: []byte("Hello world!"),
 			},
 			true,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"version required",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#12345",
-				Title: "Text note",
-				Value: "Text note...",
+				Title: "Binary note",
+				Value: []byte("Hello world!"),
 			},
 			false,
-			keeper.ErrVersionRequired,
+			notes.ErrVersionRequired,
 		},
 		{
 			"updated version",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:      "#789012",
-				Title:   "Text note",
-				Value:   "Text note...",
+				Title:   "Binary note",
+				Value:   []byte("Hello world!"),
 				Version: 10,
 			},
 			false,
@@ -382,30 +374,30 @@ func TestUpdateTextNote(t *testing.T) {
 		},
 		{
 			"overwritten",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#789012",
-				Title: "Text note",
-				Value: "Text note...",
+				Title: "Binary note",
+				Value: []byte("Hello world!"),
 			},
 			true,
 			nil,
 		},
 		{
 			"version conflict",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#34567",
-				Title: "Text note",
-				Value: "Text note...",
+				Title: "Binary note",
+				Value: []byte("Hello world!"),
 			},
 			true,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"write to repo error",
-			&entity.TextNote{
+			&entity.RawNote{
 				ID:    "#23456",
-				Title: "Text note",
-				Value: "Text note...",
+				Title: "Binary note",
+				Value: []byte("Hello world!"),
 			},
 			true,
 			errWriteToRepo,
@@ -414,22 +406,22 @@ func TestUpdateTextNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.UpdateTextNote(context.Background(), tt.TextNote, tt.overwrite)
+			err := uc.UpdateRawNote(context.Background(), tt.RawNote, tt.overwrite)
 
 			assert.Equal(t, tt.err, err)
 		})
 	}
 }
 
-func TestDeleteTextNote(t *testing.T) {
+func TestDeleteRawNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		DeleteSecureRecord(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeTextNote)).
-		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureRecordType) error {
+		DeleteSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
+		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureNoteType) error {
 			switch id {
 			case "#12345":
 				return repository.ErrNotFound
@@ -443,7 +435,7 @@ func TestDeleteTextNote(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -455,19 +447,19 @@ func TestDeleteTextNote(t *testing.T) {
 			"missing id",
 			"user#12345",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"missing user",
 			"",
 			"#12345",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"user#12345",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"write to repo error",
@@ -485,7 +477,7 @@ func TestDeleteTextNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.DeleteTextNote(context.Background(), tt.user, tt.id)
+			err := uc.DeleteRawNote(context.Background(), tt.user, tt.id)
 
 			assert.Equal(t, tt.err, err)
 		})

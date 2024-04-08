@@ -9,18 +9,18 @@ import (
 )
 
 type App struct {
-	auth   *auth.AuthManager
-	user   usecase.User
-	keeper usecase.Keeper
-	ui     ui.UserInterface
+	auth  *auth.AuthManager
+	user  usecase.User
+	notes usecase.SecureNotes
+	ui    ui.UserInterface
 }
 
-func NewApp(auth *auth.AuthManager, user usecase.User, keeper usecase.Keeper) *App {
+func NewApp(auth *auth.AuthManager, user usecase.User, notes usecase.SecureNotes) *App {
 	return &App{
-		auth:   auth,
-		user:   user,
-		keeper: keeper,
-		ui:     ui.New(),
+		auth:  auth,
+		user:  user,
+		notes: notes,
+		ui:    ui.New(),
 	}
 }
 

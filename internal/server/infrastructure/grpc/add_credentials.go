@@ -7,7 +7,7 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
@@ -22,12 +22,12 @@ func (s *KeeperServer) AddCredentials(ctx context.Context, in *pb.AddCredentials
 	creds.Password = in.Credentials.GetPassword()
 	creds.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
-	err := s.keeper.AddCredentials(ctx, creds)
+	err := s.notes.AddCredentials(ctx, creds)
 	if err != nil {
 		logger.WithError(err).Error("unable to add credentials")
 	}
 
-	if errors.Is(err, keeper.ErrInvalidEntity) {
+	if errors.Is(err, notes.ErrInvalidEntity) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 

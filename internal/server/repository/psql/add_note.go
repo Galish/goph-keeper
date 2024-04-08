@@ -10,8 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) AddSecureRecord(ctx context.Context, record *repository.SecureRecord) error {
-	protected, err := s.encrypt(record)
+func (s *psqlStore) AddSecureNote(ctx context.Context, note *repository.SecureNote) error {
+	protected, err := s.encrypt(note)
 	if err != nil {
 		return fmt.Errorf("encryption failed: %v", err)
 	}
@@ -33,14 +33,14 @@ func (s *psqlStore) AddSecureRecord(ctx context.Context, record *repository.Secu
 				$1, $2, $3, $4, $5, $6, $7, $8
 			)
 		`,
-		record.ID,
-		record.Type,
-		record.Title,
-		record.Description,
+		note.ID,
+		note.Type,
+		note.Title,
+		note.Description,
 		protected,
-		record.CreatedBy,
-		record.CreatedAt,
-		record.LastEditedAt,
+		note.CreatedBy,
+		note.CreatedAt,
+		note.LastEditedAt,
 	)
 
 	var pgErr *pgconn.PgError

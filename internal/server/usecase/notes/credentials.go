@@ -1,4 +1,4 @@
-package keeper
+package notes
 
 import (
 	"context"
@@ -14,7 +14,7 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 		return ErrInvalidEntity
 	}
 
-	record := &repository.SecureRecord{
+	note := &repository.SecureNote{
 		ID:          creds.ID,
 		Type:        repository.TypeCredentials,
 		Title:       creds.Title,
@@ -27,7 +27,7 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.AddSecureRecord(ctx, record)
+	return uc.repo.AddSecureNote(ctx, note)
 }
 
 func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error) {
@@ -35,7 +35,7 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*
 		return nil, ErrMissingArgument
 	}
 
-	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeCredentials)
+	note, err := uc.repo.GetSecureNote(ctx, user, id, repository.TypeCredentials)
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}
@@ -45,16 +45,16 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*
 	}
 
 	creds := entity.Credentials{
-		ID:          record.ID,
-		Title:       record.Title,
-		Description: record.Description,
+		ID:          note.ID,
+		Title:       note.Title,
+		Description: note.Description,
 
-		Username: record.Username,
-		Password: record.Password,
+		Username: note.Username,
+		Password: note.Password,
 
-		CreatedAt:    record.CreatedAt,
-		LastEditedAt: record.LastEditedAt,
-		Version:      record.Version,
+		CreatedAt:    note.CreatedAt,
+		LastEditedAt: note.LastEditedAt,
+		Version:      note.Version,
 	}
 
 	return &creds, nil
@@ -65,14 +65,14 @@ func (uc *KeeperUseCase) GetAllCredentials(ctx context.Context, user string) ([]
 		return nil, ErrMissingArgument
 	}
 
-	records, err := uc.repo.GetSecureRecords(ctx, user, repository.TypeCredentials)
+	notes, err := uc.repo.GetSecureNotes(ctx, user, repository.TypeCredentials)
 	if err != nil {
 		return nil, err
 	}
 
-	var creds = make([]*entity.Credentials, len(records))
+	var creds = make([]*entity.Credentials, len(notes))
 
-	for i, r := range records {
+	for i, r := range notes {
 		cred := &entity.Credentials{
 			ID:          r.ID,
 			Title:       r.Title,
@@ -100,7 +100,7 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 		return ErrVersionRequired
 	}
 
-	record := &repository.SecureRecord{
+	note := &repository.SecureNote{
 		ID:          creds.ID,
 		Type:        repository.TypeCredentials,
 		Title:       creds.Title,
@@ -114,10 +114,10 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 	}
 
 	if !overwrite {
-		record.Version = creds.Version
+		note.Version = creds.Version
 	}
 
-	err := uc.repo.UpdateSecureRecord(ctx, record)
+	err := uc.repo.UpdateSecureNote(ctx, note)
 	if errors.Is(err, repository.ErrVersionConflict) {
 		return ErrVersionConflict
 	}
@@ -134,7 +134,7 @@ func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, user, id string)
 		return ErrMissingArgument
 	}
 
-	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeCredentials)
+	err := uc.repo.DeleteSecureNote(ctx, user, id, repository.TypeCredentials)
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

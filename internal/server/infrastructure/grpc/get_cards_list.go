@@ -18,7 +18,7 @@ func (s *KeeperServer) GetCardsList(ctx context.Context, _ *emptypb.Empty) (*pb.
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	cards, err := s.keeper.GetCards(ctx, user)
+	cards, err := s.notes.GetCards(ctx, user)
 	if err != nil {
 		logger.WithError(err).Error("unable to get cards list")
 

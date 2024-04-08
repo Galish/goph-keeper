@@ -1,4 +1,4 @@
-package keeper
+package notes
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote) error {
+func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) error {
 	if note == nil || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -18,20 +18,20 @@ func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote)
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
-	req := &pb.AddTextNoteRequest{
-		Note: &pb.TextNote{
+	req := &pb.AddRawNoteRequest{
+		Note: &pb.RawNote{
 			Title:       note.Title,
 			Description: note.Description,
 			Value:       note.Value,
 		},
 	}
 
-	_, err := uc.client.AddTextNote(ctx, req)
+	_, err := uc.client.AddRawNote(ctx, req)
 
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote, overwrite bool) error {
+func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
 	if note == nil || note.ID == "" || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -39,9 +39,9 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
-	req := &pb.UpdateTextNoteRequest{
+	req := &pb.UpdateRawNoteRequest{
 		Id: note.ID,
-		Note: &pb.TextNote{
+		Note: &pb.RawNote{
 			Title:       note.Title,
 			Description: note.Description,
 			Value:       note.Value,
@@ -50,12 +50,12 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 		Overwrite: overwrite,
 	}
 
-	_, err := uc.client.UpdateTextNote(ctx, req)
+	_, err := uc.client.UpdateRawNote(ctx, req)
 
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.TextNote, error) {
+func (uc *KeeperUseCase) GetRawNote(ctx context.Context, id string) (*entity.RawNote, error) {
 	if id == "" {
 		return nil, ErrMissingArgument
 	}
@@ -67,12 +67,12 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.Te
 		Id: id,
 	}
 
-	resp, err := uc.client.GetTextNote(ctx, req)
+	resp, err := uc.client.GetRawNote(ctx, req)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	note := &entity.TextNote{
+	note := &entity.RawNote{
 		Title:       resp.GetNote().GetTitle(),
 		Description: resp.GetNote().GetDescription(),
 		Value:       resp.GetNote().GetValue(),
@@ -82,19 +82,19 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.Te
 	return note, nil
 }
 
-func (uc *KeeperUseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNote, error) {
+func (uc *KeeperUseCase) GetRawNotesList(ctx context.Context) ([]*entity.RawNote, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
-	resp, err := uc.client.GetTextNotesList(ctx, &emptypb.Empty{})
+	resp, err := uc.client.GetRawNotesList(ctx, &emptypb.Empty{})
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	var notes = make([]*entity.TextNote, len(resp.GetList()))
+	var notes = make([]*entity.RawNote, len(resp.GetList()))
 
 	for i, c := range resp.GetList() {
-		notes[i] = &entity.TextNote{
+		notes[i] = &entity.RawNote{
 			ID:          c.GetId(),
 			Title:       c.GetTitle(),
 			Description: c.GetDescription(),
@@ -104,7 +104,7 @@ func (uc *KeeperUseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNo
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, id string) error {
+func (uc *KeeperUseCase) DeleteRawNote(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrMissingArgument
 	}
@@ -116,7 +116,7 @@ func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, id string) error {
 		Id: id,
 	}
 
-	_, err := uc.client.DeleteTextNote(ctx, req)
+	_, err := uc.client.DeleteRawNote(ctx, req)
 
 	return handleError(err)
 }

@@ -7,7 +7,7 @@ import (
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc/interceptors"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 	"github.com/Galish/goph-keeper/pkg/logger"
 
 	"google.golang.org/grpc/codes"
@@ -26,7 +26,7 @@ func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCrede
 		Version:     in.GetVersion(),
 	}
 
-	err := s.keeper.UpdateCredentials(ctx, creds, in.GetOverwrite())
+	err := s.notes.UpdateCredentials(ctx, creds, in.GetOverwrite())
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{
@@ -36,16 +36,16 @@ func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCrede
 			Error("unable to update credentials")
 	}
 
-	if errors.Is(err, keeper.ErrInvalidEntity) ||
-		errors.Is(err, keeper.ErrVersionRequired) {
+	if errors.Is(err, notes.ErrInvalidEntity) ||
+		errors.Is(err, notes.ErrVersionRequired) {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	if errors.Is(err, keeper.ErrVersionConflict) {
+	if errors.Is(err, notes.ErrVersionConflict) {
 		return nil, status.Errorf(codes.FailedPrecondition, err.Error())
 	}
 
-	if errors.Is(err, keeper.ErrNotFound) {
+	if errors.Is(err, notes.ErrNotFound) {
 		return nil, status.Errorf(codes.NotFound, err.Error())
 	}
 

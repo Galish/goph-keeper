@@ -7,7 +7,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) GetSecureRecords(ctx context.Context, user string, recordType repository.SecureRecordType) ([]*repository.SecureRecord, error) {
+func (s *psqlStore) GetSecureNotes(ctx context.Context, user string, noteType repository.SecureNoteType) ([]*repository.SecureNote, error) {
 	rows, err := s.db.QueryContext(
 		ctx,
 		`
@@ -29,7 +29,7 @@ func (s *psqlStore) GetSecureRecords(ctx context.Context, user string, recordTyp
 				created_by = $2
 			;
 		`,
-		recordType, user,
+		noteType, user,
 	)
 	if err != nil {
 		return nil, err
@@ -38,37 +38,37 @@ func (s *psqlStore) GetSecureRecords(ctx context.Context, user string, recordTyp
 	defer rows.Close()
 
 	var (
-		records   []*repository.SecureRecord
+		notes     []*repository.SecureNote
 		protected string
 	)
 
 	for rows.Next() {
-		var record repository.SecureRecord
+		var note repository.SecureNote
 
 		if err := rows.Scan(
-			&record.ID,
-			&record.Type,
-			&record.Title,
-			&record.Description,
+			&note.ID,
+			&note.Type,
+			&note.Title,
+			&note.Description,
 			&protected,
-			&record.CreatedBy,
-			&record.CreatedAt,
-			&record.LastEditedAt,
-			&record.Version,
+			&note.CreatedBy,
+			&note.CreatedAt,
+			&note.LastEditedAt,
+			&note.Version,
 		); err != nil {
 			return nil, err
 		}
 
-		if err := s.decrypt(protected, &record); err != nil {
+		if err := s.decrypt(protected, &note); err != nil {
 			return nil, fmt.Errorf("decryption failed: %v", err)
 		}
 
-		records = append(records, &record)
+		notes = append(notes, &note)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return records, nil
+	return notes, nil
 }

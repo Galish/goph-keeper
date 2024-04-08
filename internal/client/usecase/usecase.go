@@ -11,7 +11,7 @@ type User interface {
 	SignIn(context.Context, string, string) error
 }
 
-type Keeper interface {
+type SecureNotes interface {
 	AddCard(context.Context, *entity.Card) error
 	GetCard(context.Context, string) (*entity.Card, error)
 	GetCardsList(context.Context) ([]*entity.Card, error)

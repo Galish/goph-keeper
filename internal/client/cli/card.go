@@ -6,14 +6,14 @@ import (
 	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (a *App) viewCardsList(ctx context.Context) {
 	a.ui.Break()
 
-	cards, err := a.keeper.GetCardsList(ctx)
+	cards, err := a.notes.GetCardsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -54,7 +54,7 @@ func (a *App) viewCardsList(ctx context.Context) {
 func (a *App) viewCard(ctx context.Context, id string) {
 	a.ui.Break()
 
-	card, err := a.keeper.GetCard(ctx, id)
+	card, err := a.notes.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -103,7 +103,7 @@ func (a *App) addCard(ctx context.Context) {
 
 	if ok := a.ui.Confirm("Add card details"); ok {
 		for {
-			err := a.keeper.AddCard(ctx, card)
+			err := a.notes.AddCard(ctx, card)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -116,7 +116,7 @@ func (a *App) addCard(ctx context.Context) {
 func (a *App) editCard(ctx context.Context, id string) {
 	a.ui.Break()
 
-	card, err := a.keeper.GetCard(ctx, id)
+	card, err := a.notes.GetCard(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -141,8 +141,8 @@ func (a *App) editCard(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Update card details"); ok {
 		for {
-			err := a.keeper.UpdateCard(ctx, updated, overwrite)
-			if errors.Is(err, keeper.ErrVersionConflict) {
+			err := a.notes.UpdateCard(ctx, updated, overwrite)
+			if errors.Is(err, notes.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Card details have already been updated. Want to overwrite"); ok {
 					overwrite = true
 					continue
@@ -167,7 +167,7 @@ func (a *App) deleteCard(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteCard(ctx, id)
+			err := a.notes.DeleteCard(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

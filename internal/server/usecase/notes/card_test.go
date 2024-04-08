@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 )
 
 var (
@@ -24,11 +24,11 @@ func TestAddCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		AddSecureRecord(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
+		AddSecureNote(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureNote) error {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}
@@ -36,7 +36,7 @@ func TestAddCard(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -46,14 +46,14 @@ func TestAddCard(t *testing.T) {
 		{
 			"empty input",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
 			&entity.Card{
 				ID: "#12345",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -61,7 +61,7 @@ func TestAddCard(t *testing.T) {
 				ID:     "#12345",
 				Number: "1234 5678 9012 4453",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -69,7 +69,7 @@ func TestAddCard(t *testing.T) {
 				ID:     "#12345",
 				Holder: "John Daw",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -77,7 +77,7 @@ func TestAddCard(t *testing.T) {
 				ID:  "#12345",
 				CVC: "123",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -85,7 +85,7 @@ func TestAddCard(t *testing.T) {
 				ID:     "#12345",
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"valid card",
@@ -126,14 +126,14 @@ func TestGetCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		GetSecureRecord(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
-		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureRecordType) (*repository.SecureRecord, error) {
+		GetSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
+		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureNoteType) (*repository.SecureNote, error) {
 			switch id {
 			case "#12345":
-				return &repository.SecureRecord{
+				return &repository.SecureNote{
 					ID:         "#12345",
 					Type:       repository.TypeCard,
 					Title:      "Credit card",
@@ -152,7 +152,7 @@ func TestGetCard(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		card *entity.Card
@@ -171,7 +171,7 @@ func TestGetCard(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -180,7 +180,7 @@ func TestGetCard(t *testing.T) {
 			"#34567",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -189,7 +189,7 @@ func TestGetCard(t *testing.T) {
 			"#34567",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -232,16 +232,16 @@ func TestGetCards(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
 		Return(nil, nil).
 		Times(1)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
-		Return([]*repository.SecureRecord{
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
+		Return([]*repository.SecureNote{
 			{
 				ID:         "#12345",
 				Type:       repository.TypeCard,
@@ -264,11 +264,11 @@ func TestGetCards(t *testing.T) {
 		Times(1)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
 		Return(nil, errReadFromRepo).
 		Times(1)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		cards []*entity.Card
@@ -285,7 +285,7 @@ func TestGetCards(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -344,11 +344,11 @@ func TestUpdateCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		UpdateSecureRecord(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
+		UpdateSecureNote(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureNote) error {
 			switch r.ID {
 			case "#12345":
 				return repository.ErrNotFound
@@ -365,7 +365,7 @@ func TestUpdateCard(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name      string
@@ -377,7 +377,7 @@ func TestUpdateCard(t *testing.T) {
 			"empty input",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -385,7 +385,7 @@ func TestUpdateCard(t *testing.T) {
 				ID: "#12345",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -394,7 +394,7 @@ func TestUpdateCard(t *testing.T) {
 				Number: "1234 5678 9012 4453",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -403,7 +403,7 @@ func TestUpdateCard(t *testing.T) {
 				Holder: "John Daw",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -412,7 +412,7 @@ func TestUpdateCard(t *testing.T) {
 				CVC: "123",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -421,7 +421,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"nothing found",
@@ -434,7 +434,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			true,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"version required",
@@ -447,7 +447,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrVersionRequired,
+			notes.ErrVersionRequired,
 		},
 		{
 			"updated version",
@@ -487,7 +487,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			true,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"write to repo error",
@@ -517,11 +517,11 @@ func TestDeleteCard(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		DeleteSecureRecord(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
-		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureRecordType) error {
+		DeleteSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCard)).
+		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureNoteType) error {
 			switch id {
 			case "#12345":
 				return repository.ErrNotFound
@@ -535,7 +535,7 @@ func TestDeleteCard(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -547,19 +547,19 @@ func TestDeleteCard(t *testing.T) {
 			"missing id",
 			"user#12345",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"missing user",
 			"",
 			"#12345",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"user#12345",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"write to repo error",

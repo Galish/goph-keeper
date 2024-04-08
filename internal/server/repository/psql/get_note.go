@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) GetSecureRecord(ctx context.Context, user, id string, recordType repository.SecureRecordType) (*repository.SecureRecord, error) {
+func (s *psqlStore) GetSecureNote(ctx context.Context, user, id string, noteType repository.SecureNoteType) (*repository.SecureNote, error) {
 	row := s.db.QueryRowContext(
 		ctx,
 		`
@@ -35,24 +35,24 @@ func (s *psqlStore) GetSecureRecord(ctx context.Context, user, id string, record
 		`,
 		id,
 		user,
-		recordType,
+		noteType,
 	)
 
 	var (
-		record    repository.SecureRecord
+		note      repository.SecureNote
 		protected string
 	)
 
 	err := row.Scan(
-		&record.ID,
-		&record.Type,
-		&record.Title,
-		&record.Description,
+		&note.ID,
+		&note.Type,
+		&note.Title,
+		&note.Description,
 		&protected,
-		&record.CreatedBy,
-		&record.CreatedAt,
-		&record.LastEditedAt,
-		&record.Version,
+		&note.CreatedBy,
+		&note.CreatedAt,
+		&note.LastEditedAt,
+		&note.Version,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, repository.ErrNotFound
@@ -62,9 +62,9 @@ func (s *psqlStore) GetSecureRecord(ctx context.Context, user, id string, record
 		return nil, err
 	}
 
-	if err := s.decrypt(protected, &record); err != nil {
+	if err := s.decrypt(protected, &note); err != nil {
 		return nil, fmt.Errorf("decryption failed: %v", err)
 	}
 
-	return &record, nil
+	return &note, nil
 }

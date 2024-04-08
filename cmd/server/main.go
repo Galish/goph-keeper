@@ -4,7 +4,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/config"
 	"github.com/Galish/goph-keeper/internal/server/infrastructure/grpc"
 	"github.com/Galish/goph-keeper/internal/server/repository/psql"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
 	"github.com/Galish/goph-keeper/pkg/auth"
 	"github.com/Galish/goph-keeper/pkg/logger"
@@ -26,7 +26,7 @@ func main() {
 	grpcServer := grpc.NewServer(
 		cfg,
 		user.New(store, auth.NewJWTManager(cfg.AuthSecretKey)),
-		keeper.New(store),
+		notes.New(store),
 	)
 
 	sd := shutdowner.New(grpcServer, store)

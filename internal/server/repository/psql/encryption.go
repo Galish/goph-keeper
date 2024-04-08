@@ -18,7 +18,7 @@ type protectedData struct {
 	CardExpiry time.Time
 }
 
-func (s *psqlStore) encrypt(r *repository.SecureRecord) (string, error) {
+func (s *psqlStore) encrypt(r *repository.SecureNote) (string, error) {
 	b, err := json.Marshal(protectedData{
 		Username:   r.Username,
 		Password:   r.Password,
@@ -36,7 +36,7 @@ func (s *psqlStore) encrypt(r *repository.SecureRecord) (string, error) {
 	return s.enc.Encrypt(string(b))
 }
 
-func (s *psqlStore) decrypt(raw string, r *repository.SecureRecord) error {
+func (s *psqlStore) decrypt(raw string, r *repository.SecureNote) error {
 	decrypted, err := s.enc.Decrypt(raw)
 	if err != nil {
 		return nil

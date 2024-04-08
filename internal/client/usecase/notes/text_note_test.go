@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -12,82 +12,78 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func TestAddCredentials(t *testing.T) {
+func TestAddTextNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		AddCredentials(gomock.Any(), gomock.Any()).
+		AddTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
-		AddCredentials(gomock.Any(), gomock.Any()).
+		AddTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errors.New("failed to write to repo").Error()))
 
 	m.EXPECT().
-		AddCredentials(gomock.Any(), gomock.Any()).
+		AddTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		AddCredentials(gomock.Any(), gomock.Any()).
-		Return(&pb.AddCredentialsResponse{Id: "#12345"}, nil)
+		AddTextNote(gomock.Any(), gomock.Any()).
+		Return(&pb.AddTextNoteResponse{Id: "#12345"}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
-		name        string
-		Credentials *entity.Credentials
-		err         error
+		name     string
+		TextNote *entity.TextNote
+		err      error
 	}{
 		{
 			"missing entity",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.Credentials{},
-			keeper.ErrInvalidEntity,
+			&entity.TextNote{},
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
-			&entity.Credentials{
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"writing to repo error",
-			&entity.Credentials{
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			errWriteToRepo,
 		},
 		{
 			"no internet connection",
-			&entity.Credentials{
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
 			},
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
-			&entity.Credentials{
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			nil,
 		},
@@ -95,7 +91,7 @@ func TestAddCredentials(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.AddCredentials(context.Background(), tt.Credentials)
+			err := uc.AddTextNote(context.Background(), tt.TextNote)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -106,131 +102,124 @@ func TestAddCredentials(t *testing.T) {
 	}
 }
 
-func TestUpdateCredentials(t *testing.T) {
+func TestUpdateTextNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		UpdateCredentials(gomock.Any(), gomock.Any()).
+		UpdateTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
-		UpdateCredentials(gomock.Any(), gomock.Any()).
+		UpdateTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
 
 	m.EXPECT().
-		UpdateCredentials(gomock.Any(), gomock.Any()).
+		UpdateTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
-		UpdateCredentials(gomock.Any(), gomock.Any()).
+		UpdateTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errors.New("failed to write to repo").Error()))
 
 	m.EXPECT().
-		UpdateCredentials(gomock.Any(), gomock.Any()).
+		UpdateTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		UpdateCredentials(gomock.Any(), gomock.Any()).
+		UpdateTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
-		name        string
-		Credentials *entity.Credentials
-		overwrite   bool
-		err         error
+		name      string
+		TextNote  *entity.TextNote
+		overwrite bool
+		err       error
 	}{
 		{
 			"missing entity",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
-			&entity.Credentials{
+			&entity.TextNote{
 				ID:    "#12345678",
-				Title: "Credit Credentials",
+				Title: "Credit TextNote",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"missing id",
-			&entity.Credentials{
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
-			&entity.Credentials{
-				ID:       "#12345678",
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			true,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"version conflict",
-			&entity.Credentials{
-				ID:       "#12345678",
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			false,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"nothing found",
-			&entity.Credentials{
-				ID:       "#12345678",
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			false,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"writing to repo error",
-			&entity.Credentials{
-				ID:       "#12345678",
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			true,
 			errWriteToRepo,
 		},
 		{
 			"no internet connection",
-			&entity.Credentials{
-				ID:       "#12345678",
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			false,
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
-			&entity.Credentials{
-				ID:       "#12345678",
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			true,
 			nil,
@@ -239,7 +228,7 @@ func TestUpdateCredentials(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.UpdateCredentials(context.Background(), tt.Credentials, tt.overwrite)
+			err := uc.UpdateTextNote(context.Background(), tt.TextNote, tt.overwrite)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -250,40 +239,39 @@ func TestUpdateCredentials(t *testing.T) {
 	}
 }
 
-func TestGetCredentials(t *testing.T) {
+func TestGetTextNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		GetCredentials(gomock.Any(), gomock.Any()).
+		GetTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
-		GetCredentials(gomock.Any(), gomock.Any()).
+		GetTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errReadFromRepo.Error()))
 
 	m.EXPECT().
-		GetCredentials(gomock.Any(), gomock.Any()).
+		GetTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		GetCredentials(gomock.Any(), gomock.Any()).
-		Return(&pb.GetCredentialsResponse{
-			Credentials: &pb.Credentials{
-				Title:    "Gmail",
-				Username: "john.doe",
-				Password: "qwe123456",
+		GetTextNote(gomock.Any(), gomock.Any()).
+		Return(&pb.GetTextNoteResponse{
+			Note: &pb.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
 			},
 			Version: 10,
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
-		Credentials *entity.Credentials
-		err         error
+		TextNote *entity.TextNote
+		err      error
 	}
 
 	tests := []struct {
@@ -296,7 +284,7 @@ func TestGetCredentials(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -304,7 +292,7 @@ func TestGetCredentials(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -320,18 +308,17 @@ func TestGetCredentials(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
 			"valid entity",
 			"#12345",
 			&want{
-				&entity.Credentials{
-					Title:    "Gmail",
-					Username: "john.doe",
-					Password: "qwe123456",
-					Version:  10,
+				&entity.TextNote{
+					Title:   "My text note",
+					Value:   "Text note ...",
+					Version: 10,
 				},
 				nil,
 			},
@@ -340,9 +327,9 @@ func TestGetCredentials(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Credentials, err := uc.GetCredentials(context.Background(), tt.id)
+			TextNote, err := uc.GetTextNote(context.Background(), tt.id)
 
-			assert.Equal(t, tt.want.Credentials, Credentials)
+			assert.Equal(t, tt.want.TextNote, TextNote)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -353,46 +340,46 @@ func TestGetCredentials(t *testing.T) {
 	}
 }
 
-func TestGetCredentialsList(t *testing.T) {
+func TestGetTextNotesList(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		GetCredentialsList(gomock.Any(), gomock.Any()).
+		GetTextNotesList(gomock.Any(), gomock.Any()).
 		Return(&pb.GetListResponse{}, nil)
 
 	m.EXPECT().
-		GetCredentialsList(gomock.Any(), gomock.Any()).
+		GetTextNotesList(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errReadFromRepo.Error()))
 
 	m.EXPECT().
-		GetCredentialsList(gomock.Any(), gomock.Any()).
+		GetTextNotesList(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		GetCredentialsList(gomock.Any(), gomock.Any()).
+		GetTextNotesList(gomock.Any(), gomock.Any()).
 		Return(&pb.GetListResponse{
 			List: []*pb.ListItem{
 				{
 					Id:          "#12345",
-					Title:       "Gmail",
-					Description: "My main account",
+					Title:       "My text note",
+					Description: "",
 				},
 				{
 					Id:          "#23456",
-					Title:       "Yandex",
-					Description: "Work account",
+					Title:       "Another file",
+					Description: "Super secret file",
 				},
 			},
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
-		Credentialss []*entity.Credentials
-		err          error
+		TextNotes []*entity.TextNote
+		err       error
 	}
 
 	tests := []struct {
@@ -402,7 +389,7 @@ func TestGetCredentialsList(t *testing.T) {
 		{
 			"nothing found",
 			&want{
-				[]*entity.Credentials{},
+				[]*entity.TextNote{},
 				nil,
 			},
 		},
@@ -417,22 +404,22 @@ func TestGetCredentialsList(t *testing.T) {
 			"no internet connection",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
 			"valid entity",
 			&want{
-				[]*entity.Credentials{
+				[]*entity.TextNote{
 					{
 						ID:          "#12345",
-						Title:       "Gmail",
-						Description: "My main account",
+						Title:       "My text note",
+						Description: "",
 					},
 					{
 						ID:          "#23456",
-						Title:       "Yandex",
-						Description: "Work account",
+						Title:       "Another file",
+						Description: "Super secret file",
 					},
 				},
 				nil,
@@ -442,9 +429,9 @@ func TestGetCredentialsList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Credentialss, err := uc.GetCredentialsList(context.Background())
+			TextNotes, err := uc.GetTextNotesList(context.Background())
 
-			assert.Equal(t, tt.want.Credentialss, Credentialss)
+			assert.Equal(t, tt.want.TextNotes, TextNotes)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -455,29 +442,29 @@ func TestGetCredentialsList(t *testing.T) {
 	}
 }
 
-func TestDeleteCredentials(t *testing.T) {
+func TestDeleteTextNote(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
 
 	m.EXPECT().
-		DeleteCredentials(gomock.Any(), gomock.Any()).
+		DeleteTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
-		DeleteCredentials(gomock.Any(), gomock.Any()).
+		DeleteTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Internal, errReadFromRepo.Error()))
 
 	m.EXPECT().
-		DeleteCredentials(gomock.Any(), gomock.Any()).
+		DeleteTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.Unavailable, errors.New("no connection").Error()))
 
 	m.EXPECT().
-		DeleteCredentials(gomock.Any(), gomock.Any()).
+		DeleteTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -487,12 +474,12 @@ func TestDeleteCredentials(t *testing.T) {
 		{
 			"missing argument",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"reading from repo error",
@@ -502,7 +489,7 @@ func TestDeleteCredentials(t *testing.T) {
 		{
 			"no internet connection",
 			"#12345",
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"successfully deleted",
@@ -513,7 +500,7 @@ func TestDeleteCredentials(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.DeleteCredentials(context.Background(), tt.id)
+			err := uc.DeleteTextNote(context.Background(), tt.id)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
