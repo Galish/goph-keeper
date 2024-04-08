@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Galish/goph-keeper/internal/server/repository"
+	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
 func (uc *UserUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
@@ -28,5 +29,7 @@ func (uc *UserUseCase) SignIn(ctx context.Context, username, password string) (s
 		return "", ErrInvalidCredentials
 	}
 
-	return uc.jwtManager.Generate(user)
+	return uc.jwtManager.Generate(&auth.JWTClaims{
+		UserID: user.ID,
+	})
 }

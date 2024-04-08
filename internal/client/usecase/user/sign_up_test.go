@@ -112,7 +112,7 @@ func TestSignUp(t *testing.T) {
 			err := uc.SignUp(context.Background(), tt.username, tt.password)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}

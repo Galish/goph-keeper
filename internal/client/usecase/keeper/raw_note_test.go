@@ -94,7 +94,7 @@ func TestAddRawNote(t *testing.T) {
 			err := uc.AddRawNote(context.Background(), tt.RawNote)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -231,7 +231,7 @@ func TestUpdateRawNote(t *testing.T) {
 			err := uc.UpdateRawNote(context.Background(), tt.RawNote, tt.overwrite)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -332,7 +332,7 @@ func TestGetRawNote(t *testing.T) {
 			assert.Equal(t, tt.want.RawNote, RawNote)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -434,7 +434,7 @@ func TestGetRawNotesList(t *testing.T) {
 			assert.Equal(t, tt.want.RawNotes, RawNotes)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -503,7 +503,7 @@ func TestDeleteRawNote(t *testing.T) {
 			err := uc.DeleteRawNote(context.Background(), tt.id)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}

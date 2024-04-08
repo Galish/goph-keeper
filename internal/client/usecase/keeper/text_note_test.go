@@ -94,7 +94,7 @@ func TestAddTextNote(t *testing.T) {
 			err := uc.AddTextNote(context.Background(), tt.TextNote)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -231,7 +231,7 @@ func TestUpdateTextNote(t *testing.T) {
 			err := uc.UpdateTextNote(context.Background(), tt.TextNote, tt.overwrite)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -332,7 +332,7 @@ func TestGetTextNote(t *testing.T) {
 			assert.Equal(t, tt.want.TextNote, TextNote)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -434,7 +434,7 @@ func TestGetTextNotesList(t *testing.T) {
 			assert.Equal(t, tt.want.TextNotes, TextNotes)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -503,7 +503,7 @@ func TestDeleteTextNote(t *testing.T) {
 			err := uc.DeleteTextNote(context.Background(), tt.id)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}

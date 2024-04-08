@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Galish/goph-keeper/internal/entity"
-
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -24,12 +22,14 @@ func NewJWTManager(secretKey string) *JWTManager {
 	}
 }
 
-func (m *JWTManager) Generate(user *entity.User) (string, error) {
+func (m *JWTManager) Generate(claims *JWTClaims) (string, error) {
+	if claims == nil {
+		return "", errors.New("missing required argument")
+	}
+
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
-		&JWTClaims{
-			UserID: user.ID,
-		},
+		claims,
 	)
 
 	return token.SignedString([]byte(m.secretKey))

@@ -98,7 +98,7 @@ func TestAddCredentials(t *testing.T) {
 			err := uc.AddCredentials(context.Background(), tt.Credentials)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -242,7 +242,7 @@ func TestUpdateCredentials(t *testing.T) {
 			err := uc.UpdateCredentials(context.Background(), tt.Credentials, tt.overwrite)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -345,7 +345,7 @@ func TestGetCredentials(t *testing.T) {
 			assert.Equal(t, tt.want.Credentials, Credentials)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -447,7 +447,7 @@ func TestGetCredentialsList(t *testing.T) {
 			assert.Equal(t, tt.want.Credentialss, Credentialss)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -516,7 +516,7 @@ func TestDeleteCredentials(t *testing.T) {
 			err := uc.DeleteCredentials(context.Background(), tt.id)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}

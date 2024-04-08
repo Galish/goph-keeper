@@ -8,6 +8,7 @@ import (
 
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
+	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
 func (uc *UserUseCase) SignUp(ctx context.Context, username, password string) (string, error) {
@@ -33,5 +34,7 @@ func (uc *UserUseCase) SignUp(ctx context.Context, username, password string) (s
 		return "", err
 	}
 
-	return uc.jwtManager.Generate(user)
+	return uc.jwtManager.Generate(&auth.JWTClaims{
+		UserID: user.ID,
+	})
 }

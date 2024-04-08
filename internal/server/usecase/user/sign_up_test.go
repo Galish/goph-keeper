@@ -115,8 +115,8 @@ func TestSignUp(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			token, err := uc.SignUp(context.Background(), tt.username, tt.password)
 
-			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+			if tt.want.err != nil {
+				assert.Equal(t, err, tt.want.err)
 				return
 			}
 

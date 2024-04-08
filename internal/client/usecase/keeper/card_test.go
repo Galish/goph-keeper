@@ -113,7 +113,7 @@ func TestAddCard(t *testing.T) {
 			err := uc.AddCard(context.Background(), tt.card)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -271,7 +271,7 @@ func TestUpdateCard(t *testing.T) {
 			err := uc.UpdateCard(context.Background(), tt.card, tt.overwrite)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -378,7 +378,7 @@ func TestGetCard(t *testing.T) {
 			assert.Equal(t, tt.want.card, card)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -480,7 +480,7 @@ func TestGetCardsList(t *testing.T) {
 			assert.Equal(t, tt.want.cards, cards)
 
 			if err != nil {
-				assert.Error(t, err, tt.want.err.Error())
+				assert.Equal(t, err, tt.want.err)
 			} else {
 				assert.NoError(t, err)
 			}
@@ -549,7 +549,7 @@ func TestDeleteCard(t *testing.T) {
 			err := uc.DeleteCard(context.Background(), tt.id)
 
 			if err != nil {
-				assert.Error(t, err, tt.err.Error())
+				assert.Equal(t, err, tt.err)
 			} else {
 				assert.NoError(t, err)
 			}

@@ -52,7 +52,7 @@ func TestVerify(t *testing.T) {
 				&entity.User{
 					ID: "#12345",
 				},
-				errors.New("token contains an invalid number of segments"),
+				nil,
 			},
 		},
 	}
@@ -61,7 +61,12 @@ func TestVerify(t *testing.T) {
 			user, err := uc.Verify(tt.token)
 
 			assert.Equal(t, tt.want.user, user)
-			assert.Error(t, tt.want.err, err)
+
+			if tt.want.err != nil {
+				assert.ErrorContains(t, tt.want.err, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }
