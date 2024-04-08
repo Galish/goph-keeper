@@ -118,7 +118,7 @@ func TestUpdateCredentials(t *testing.T) {
 
 	m.EXPECT().
 		UpdateCredentials(gomock.Any(), gomock.Any()).
-		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
+		Return(nil, status.Error(codes.FailedPrecondition, errors.New("entity version conflict").Error()))
 
 	m.EXPECT().
 		UpdateCredentials(gomock.Any(), gomock.Any()).

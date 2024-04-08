@@ -36,3 +36,7 @@ type SecureNotes interface {
 	UpdateRawNote(context.Context, *entity.RawNote, bool) error
 	DeleteRawNote(context.Context, string) error
 }
+
+type HealthCheck interface {
+	Check(context.Context) error
+}

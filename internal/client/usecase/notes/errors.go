@@ -11,7 +11,7 @@ var (
 	ErrInvalidEntity   = errors.New("failed entity validation")
 	ErrMissingArgument = errors.New("missing required argument")
 	ErrNoConnection    = errors.New("check your connection and try again")
-	ErrNotFound        = errors.New("record not found")
+	ErrNotFound        = errors.New("entity not found")
 	ErrVersionConflict = errors.New("version conflict")
 )
 

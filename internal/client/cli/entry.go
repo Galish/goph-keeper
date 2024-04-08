@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"syscall"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 )
@@ -27,9 +26,7 @@ func (a *App) viewAuthScreen(ctx context.Context) {
 			},
 			{
 				Label: "Exit",
-				Run: func() {
-					syscall.Kill(syscall.Getpid(), syscall.SIGINT)
-				},
+				Run:   a.Stop,
 			},
 		},
 	)

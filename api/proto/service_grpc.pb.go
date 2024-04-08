@@ -20,6 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	Keeper_HealthCheck_FullMethodName        = "/service.Keeper/HealthCheck"
 	Keeper_SignUp_FullMethodName             = "/service.Keeper/SignUp"
 	Keeper_SignIn_FullMethodName             = "/service.Keeper/SignIn"
 	Keeper_AddTextNote_FullMethodName        = "/service.Keeper/AddTextNote"
@@ -48,6 +49,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KeeperClient interface {
+	HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SignUp(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	SignIn(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	AddTextNote(ctx context.Context, in *AddTextNoteRequest, opts ...grpc.CallOption) (*AddTextNoteResponse, error)
@@ -78,6 +80,15 @@ type keeperClient struct {
 
 func NewKeeperClient(cc grpc.ClientConnInterface) KeeperClient {
 	return &keeperClient{cc}
+}
+
+func (c *keeperClient) HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Keeper_HealthCheck_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *keeperClient) SignUp(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
@@ -282,6 +293,7 @@ func (c *keeperClient) DeleteCredentials(ctx context.Context, in *DeleteRequest,
 // All implementations must embed UnimplementedKeeperServer
 // for forward compatibility
 type KeeperServer interface {
+	HealthCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	SignUp(context.Context, *AuthRequest) (*AuthResponse, error)
 	SignIn(context.Context, *AuthRequest) (*AuthResponse, error)
 	AddTextNote(context.Context, *AddTextNoteRequest) (*AddTextNoteResponse, error)
@@ -311,6 +323,9 @@ type KeeperServer interface {
 type UnimplementedKeeperServer struct {
 }
 
+func (UnimplementedKeeperServer) HealthCheck(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
+}
 func (UnimplementedKeeperServer) SignUp(context.Context, *AuthRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
@@ -388,6 +403,24 @@ type UnsafeKeeperServer interface {
 
 func RegisterKeeperServer(s grpc.ServiceRegistrar, srv KeeperServer) {
 	s.RegisterService(&Keeper_ServiceDesc, srv)
+}
+
+func _Keeper_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeeperServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Keeper_HealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeeperServer).HealthCheck(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Keeper_SignUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -793,6 +826,10 @@ var Keeper_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "service.Keeper",
 	HandlerType: (*KeeperServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "HealthCheck",
+			Handler:    _Keeper_HealthCheck_Handler,
+		},
 		{
 			MethodName: "SignUp",
 			Handler:    _Keeper_SignUp_Handler,

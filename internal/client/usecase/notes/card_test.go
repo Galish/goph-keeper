@@ -133,7 +133,7 @@ func TestUpdateCard(t *testing.T) {
 
 	m.EXPECT().
 		UpdateCard(gomock.Any(), gomock.Any()).
-		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
+		Return(nil, status.Error(codes.FailedPrecondition, errors.New("entity version conflict").Error()))
 
 	m.EXPECT().
 		UpdateCard(gomock.Any(), gomock.Any()).
