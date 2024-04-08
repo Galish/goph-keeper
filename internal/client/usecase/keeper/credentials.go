@@ -5,11 +5,16 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
-	"github.com/Galish/goph-keeper/internal/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
+	if creds == nil || !creds.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -28,6 +33,10 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 }
 
 func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
+	if creds == nil || creds.ID == "" || !creds.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -49,6 +58,10 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 }
 
 func (uc *KeeperUseCase) GetCredentials(ctx context.Context, id string) (*entity.Credentials, error) {
+	if id == "" {
+		return nil, ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -62,10 +75,10 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, id string) (*entity
 	}
 
 	creds := &entity.Credentials{
-		Title:       resp.Credentials.GetTitle(),
-		Description: resp.Credentials.GetDescription(),
-		Username:    resp.Credentials.GetUsername(),
-		Password:    resp.Credentials.GetPassword(),
+		Title:       resp.GetCredentials().GetTitle(),
+		Description: resp.GetCredentials().GetDescription(),
+		Username:    resp.GetCredentials().GetUsername(),
+		Password:    resp.GetCredentials().GetPassword(),
 		Version:     resp.GetVersion(),
 	}
 
@@ -95,6 +108,10 @@ func (uc *KeeperUseCase) GetCredentialsList(ctx context.Context) ([]*entity.Cred
 }
 
 func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, id string) error {
+	if id == "" {
+		return ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 

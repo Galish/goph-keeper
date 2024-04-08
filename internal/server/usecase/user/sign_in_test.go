@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/Galish/goph-keeper/internal/entity"
+	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
 	"github.com/Galish/goph-keeper/internal/server/usecase/user"
 	"github.com/Galish/goph-keeper/pkg/auth"
@@ -30,6 +31,10 @@ func TestSignIn(t *testing.T) {
 						Password: "$2a$10$3S997zQF4Fh2MSmo5gIdwu7OUg3Q21WXe77dgmJGTxNYU7Y/rAdtK",
 					},
 					nil
+
+			case "johnn.doe":
+				return nil, repository.ErrNotFound
+
 			default:
 				return nil, errWriteToRepo
 			}
@@ -77,6 +82,15 @@ func TestSignIn(t *testing.T) {
 			},
 		},
 		{
+			"user not found",
+			"johnn.doe",
+			"qwe123456",
+			&want{
+				"",
+				user.ErrNotFound,
+			},
+		},
+		{
 			"valid credentials",
 			"john.doe",
 			"qwe123456",
@@ -104,6 +118,7 @@ func TestSignIn(t *testing.T) {
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			token, err := uc.SignIn(context.Background(), tt.username, tt.password)

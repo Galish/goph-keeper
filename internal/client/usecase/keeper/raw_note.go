@@ -5,11 +5,16 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
-	"github.com/Galish/goph-keeper/internal/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) error {
+	if note == nil || !note.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -27,6 +32,10 @@ func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) e
 }
 
 func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
+	if note == nil || note.ID == "" || !note.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -47,6 +56,10 @@ func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote
 }
 
 func (uc *KeeperUseCase) GetRawNote(ctx context.Context, id string) (*entity.RawNote, error) {
+	if id == "" {
+		return nil, ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -60,9 +73,9 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, id string) (*entity.Raw
 	}
 
 	note := &entity.RawNote{
-		Title:       resp.Note.GetTitle(),
-		Description: resp.Note.GetDescription(),
-		Value:       resp.Note.GetValue(),
+		Title:       resp.GetNote().GetTitle(),
+		Description: resp.GetNote().GetDescription(),
+		Value:       resp.GetNote().GetValue(),
 		Version:     resp.GetVersion(),
 	}
 
@@ -92,6 +105,10 @@ func (uc *KeeperUseCase) GetRawNotesList(ctx context.Context) ([]*entity.RawNote
 }
 
 func (uc *KeeperUseCase) DeleteRawNote(ctx context.Context, id string) error {
+	if id == "" {
+		return ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 

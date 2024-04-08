@@ -8,12 +8,10 @@ import (
 
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
+	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
-func (uc *UserUseCase) SignUp(
-	ctx context.Context,
-	username, password string,
-) (string, error) {
+func (uc *UserUseCase) SignUp(ctx context.Context, username, password string) (string, error) {
 	if username == "" || password == "" {
 		return "", ErrMissingCredentials
 	}
@@ -27,7 +25,7 @@ func (uc *UserUseCase) SignUp(
 	user.Login = username
 	user.Password = string(bytes)
 
-	err = uc.repo.SetUser(ctx, user)
+	err = uc.repo.AddUser(ctx, user)
 	if errors.Is(err, repository.ErrConflict) {
 		return "", ErrConflict
 	}
@@ -36,5 +34,7 @@ func (uc *UserUseCase) SignUp(
 		return "", err
 	}
 
-	return uc.jwtManager.Generate(user)
+	return uc.jwtManager.Generate(&auth.JWTClaims{
+		UserID: user.ID,
+	})
 }

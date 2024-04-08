@@ -6,11 +6,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) DeleteSecureRecord(
-	ctx context.Context,
-	user, id string,
-	recordType repository.SecureRecordType,
-) error {
+func (s *psqlStore) DeleteSecureRecord(ctx context.Context, user, id string, recordType repository.SecureRecordType) error {
 	res, err := s.db.ExecContext(
 		ctx,
 		`

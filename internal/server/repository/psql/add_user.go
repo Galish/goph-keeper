@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (s *psqlStore) SetUser(ctx context.Context, user *entity.User) error {
+func (s *psqlStore) AddUser(ctx context.Context, user *entity.User) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		`

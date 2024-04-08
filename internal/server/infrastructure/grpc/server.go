@@ -27,11 +27,7 @@ type KeeperServer struct {
 }
 
 // NewServer configures and creates a gRPC server.
-func NewServer(
-	cfg *config.Config,
-	user usecase.User,
-	keeper usecase.Keeper,
-) *KeeperServer {
+func NewServer(cfg *config.Config, user usecase.User, keeper usecase.Keeper) *KeeperServer {
 	opts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
 			interceptors.NewAuthInterceptor(user).Unary(),

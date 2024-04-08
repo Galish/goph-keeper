@@ -11,8 +11,6 @@ var (
 	ErrAlreadyExists      = errors.New("user already exists")
 	ErrInvalidCredentials = errors.New("incorrect login/password pair")
 	ErrNoConnection       = errors.New("check your connection and try again")
-	ErrNoPassword         = errors.New("password not specified")
-	ErrNoUsername         = errors.New("username not specified")
 	ErrNotFound           = errors.New("user not found")
 )
 
@@ -31,6 +29,10 @@ func handleError(err error) error {
 	e, ok := status.FromError(err)
 	if !ok {
 		return err
+	}
+
+	if e.Code() == codes.Internal {
+		return errors.New(e.Message())
 	}
 
 	custom, ok := errorMap[e.Code()]

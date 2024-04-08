@@ -5,12 +5,17 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
-	"github.com/Galish/goph-keeper/internal/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
+	if card == nil || !card.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -25,14 +30,16 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 		},
 	}
 
-	if _, err := uc.client.AddCard(ctx, req); err != nil {
-		return err
-	}
+	_, err := uc.client.AddCard(ctx, req)
 
-	return nil
+	return handleError(err)
 }
 
 func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
+	if card == nil || card.ID == "" || !card.IsValid() {
+		return ErrInvalidEntity
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -56,6 +63,10 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, over
 }
 
 func (uc *KeeperUseCase) GetCard(ctx context.Context, id string) (*entity.Card, error) {
+	if id == "" {
+		return nil, ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -69,12 +80,12 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, id string) (*entity.Card, 
 	}
 
 	card := &entity.Card{
-		Title:       resp.Card.GetTitle(),
-		Description: resp.Card.GetDescription(),
-		Number:      resp.Card.GetNumber(),
-		Holder:      resp.Card.GetHolder(),
-		CVC:         resp.Card.GetCvc(),
-		Expiry:      resp.Card.GetExpiry().AsTime(),
+		Title:       resp.GetCard().GetTitle(),
+		Description: resp.GetCard().GetDescription(),
+		Number:      resp.GetCard().GetNumber(),
+		Holder:      resp.GetCard().GetHolder(),
+		CVC:         resp.GetCard().GetCvc(),
+		Expiry:      resp.GetCard().GetExpiry().AsTime(),
 		Version:     resp.GetVersion(),
 	}
 
@@ -104,6 +115,10 @@ func (uc *KeeperUseCase) GetCardsList(ctx context.Context) ([]*entity.Card, erro
 }
 
 func (uc *KeeperUseCase) DeleteCard(ctx context.Context, id string) error {
+	if id == "" {
+		return ErrMissingArgument
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
