@@ -43,6 +43,11 @@ func Info(args ...interface{}) {
 	logger.Log(log.InfoLevel, args...)
 }
 
+// Fatal logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
+func Fatal(args ...interface{}) {
+	logger.Fatal(args...)
+}
+
 // WithError creates an entry from the standard logger and adds an error to it.
 func WithError(err error) *log.Entry {
 	return log.NewEntry(logger).WithError(err)

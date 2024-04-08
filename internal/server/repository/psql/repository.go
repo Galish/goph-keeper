@@ -36,7 +36,7 @@ func New(cfg *config.Config) (*psqlStore, error) {
 
 	store := &psqlStore{
 		db:  db,
-		enc: encryption.NewAESEncryptor([]byte("pqssjyEpfbwxyAqTPJdP28ueaVmrjEjV")), // TODO: move to config
+		enc: encryption.NewAESEncryptor([]byte(cfg.EncryptPassphrase)),
 	}
 
 	if err := store.Bootstrap(cfg.DBInitPath); err != nil {
