@@ -60,8 +60,8 @@ func (a *App) viewCredentials(ctx context.Context, id string) {
 		return
 	}
 
-	a.ui.Break()
 	a.ui.Print(creds.String())
+	a.ui.Break()
 
 	var commands = []*ui.SelectOption{
 		{
