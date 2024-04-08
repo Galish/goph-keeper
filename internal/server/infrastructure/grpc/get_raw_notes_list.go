@@ -18,7 +18,7 @@ func (s *KeeperServer) GetRawNotesList(ctx context.Context, _ *emptypb.Empty) (*
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	notes, err := s.keeper.GetRawNotes(ctx, user)
+	notes, err := s.notes.GetRawNotes(ctx, user)
 	if err != nil {
 		logger.WithError(err).Error("unable to get binary notes")
 

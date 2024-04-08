@@ -11,7 +11,7 @@ type User interface {
 	SignIn(context.Context, string, string) error
 }
 
-type Keeper interface {
+type SecureNotes interface {
 	AddCard(context.Context, *entity.Card) error
 	GetCard(context.Context, string) (*entity.Card, error)
 	GetCardsList(context.Context) ([]*entity.Card, error)
@@ -35,4 +35,8 @@ type Keeper interface {
 	GetRawNotesList(context.Context) ([]*entity.RawNote, error)
 	UpdateRawNote(context.Context, *entity.RawNote, bool) error
 	DeleteRawNote(context.Context, string) error
+}
+
+type HealthCheck interface {
+	Check(context.Context) error
 }

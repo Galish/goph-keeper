@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
@@ -45,7 +45,7 @@ func TestAddCard(t *testing.T) {
 		AddCard(gomock.Any(), gomock.Any()).
 		Return(&pb.AddCardResponse{Id: "#12345"}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -55,12 +55,12 @@ func TestAddCard(t *testing.T) {
 		{
 			"missing entity",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
 			&entity.Card{},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
@@ -71,7 +71,7 @@ func TestAddCard(t *testing.T) {
 				CVC:    "123",
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"writing to repo error",
@@ -93,7 +93,7 @@ func TestAddCard(t *testing.T) {
 				CVC:    "123",
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
@@ -133,7 +133,7 @@ func TestUpdateCard(t *testing.T) {
 
 	m.EXPECT().
 		UpdateCard(gomock.Any(), gomock.Any()).
-		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
+		Return(nil, status.Error(codes.FailedPrecondition, errors.New("entity version conflict").Error()))
 
 	m.EXPECT().
 		UpdateCard(gomock.Any(), gomock.Any()).
@@ -151,7 +151,7 @@ func TestUpdateCard(t *testing.T) {
 		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name      string
@@ -163,7 +163,7 @@ func TestUpdateCard(t *testing.T) {
 			"missing entity",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -172,7 +172,7 @@ func TestUpdateCard(t *testing.T) {
 				Title: "Credit card",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"missing id",
@@ -184,7 +184,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
@@ -197,7 +197,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			true,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"version conflict",
@@ -210,7 +210,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"nothing found",
@@ -223,7 +223,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"writing to repo error",
@@ -249,7 +249,7 @@ func TestUpdateCard(t *testing.T) {
 				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
 			},
 			false,
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
@@ -310,7 +310,7 @@ func TestGetCard(t *testing.T) {
 			Version: 10,
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		card *entity.Card
@@ -327,7 +327,7 @@ func TestGetCard(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -335,7 +335,7 @@ func TestGetCard(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -351,7 +351,7 @@ func TestGetCard(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
@@ -421,7 +421,7 @@ func TestGetCardsList(t *testing.T) {
 			},
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		cards []*entity.Card
@@ -450,7 +450,7 @@ func TestGetCardsList(t *testing.T) {
 			"no internet connection",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
@@ -510,7 +510,7 @@ func TestDeleteCard(t *testing.T) {
 		DeleteCard(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -520,12 +520,12 @@ func TestDeleteCard(t *testing.T) {
 		{
 			"missing argument",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"reading from repo error",
@@ -535,7 +535,7 @@ func TestDeleteCard(t *testing.T) {
 		{
 			"no internet connection",
 			"#12345",
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"successfully deleted",

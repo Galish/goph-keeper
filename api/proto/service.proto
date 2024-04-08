@@ -152,6 +152,8 @@ message GetCredentialsResponse {
 
 
 service Keeper {
+  rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty);
+
   rpc SignUp(AuthRequest) returns (AuthResponse);
   rpc SignIn(AuthRequest) returns (AuthResponse);
 

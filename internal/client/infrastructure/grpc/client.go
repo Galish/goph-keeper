@@ -1,8 +1,6 @@
 package grpc
 
 import (
-	"log"
-
 	pb "github.com/Galish/goph-keeper/api/proto"
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/config"
@@ -25,7 +23,7 @@ func NewClient(cfg *config.Config, auth *auth.AuthManager) *KeeperClient {
 		withTransport(cfg),
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	client := &KeeperClient{

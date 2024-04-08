@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -10,18 +10,18 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 	"github.com/Galish/goph-keeper/internal/server/repository"
 	"github.com/Galish/goph-keeper/internal/server/repository/mocks"
-	"github.com/Galish/goph-keeper/internal/server/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/server/usecase/notes"
 )
 
 func TestAddCredentials(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		AddSecureRecord(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
+		AddSecureNote(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureNote) error {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}
@@ -29,7 +29,7 @@ func TestAddCredentials(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name  string
@@ -39,7 +39,7 @@ func TestAddCredentials(t *testing.T) {
 		{
 			"empty input",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -47,7 +47,7 @@ func TestAddCredentials(t *testing.T) {
 				ID:       "#12345",
 				Username: "john.doe",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"valid entity",
@@ -83,14 +83,14 @@ func TestGetCredentials(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		GetSecureRecord(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
-		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureRecordType) (*repository.SecureRecord, error) {
+		GetSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
+		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureNoteType) (*repository.SecureNote, error) {
 			switch id {
 			case "#12345":
-				return &repository.SecureRecord{
+				return &repository.SecureNote{
 					ID:       "#12345",
 					Type:     repository.TypeCredentials,
 					Title:    "Gmail",
@@ -107,7 +107,7 @@ func TestGetCredentials(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		creds *entity.Credentials
@@ -126,7 +126,7 @@ func TestGetCredentials(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -135,7 +135,7 @@ func TestGetCredentials(t *testing.T) {
 			"#34567",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -144,7 +144,7 @@ func TestGetCredentials(t *testing.T) {
 			"#34567",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -185,16 +185,16 @@ func TestGetAllCredentials(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
 		Return(nil, nil).
 		Times(1)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
-		Return([]*repository.SecureRecord{
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
+		Return([]*repository.SecureNote{
 			{
 				ID:       "#12345",
 				Type:     repository.TypeCredentials,
@@ -213,11 +213,11 @@ func TestGetAllCredentials(t *testing.T) {
 		Times(1)
 
 	m.EXPECT().
-		GetSecureRecords(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
+		GetSecureNotes(gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
 		Return(nil, errReadFromRepo).
 		Times(1)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		creds []*entity.Credentials
@@ -234,7 +234,7 @@ func TestGetAllCredentials(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -289,11 +289,11 @@ func TestUpdateCredentials(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		UpdateSecureRecord(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, r *repository.SecureRecord) error {
+		UpdateSecureNote(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, r *repository.SecureNote) error {
 			switch r.ID {
 			case "#12345":
 				return repository.ErrNotFound
@@ -310,7 +310,7 @@ func TestUpdateCredentials(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name        string
@@ -322,7 +322,7 @@ func TestUpdateCredentials(t *testing.T) {
 			"empty input",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -330,7 +330,7 @@ func TestUpdateCredentials(t *testing.T) {
 				ID: "#12345",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -340,7 +340,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Username: "john.doe",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -350,7 +350,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"nothing found",
@@ -361,7 +361,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			true,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"version required",
@@ -372,7 +372,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			false,
-			keeper.ErrVersionRequired,
+			notes.ErrVersionRequired,
 		},
 		{
 			"updated version",
@@ -406,7 +406,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			true,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"write to repo error",
@@ -434,11 +434,11 @@ func TestDeleteCredentials(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	m := mocks.NewMockKeeperRepository(ctrl)
+	m := mocks.NewMockSecureNotesRepository(ctrl)
 
 	m.EXPECT().
-		DeleteSecureRecord(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
-		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureRecordType) error {
+		DeleteSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeCredentials)).
+		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureNoteType) error {
 			switch id {
 			case "#12345":
 				return repository.ErrNotFound
@@ -452,7 +452,7 @@ func TestDeleteCredentials(t *testing.T) {
 		}).
 		AnyTimes()
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -464,19 +464,19 @@ func TestDeleteCredentials(t *testing.T) {
 			"missing id",
 			"user#12345",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"missing user",
 			"",
 			"#12345",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"user#12345",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"write to repo error",

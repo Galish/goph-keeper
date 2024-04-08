@@ -18,7 +18,7 @@ func (s *KeeperServer) GetTextNotesList(ctx context.Context, _ *emptypb.Empty) (
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	notes, err := s.keeper.GetTextNotes(ctx, user)
+	notes, err := s.notes.GetTextNotes(ctx, user)
 	if err != nil {
 		logger.WithError(err).Error("unable to get text notes")
 

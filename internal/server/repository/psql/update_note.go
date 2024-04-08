@@ -9,8 +9,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) UpdateSecureRecord(ctx context.Context, record *repository.SecureRecord) error {
-	protected, err := s.encrypt(record)
+func (s *psqlStore) UpdateSecureNote(ctx context.Context, note *repository.SecureNote) error {
+	protected, err := s.encrypt(note)
 	if err != nil {
 		return fmt.Errorf("encryption failed: %v", err)
 	}
@@ -35,13 +35,13 @@ func (s *psqlStore) UpdateSecureRecord(ctx context.Context, record *repository.S
 				AND created_by = $7
 			RETURNING version
 		`,
-		record.Title,
-		record.Description,
+		note.Title,
+		note.Description,
 		protected,
-		record.LastEditedAt,
-		record.ID,
-		record.Type,
-		record.CreatedBy,
+		note.LastEditedAt,
+		note.ID,
+		note.Type,
+		note.CreatedBy,
 	)
 
 	var version int32
@@ -56,7 +56,7 @@ func (s *psqlStore) UpdateSecureRecord(ctx context.Context, record *repository.S
 		return err
 	}
 
-	if record.Version > 0 && record.Version != version {
+	if note.Version > 0 && note.Version != version {
 		tx.Rollback()
 
 		return repository.ErrVersionConflict

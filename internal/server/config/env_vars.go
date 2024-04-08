@@ -19,6 +19,10 @@ func parseEnvVars(c *Config) {
 		c.AuthSecretKey = authKey
 	}
 
+	if passphrase := os.Getenv("PASSPHRASE"); passphrase != "" {
+		c.EncryptPassphrase = passphrase
+	}
+
 	if certPath := os.Getenv("CERTIFICATE_PATH"); certPath != "" {
 		c.CertPath = certPath
 	}

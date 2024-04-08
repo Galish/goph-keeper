@@ -1,4 +1,4 @@
-package keeper
+package notes
 
 import (
 	"context"
@@ -14,7 +14,7 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 		return ErrInvalidEntity
 	}
 
-	record := &repository.SecureRecord{
+	note := &repository.SecureNote{
 		ID:          card.ID,
 		Type:        repository.TypeCard,
 		Title:       card.Title,
@@ -29,7 +29,7 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 		CreatedAt: time.Now(),
 	}
 
-	return uc.repo.AddSecureRecord(ctx, record)
+	return uc.repo.AddSecureNote(ctx, note)
 }
 
 func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.Card, error) {
@@ -37,7 +37,7 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.
 		return nil, ErrMissingArgument
 	}
 
-	record, err := uc.repo.GetSecureRecord(ctx, user, id, repository.TypeCard)
+	note, err := uc.repo.GetSecureNote(ctx, user, id, repository.TypeCard)
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}
@@ -46,18 +46,18 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.
 	}
 
 	card := entity.Card{
-		ID:          record.ID,
-		Title:       record.Title,
-		Description: record.Description,
+		ID:          note.ID,
+		Title:       note.Title,
+		Description: note.Description,
 
-		Number: record.CardNumber,
-		Holder: record.CardHolder,
-		CVC:    record.CardCVC,
-		Expiry: record.CardExpiry,
+		Number: note.CardNumber,
+		Holder: note.CardHolder,
+		CVC:    note.CardCVC,
+		Expiry: note.CardExpiry,
 
-		CreatedAt:    record.CreatedAt,
-		LastEditedAt: record.LastEditedAt,
-		Version:      record.Version,
+		CreatedAt:    note.CreatedAt,
+		LastEditedAt: note.LastEditedAt,
+		Version:      note.Version,
 	}
 
 	return &card, nil
@@ -68,14 +68,14 @@ func (uc *KeeperUseCase) GetCards(ctx context.Context, user string) ([]*entity.C
 		return nil, ErrMissingArgument
 	}
 
-	records, err := uc.repo.GetSecureRecords(ctx, user, repository.TypeCard)
+	notes, err := uc.repo.GetSecureNotes(ctx, user, repository.TypeCard)
 	if err != nil {
 		return nil, err
 	}
 
-	var cards = make([]*entity.Card, len(records))
+	var cards = make([]*entity.Card, len(notes))
 
-	for i, r := range records {
+	for i, r := range notes {
 		card := &entity.Card{
 			ID:          r.ID,
 			Title:       r.Title,
@@ -105,7 +105,7 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, over
 		return ErrVersionRequired
 	}
 
-	record := &repository.SecureRecord{
+	note := &repository.SecureNote{
 		ID:          card.ID,
 		Type:        repository.TypeCard,
 		Title:       card.Title,
@@ -121,10 +121,10 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, over
 	}
 
 	if !overwrite {
-		record.Version = card.Version
+		note.Version = card.Version
 	}
 
-	err := uc.repo.UpdateSecureRecord(ctx, record)
+	err := uc.repo.UpdateSecureNote(ctx, note)
 	if errors.Is(err, repository.ErrVersionConflict) {
 		return ErrVersionConflict
 	}
@@ -141,7 +141,7 @@ func (uc *KeeperUseCase) DeleteCard(ctx context.Context, user, id string) error 
 		return ErrMissingArgument
 	}
 
-	err := uc.repo.DeleteSecureRecord(ctx, user, id, repository.TypeCard)
+	err := uc.repo.DeleteSecureNote(ctx, user, id, repository.TypeCard)
 	if errors.Is(err, repository.ErrNotFound) {
 		return ErrNotFound
 	}

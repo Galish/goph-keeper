@@ -15,9 +15,10 @@ import (
 type contextKey string
 
 var (
-	authMethods = map[string]bool{
-		"/service.Keeper/SignIn": true,
-		"/service.Keeper/SignUp": true,
+	publicMethods = map[string]bool{
+		"/service.Keeper/SignIn":      true,
+		"/service.Keeper/SignUp":      true,
+		"/service.Keeper/HealthCheck": true,
 	}
 
 	ErrInvalidAccessToken = errors.New("access token is invalid")
@@ -43,7 +44,7 @@ func (ai *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		if isAuth := authMethods[info.FullMethod]; isAuth {
+		if isPublic := publicMethods[info.FullMethod]; isPublic {
 			return handler(ctx, req)
 		}
 

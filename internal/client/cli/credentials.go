@@ -6,14 +6,14 @@ import (
 	"fmt"
 
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
 func (a *App) viewCredentialsList(ctx context.Context) {
 	a.ui.Break()
 
-	creds, err := a.keeper.GetCredentialsList(ctx)
+	creds, err := a.notes.GetCredentialsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -54,14 +54,14 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 func (a *App) viewCredentials(ctx context.Context, id string) {
 	a.ui.Break()
 
-	creds, err := a.keeper.GetCredentials(ctx, id)
+	creds, err := a.notes.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
 	}
 
-	a.ui.Break()
 	a.ui.Print(creds.String())
+	a.ui.Break()
 
 	var commands = []*ui.SelectOption{
 		{
@@ -101,7 +101,7 @@ func (a *App) addCredentials(ctx context.Context) {
 
 	if ok := a.ui.Confirm("Add credentials"); ok {
 		for {
-			err := a.keeper.AddCredentials(ctx, creds)
+			err := a.notes.AddCredentials(ctx, creds)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
@@ -114,7 +114,7 @@ func (a *App) addCredentials(ctx context.Context) {
 func (a *App) editCredentials(ctx context.Context, id string) {
 	a.ui.Break()
 
-	creds, err := a.keeper.GetCredentials(ctx, id)
+	creds, err := a.notes.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 		return
@@ -137,8 +137,8 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Update credentials"); ok {
 		for {
-			err := a.keeper.UpdateCredentials(ctx, updated, overwrite)
-			if errors.Is(err, keeper.ErrVersionConflict) {
+			err := a.notes.UpdateCredentials(ctx, updated, overwrite)
+			if errors.Is(err, notes.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Credentials have already been updated. Want to overwrite"); ok {
 					overwrite = true
 					continue
@@ -163,7 +163,7 @@ func (a *App) deleteCredentials(ctx context.Context, id string) {
 
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.keeper.DeleteCredentials(ctx, id)
+			err := a.notes.DeleteCredentials(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}

@@ -12,10 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *KeeperServer) SignUp(
-	ctx context.Context,
-	in *pb.AuthRequest,
-) (*pb.AuthResponse, error) {
+func (s *KeeperServer) SignUp(ctx context.Context, in *pb.AuthRequest) (*pb.AuthResponse, error) {
 	var response pb.AuthResponse
 
 	token, err := s.user.SignUp(ctx, in.GetUsername(), in.GetPassword())

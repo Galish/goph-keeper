@@ -12,7 +12,7 @@ type User interface {
 	Verify(accessToken string) (*entity.User, error)
 }
 
-type Keeper interface {
+type SecureNotes interface {
 	AddCredentials(ctx context.Context, creds *entity.Credentials) error
 	GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error)
 	GetAllCredentials(ctx context.Context, user string) ([]*entity.Credentials, error)

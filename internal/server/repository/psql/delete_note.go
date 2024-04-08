@@ -6,7 +6,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) DeleteSecureRecord(ctx context.Context, user, id string, recordType repository.SecureRecordType) error {
+func (s *psqlStore) DeleteSecureNote(ctx context.Context, user, id string, noteType repository.SecureNoteType) error {
 	res, err := s.db.ExecContext(
 		ctx,
 		`
@@ -21,7 +21,7 @@ func (s *psqlStore) DeleteSecureRecord(ctx context.Context, user, id string, rec
 				type = $3
 			;
 		`,
-		id, user, recordType,
+		id, user, noteType,
 	)
 	if err != nil {
 		return err

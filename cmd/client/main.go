@@ -7,7 +7,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/client/cli"
 	"github.com/Galish/goph-keeper/internal/client/config"
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	healthcheck "github.com/Galish/goph-keeper/internal/client/usecase/health_check"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/client/usecase/user"
 	"github.com/Galish/goph-keeper/pkg/logger"
 	"github.com/Galish/goph-keeper/pkg/shutdowner"
@@ -27,7 +28,8 @@ func main() {
 	app := cli.NewApp(
 		authManager,
 		user.New(grpcClient),
-		keeper.New(grpcClient),
+		notes.New(grpcClient),
+		healthcheck.New(grpcClient),
 	)
 
 	sd := shutdowner.New(grpcClient, app)

@@ -8,11 +8,10 @@ import (
 	context "context"
 	reflect "reflect"
 
+	grpc "github.com/Galish/goph-keeper/api/proto"
 	gomock "github.com/golang/mock/gomock"
 	grpc0 "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-
-	grpc "github.com/Galish/goph-keeper/api/proto"
 )
 
 // MockKeeperClient is a mock of KeeperClient interface.
@@ -356,6 +355,26 @@ func (mr *MockKeeperClientMockRecorder) GetTextNotesList(ctx, in interface{}, op
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTextNotesList", reflect.TypeOf((*MockKeeperClient)(nil).GetTextNotesList), varargs...)
+}
+
+// HealthCheck mocks base method.
+func (m *MockKeeperClient) HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc0.CallOption) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HealthCheck", varargs...)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockKeeperClientMockRecorder) HealthCheck(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockKeeperClient)(nil).HealthCheck), varargs...)
 }
 
 // SignIn mocks base method.
@@ -739,6 +758,21 @@ func (m *MockKeeperServer) GetTextNotesList(arg0 context.Context, arg1 *emptypb.
 func (mr *MockKeeperServerMockRecorder) GetTextNotesList(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTextNotesList", reflect.TypeOf((*MockKeeperServer)(nil).GetTextNotesList), arg0, arg1)
+}
+
+// HealthCheck mocks base method.
+func (m *MockKeeperServer) HealthCheck(arg0 context.Context, arg1 *emptypb.Empty) (*emptypb.Empty, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0, arg1)
+	ret0, _ := ret[0].(*emptypb.Empty)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockKeeperServerMockRecorder) HealthCheck(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockKeeperServer)(nil).HealthCheck), arg0, arg1)
 }
 
 // SignIn mocks base method.

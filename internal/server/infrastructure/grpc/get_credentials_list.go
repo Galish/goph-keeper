@@ -18,7 +18,7 @@ func (s *KeeperServer) GetCredentialsList(ctx context.Context, _ *emptypb.Empty)
 
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	creds, err := s.keeper.GetAllCredentials(ctx, user)
+	creds, err := s.notes.GetAllCredentials(ctx, user)
 	if err != nil {
 		logger.WithError(err).Error("unable to get credentials list")
 

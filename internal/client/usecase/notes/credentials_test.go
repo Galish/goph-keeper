@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
@@ -38,7 +38,7 @@ func TestAddCredentials(t *testing.T) {
 		AddCredentials(gomock.Any(), gomock.Any()).
 		Return(&pb.AddCredentialsResponse{Id: "#12345"}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name        string
@@ -48,12 +48,12 @@ func TestAddCredentials(t *testing.T) {
 		{
 			"missing entity",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
 			&entity.Credentials{},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
@@ -62,7 +62,7 @@ func TestAddCredentials(t *testing.T) {
 				Username: "john.doe",
 				Password: "qwe123456",
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"writing to repo error",
@@ -80,7 +80,7 @@ func TestAddCredentials(t *testing.T) {
 				Username: "john.doe",
 				Password: "qwe123456",
 			},
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
@@ -118,7 +118,7 @@ func TestUpdateCredentials(t *testing.T) {
 
 	m.EXPECT().
 		UpdateCredentials(gomock.Any(), gomock.Any()).
-		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
+		Return(nil, status.Error(codes.FailedPrecondition, errors.New("entity version conflict").Error()))
 
 	m.EXPECT().
 		UpdateCredentials(gomock.Any(), gomock.Any()).
@@ -136,7 +136,7 @@ func TestUpdateCredentials(t *testing.T) {
 		UpdateCredentials(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name        string
@@ -148,7 +148,7 @@ func TestUpdateCredentials(t *testing.T) {
 			"missing entity",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -157,7 +157,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Title: "Credit Credentials",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"missing id",
@@ -167,7 +167,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
@@ -178,7 +178,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			true,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"version conflict",
@@ -189,7 +189,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			false,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"nothing found",
@@ -200,7 +200,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			false,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"writing to repo error",
@@ -222,7 +222,7 @@ func TestUpdateCredentials(t *testing.T) {
 				Password: "qwe123456",
 			},
 			false,
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
@@ -279,7 +279,7 @@ func TestGetCredentials(t *testing.T) {
 			Version: 10,
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		Credentials *entity.Credentials
@@ -296,7 +296,7 @@ func TestGetCredentials(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -304,7 +304,7 @@ func TestGetCredentials(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -320,7 +320,7 @@ func TestGetCredentials(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
@@ -388,7 +388,7 @@ func TestGetCredentialsList(t *testing.T) {
 			},
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		Credentialss []*entity.Credentials
@@ -417,7 +417,7 @@ func TestGetCredentialsList(t *testing.T) {
 			"no internet connection",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
@@ -477,7 +477,7 @@ func TestDeleteCredentials(t *testing.T) {
 		DeleteCredentials(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -487,12 +487,12 @@ func TestDeleteCredentials(t *testing.T) {
 		{
 			"missing argument",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"reading from repo error",
@@ -502,7 +502,7 @@ func TestDeleteCredentials(t *testing.T) {
 		{
 			"no internet connection",
 			"#12345",
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"successfully deleted",

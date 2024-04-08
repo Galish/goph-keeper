@@ -1,4 +1,4 @@
-package keeper_test
+package notes_test
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 	mocks "github.com/Galish/goph-keeper/internal/client/infrastructure/grpc/mock"
-	"github.com/Galish/goph-keeper/internal/client/usecase/keeper"
+	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
@@ -38,7 +38,7 @@ func TestAddRawNote(t *testing.T) {
 		AddRawNote(gomock.Any(), gomock.Any()).
 		Return(&pb.AddRawNoteResponse{Id: "#12345"}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name    string
@@ -48,12 +48,12 @@ func TestAddRawNote(t *testing.T) {
 		{
 			"missing entity",
 			nil,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
 			&entity.RawNote{},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
@@ -61,7 +61,7 @@ func TestAddRawNote(t *testing.T) {
 				Title: "Secret file",
 				Value: []byte("Hello world!"),
 			},
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"writing to repo error",
@@ -77,7 +77,7 @@ func TestAddRawNote(t *testing.T) {
 				Title: "Secret file",
 				Value: []byte("Hello world!"),
 			},
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
@@ -114,7 +114,7 @@ func TestUpdateRawNote(t *testing.T) {
 
 	m.EXPECT().
 		UpdateRawNote(gomock.Any(), gomock.Any()).
-		Return(nil, status.Error(codes.FailedPrecondition, errors.New("record version conflict").Error()))
+		Return(nil, status.Error(codes.FailedPrecondition, errors.New("entity version conflict").Error()))
 
 	m.EXPECT().
 		UpdateRawNote(gomock.Any(), gomock.Any()).
@@ -132,7 +132,7 @@ func TestUpdateRawNote(t *testing.T) {
 		UpdateRawNote(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name      string
@@ -144,7 +144,7 @@ func TestUpdateRawNote(t *testing.T) {
 			"missing entity",
 			nil,
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"invalid entity",
@@ -153,7 +153,7 @@ func TestUpdateRawNote(t *testing.T) {
 				Title: "Credit RawNote",
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"missing id",
@@ -162,7 +162,7 @@ func TestUpdateRawNote(t *testing.T) {
 				Value: []byte("Hello world!"),
 			},
 			false,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"failed validation",
@@ -172,7 +172,7 @@ func TestUpdateRawNote(t *testing.T) {
 				Value: []byte("Hello world!"),
 			},
 			true,
-			keeper.ErrInvalidEntity,
+			notes.ErrInvalidEntity,
 		},
 		{
 			"version conflict",
@@ -182,7 +182,7 @@ func TestUpdateRawNote(t *testing.T) {
 				Value: []byte("Hello world!"),
 			},
 			false,
-			keeper.ErrVersionConflict,
+			notes.ErrVersionConflict,
 		},
 		{
 			"nothing found",
@@ -192,7 +192,7 @@ func TestUpdateRawNote(t *testing.T) {
 				Value: []byte("Hello world!"),
 			},
 			false,
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"writing to repo error",
@@ -212,7 +212,7 @@ func TestUpdateRawNote(t *testing.T) {
 				Value: []byte("Hello world!"),
 			},
 			false,
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"valid entity",
@@ -267,7 +267,7 @@ func TestGetRawNote(t *testing.T) {
 			Version: 10,
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		RawNote *entity.RawNote
@@ -284,7 +284,7 @@ func TestGetRawNote(t *testing.T) {
 			"",
 			&want{
 				nil,
-				keeper.ErrMissingArgument,
+				notes.ErrMissingArgument,
 			},
 		},
 		{
@@ -292,7 +292,7 @@ func TestGetRawNote(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNotFound,
+				notes.ErrNotFound,
 			},
 		},
 		{
@@ -308,7 +308,7 @@ func TestGetRawNote(t *testing.T) {
 			"#12345",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
@@ -375,7 +375,7 @@ func TestGetRawNotesList(t *testing.T) {
 			},
 		}, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	type want struct {
 		RawNotes []*entity.RawNote
@@ -404,7 +404,7 @@ func TestGetRawNotesList(t *testing.T) {
 			"no internet connection",
 			&want{
 				nil,
-				keeper.ErrNoConnection,
+				notes.ErrNoConnection,
 			},
 		},
 		{
@@ -464,7 +464,7 @@ func TestDeleteRawNote(t *testing.T) {
 		DeleteRawNote(gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 
-	uc := keeper.New(m)
+	uc := notes.New(m)
 
 	tests := []struct {
 		name string
@@ -474,12 +474,12 @@ func TestDeleteRawNote(t *testing.T) {
 		{
 			"missing argument",
 			"",
-			keeper.ErrMissingArgument,
+			notes.ErrMissingArgument,
 		},
 		{
 			"nothing found",
 			"#12345",
-			keeper.ErrNotFound,
+			notes.ErrNotFound,
 		},
 		{
 			"reading from repo error",
@@ -489,7 +489,7 @@ func TestDeleteRawNote(t *testing.T) {
 		{
 			"no internet connection",
 			"#12345",
-			keeper.ErrNoConnection,
+			notes.ErrNoConnection,
 		},
 		{
 			"successfully deleted",
