@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (uc *KeeperUseCase) AddRawNote(ctx context.Context, rawNote *entity.RawNote) error {
+func (uc *UseCase) AddRawNote(ctx context.Context, rawNote *entity.RawNote) error {
 	if rawNote == nil || !rawNote.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -29,7 +29,7 @@ func (uc *KeeperUseCase) AddRawNote(ctx context.Context, rawNote *entity.RawNote
 	return uc.repo.AddSecureNote(ctx, note)
 }
 
-func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*entity.RawNote, error) {
+func (uc *UseCase) GetRawNote(ctx context.Context, user, id string) (*entity.RawNote, error) {
 	if id == "" || user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -38,6 +38,7 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*enti
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, user, id string) (*enti
 	return &rawNote, nil
 }
 
-func (uc *KeeperUseCase) GetRawNotes(ctx context.Context, user string) ([]*entity.RawNote, error) {
+func (uc *UseCase) GetRawNotes(ctx context.Context, user string) ([]*entity.RawNote, error) {
 	if user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -87,7 +88,7 @@ func (uc *KeeperUseCase) GetRawNotes(ctx context.Context, user string) ([]*entit
 	return rawNotes, nil
 }
 
-func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, rawNote *entity.RawNote, overwrite bool) error {
+func (uc *UseCase) UpdateRawNote(ctx context.Context, rawNote *entity.RawNote, overwrite bool) error {
 	if rawNote == nil || rawNote.ID == "" || !rawNote.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -124,7 +125,7 @@ func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, rawNote *entity.RawN
 	return err
 }
 
-func (uc *KeeperUseCase) DeleteRawNote(ctx context.Context, user, id string) error {
+func (uc *UseCase) DeleteRawNote(ctx context.Context, user, id string) error {
 	if id == "" || user == "" {
 		return ErrMissingArgument
 	}

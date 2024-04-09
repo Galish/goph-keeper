@@ -12,11 +12,11 @@ import (
 
 type KeeperClient struct {
 	pb.KeeperClient
-	auth *auth.AuthManager
+	auth *auth.Manager
 	conn *grpc.ClientConn
 }
 
-func NewClient(cfg *config.Config, auth *auth.AuthManager) *KeeperClient {
+func NewClient(cfg *config.Config, auth *auth.Manager) *KeeperClient {
 	conn, err := grpc.Dial(
 		cfg.GRPCServAddr,
 		grpc.WithUnaryInterceptor(interceptors.NewAuthInterceptor(auth)),

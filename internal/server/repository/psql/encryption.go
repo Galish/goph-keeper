@@ -2,6 +2,7 @@ package psql
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/Galish/goph-keeper/internal/server/repository"
@@ -18,7 +19,7 @@ type protectedData struct {
 	CardExpiry time.Time
 }
 
-func (s *psqlStore) encrypt(r *repository.SecureNote) (string, error) {
+func (s *Store) encrypt(r *repository.SecureNote) (string, error) {
 	b, err := json.Marshal(protectedData{
 		Username:   r.Username,
 		Password:   r.Password,
@@ -30,21 +31,26 @@ func (s *psqlStore) encrypt(r *repository.SecureNote) (string, error) {
 		CardExpiry: r.CardExpiry,
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to encode data for encryption: %w", err)
 	}
 
-	return s.enc.Encrypt(string(b))
+	encrypted, err := s.enc.Encrypt(string(b))
+	if err != nil {
+		return "", fmt.Errorf("failed data encryption: %w", err)
+	}
+
+	return encrypted, err
 }
 
-func (s *psqlStore) decrypt(raw string, r *repository.SecureNote) error {
+func (s *Store) decrypt(raw string, r *repository.SecureNote) error {
 	decrypted, err := s.enc.Decrypt(raw)
 	if err != nil {
-		return nil
+		return fmt.Errorf("failed data decryption: %w", err)
 	}
 
 	var protected = new(protectedData)
 	if err := json.Unmarshal([]byte(decrypted), protected); err != nil {
-		return err
+		return fmt.Errorf("failed to decode decrypted data: %w", err)
 	}
 
 	r.Username = protected.Username

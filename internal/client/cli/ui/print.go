@@ -3,11 +3,14 @@ package ui
 import (
 	"io"
 
+	"github.com/Galish/goph-keeper/pkg/logger"
 	"github.com/fatih/color"
 )
 
 func (ui *UI) Print(str string) {
-	io.WriteString(ui.w, str)
+	if _, err := io.WriteString(ui.w, str); err != nil {
+		logger.WithError(err).Debug("failed writing string")
+	}
 }
 
 func (ui *UI) Error(err error) {
@@ -15,5 +18,5 @@ func (ui *UI) Error(err error) {
 }
 
 func (ui *UI) Break() {
-	io.WriteString(ui.w, "\n")
+	ui.Print("\n")
 }

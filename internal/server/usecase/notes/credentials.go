@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
+func (uc *UseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
 	if creds == nil || !creds.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -30,7 +30,7 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 	return uc.repo.AddSecureNote(ctx, note)
 }
 
-func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error) {
+func (uc *UseCase) GetCredentials(ctx context.Context, user, id string) (*entity.Credentials, error) {
 	if id == "" || user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -60,7 +60,7 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, user, id string) (*
 	return &creds, nil
 }
 
-func (uc *KeeperUseCase) GetAllCredentials(ctx context.Context, user string) ([]*entity.Credentials, error) {
+func (uc *UseCase) GetAllCredentials(ctx context.Context, user string) ([]*entity.Credentials, error) {
 	if user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -91,7 +91,7 @@ func (uc *KeeperUseCase) GetAllCredentials(ctx context.Context, user string) ([]
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
+func (uc *UseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
 	if creds == nil || creds.ID == "" || !creds.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -129,7 +129,7 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 	return err
 }
 
-func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, user, id string) error {
+func (uc *UseCase) DeleteCredentials(ctx context.Context, user, id string) error {
 	if id == "" || user == "" {
 		return ErrMissingArgument
 	}

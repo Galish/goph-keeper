@@ -7,7 +7,11 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) GetSecureNotes(ctx context.Context, user string, noteType repository.SecureNoteType) ([]*repository.SecureNote, error) {
+func (s *Store) GetSecureNotes(
+	ctx context.Context,
+	user string,
+	noteType repository.SecureNoteType,
+) ([]*repository.SecureNote, error) {
 	rows, err := s.db.QueryContext(
 		ctx,
 		`
@@ -60,7 +64,7 @@ func (s *psqlStore) GetSecureNotes(ctx context.Context, user string, noteType re
 		}
 
 		if err := s.decrypt(protected, &note); err != nil {
-			return nil, fmt.Errorf("decryption failed: %v", err)
+			return nil, fmt.Errorf("decryption failed: %w", err)
 		}
 
 		notes = append(notes, &note)

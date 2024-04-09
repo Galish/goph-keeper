@@ -3,6 +3,7 @@ package ui
 import (
 	"io"
 	"os"
+	"syscall"
 
 	"github.com/Galish/goph-keeper/pkg/logger"
 )
@@ -13,6 +14,7 @@ type UserInterface interface {
 	Confirm(string) bool
 	Edit(string, string, bool) string
 	Error(error)
+	Exit()
 	Input(string, bool) string
 	InputPassword(string, bool) string
 	Print(string)
@@ -31,6 +33,12 @@ func New() *UI {
 	return &UI{
 		r: os.Stdin,
 		w: os.Stdout,
+	}
+}
+
+func (ui *UI) Exit() {
+	if err := syscall.Kill(syscall.Getpid(), syscall.SIGINT); err != nil {
+		logger.WithError(err).Debug("failed exit")
 	}
 }
 

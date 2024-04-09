@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (s *psqlStore) AddUser(ctx context.Context, user *entity.User) error {
+func (s *Store) AddUser(ctx context.Context, user *entity.User) error {
 	_, err := s.db.ExecContext(
 		ctx,
 		`
@@ -27,6 +27,7 @@ func (s *psqlStore) AddUser(ctx context.Context, user *entity.User) error {
 	if errors.As(err, &pgErr) && pgErr.Code == errCodeConflict {
 		return repository.ErrConflict
 	}
+
 	if err != nil {
 		return err
 	}

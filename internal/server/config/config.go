@@ -25,8 +25,10 @@ var defaultConfig = &Config{
 }
 
 func New() *Config {
-	var flags = new(Config)
-	var envVars = new(Config)
+	var (
+		flags   = new(Config)
+		envVars = new(Config)
+	)
 
 	parseFlags(flags)
 	parseEnvVars(envVars)

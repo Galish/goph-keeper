@@ -16,6 +16,7 @@ func (a *App) viewTextNotesList(ctx context.Context) {
 	notes, err := a.notes.GetTextNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -57,6 +58,7 @@ func (a *App) viewTextNote(ctx context.Context, id string) {
 	note, err := a.notes.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -116,6 +118,7 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 	note, err := a.notes.GetTextNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -139,6 +142,7 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 			if errors.Is(err, notes.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Text note has already been updated. Want to overwrite"); ok {
 					overwrite = true
+
 					continue
 				}
 
@@ -168,6 +172,7 @@ func (a *App) deleteTextNote(ctx context.Context, id string) {
 		}
 
 		a.viewTextNotesList(ctx)
+
 		return
 	}
 

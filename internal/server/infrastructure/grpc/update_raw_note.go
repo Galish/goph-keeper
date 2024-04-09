@@ -18,9 +18,9 @@ import (
 func (s *KeeperServer) UpdateRawNote(ctx context.Context, in *pb.UpdateRawNoteRequest) (*emptypb.Empty, error) {
 	note := &entity.RawNote{
 		ID:          in.GetId(),
-		Title:       in.Note.GetTitle(),
-		Description: in.Note.GetDescription(),
-		Value:       in.Note.GetValue(),
+		Title:       in.GetNote().GetTitle(),
+		Description: in.GetNote().GetDescription(),
+		Value:       in.GetNote().GetValue(),
 		CreatedBy:   ctx.Value(interceptors.UserContextKey).(string),
 		Version:     in.GetVersion(),
 	}

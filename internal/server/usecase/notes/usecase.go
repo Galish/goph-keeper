@@ -4,12 +4,12 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-type KeeperUseCase struct {
+type UseCase struct {
 	repo repository.SecureNotesRepository
 }
 
-func New(repo repository.SecureNotesRepository) *KeeperUseCase {
-	return &KeeperUseCase{
+func New(repo repository.SecureNotesRepository) *UseCase {
+	return &UseCase{
 		repo,
 	}
 }

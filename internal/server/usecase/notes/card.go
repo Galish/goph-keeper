@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
+func (uc *UseCase) AddCard(ctx context.Context, card *entity.Card) error {
 	if card == nil || !card.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -32,7 +32,7 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 	return uc.repo.AddSecureNote(ctx, note)
 }
 
-func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.Card, error) {
+func (uc *UseCase) GetCard(ctx context.Context, user, id string) (*entity.Card, error) {
 	if id == "" || user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -41,6 +41,7 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +64,7 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, user, id string) (*entity.
 	return &card, nil
 }
 
-func (uc *KeeperUseCase) GetCards(ctx context.Context, user string) ([]*entity.Card, error) {
+func (uc *UseCase) GetCards(ctx context.Context, user string) ([]*entity.Card, error) {
 	if user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -96,7 +97,7 @@ func (uc *KeeperUseCase) GetCards(ctx context.Context, user string) ([]*entity.C
 	return cards, nil
 }
 
-func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
+func (uc *UseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
 	if card == nil || card.ID == "" || !card.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -136,7 +137,7 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, over
 	return err
 }
 
-func (uc *KeeperUseCase) DeleteCard(ctx context.Context, user, id string) error {
+func (uc *UseCase) DeleteCard(ctx context.Context, user, id string) error {
 	if id == "" || user == "" {
 		return ErrMissingArgument
 	}

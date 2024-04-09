@@ -16,6 +16,7 @@ func (a *App) viewRawNotesList(ctx context.Context) {
 	notes, err := a.notes.GetRawNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -57,6 +58,7 @@ func (a *App) viewRawNote(ctx context.Context, id string) {
 	note, err := a.notes.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -117,6 +119,7 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 	note, err := a.notes.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -145,6 +148,7 @@ func (a *App) editRawNote(ctx context.Context, id string) {
 			if errors.Is(err, notes.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Binary note has already been updated. Want to overwrite"); ok {
 					overwrite = true
+
 					continue
 				}
 
@@ -174,6 +178,7 @@ func (a *App) deleteRawNote(ctx context.Context, id string) {
 		}
 
 		a.viewRawNotesList(ctx)
+
 		return
 	}
 

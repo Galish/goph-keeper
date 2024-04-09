@@ -16,9 +16,9 @@ import (
 
 func (s *KeeperServer) AddTextNote(ctx context.Context, in *pb.AddTextNoteRequest) (*pb.AddTextNoteResponse, error) {
 	note := entity.NewTextNote()
-	note.Title = in.Note.GetTitle()
-	note.Description = in.Note.GetDescription()
-	note.Value = in.Note.GetValue()
+	note.Title = in.GetNote().GetTitle()
+	note.Description = in.GetNote().GetDescription()
+	note.Value = in.GetNote().GetValue()
 	note.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.notes.AddTextNote(ctx, note)

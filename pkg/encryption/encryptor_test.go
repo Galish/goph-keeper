@@ -7,6 +7,7 @@ import (
 	"github.com/Galish/goph-keeper/pkg/encryption"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewAESEncryptor(t *testing.T) {
@@ -42,12 +43,12 @@ func TestNewAESEncryptor(t *testing.T) {
 
 			encrypted, err := enc.Encrypt(tt.input)
 			if err != nil {
-				assert.ErrorContains(t, tt.err, err.Error())
+				require.ErrorContains(t, tt.err, err.Error())
 			}
 
 			decrypted, err := enc.Decrypt(encrypted)
 			if err != nil {
-				assert.ErrorContains(t, tt.err, err.Error())
+				require.ErrorContains(t, tt.err, err.Error())
 			}
 
 			assert.Equal(t, tt.input, decrypted)

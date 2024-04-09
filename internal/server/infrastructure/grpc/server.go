@@ -69,7 +69,7 @@ func (s *KeeperServer) Run() error {
 	return s.server.Serve(listener)
 }
 
-// Close is executed to release the memory
+// Close is executed to release the memory.
 func (s *KeeperServer) Close() error {
 	logger.Info("shutting down the gRPC server")
 

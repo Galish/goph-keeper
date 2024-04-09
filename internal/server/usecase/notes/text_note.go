@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (uc *KeeperUseCase) AddTextNote(ctx context.Context, textNote *entity.TextNote) error {
+func (uc *UseCase) AddTextNote(ctx context.Context, textNote *entity.TextNote) error {
 	if textNote == nil || !textNote.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -29,7 +29,7 @@ func (uc *KeeperUseCase) AddTextNote(ctx context.Context, textNote *entity.TextN
 	return uc.repo.AddSecureNote(ctx, note)
 }
 
-func (uc *KeeperUseCase) GetTextNote(ctx context.Context, user, id string) (*entity.TextNote, error) {
+func (uc *UseCase) GetTextNote(ctx context.Context, user, id string) (*entity.TextNote, error) {
 	if id == "" || user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -38,6 +38,7 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, user, id string) (*ent
 	if errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +58,7 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, user, id string) (*ent
 	return &textNote, nil
 }
 
-func (uc *KeeperUseCase) GetTextNotes(ctx context.Context, user string) ([]*entity.TextNote, error) {
+func (uc *UseCase) GetTextNotes(ctx context.Context, user string) ([]*entity.TextNote, error) {
 	if user == "" {
 		return nil, ErrMissingArgument
 	}
@@ -87,7 +88,7 @@ func (uc *KeeperUseCase) GetTextNotes(ctx context.Context, user string) ([]*enti
 	return textNotes, nil
 }
 
-func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, textNote *entity.TextNote, overwrite bool) error {
+func (uc *UseCase) UpdateTextNote(ctx context.Context, textNote *entity.TextNote, overwrite bool) error {
 	if textNote == nil || textNote.ID == "" || !textNote.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -109,7 +110,7 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, textNote *entity.Te
 	}
 
 	if !overwrite {
-		note.Version = note.Version
+		note.Version = textNote.Version
 	}
 
 	err := uc.repo.UpdateSecureNote(ctx, note)
@@ -124,7 +125,7 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, textNote *entity.Te
 	return err
 }
 
-func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, user, id string) error {
+func (uc *UseCase) DeleteTextNote(ctx context.Context, user, id string) error {
 	if id == "" || user == "" {
 		return ErrMissingArgument
 	}
