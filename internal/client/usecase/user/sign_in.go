@@ -6,7 +6,7 @@ import (
 	grpc "github.com/Galish/goph-keeper/api/proto"
 )
 
-func (uc *UserUseCase) SignIn(ctx context.Context, username, password string) error {
+func (uc *UseCase) SignIn(ctx context.Context, username, password string) error {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 

@@ -10,10 +10,10 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) AddSecureNote(ctx context.Context, note *repository.SecureNote) error {
+func (s *Store) AddSecureNote(ctx context.Context, note *repository.SecureNote) error {
 	protected, err := s.encrypt(note)
 	if err != nil {
-		return fmt.Errorf("encryption failed: %v", err)
+		return fmt.Errorf("encryption failed: %w", err)
 	}
 
 	_, err = s.db.ExecContext(
@@ -47,6 +47,7 @@ func (s *psqlStore) AddSecureNote(ctx context.Context, note *repository.SecureNo
 	if errors.As(err, &pgErr) && pgErr.Code == errCodeConflict {
 		return repository.ErrConflict
 	}
+
 	if err != nil {
 		return err
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) GetUserByLogin(ctx context.Context, login string) (*entity.User, error) {
+func (s *Store) GetUserByLogin(ctx context.Context, login string) (*entity.User, error) {
 	row := s.db.QueryRowContext(
 		ctx,
 		`SELECT uuid, login, password, is_active FROM users WHERE login=$1;`,

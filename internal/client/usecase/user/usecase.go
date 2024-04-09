@@ -8,12 +8,12 @@ import (
 
 var defaultTimeout = 1 * time.Minute
 
-type UserUseCase struct {
+type UseCase struct {
 	client pb.KeeperClient
 }
 
-func New(client pb.KeeperClient) *UserUseCase {
-	return &UserUseCase{
+func New(client pb.KeeperClient) *UseCase {
+	return &UseCase{
 		client: client,
 	}
 }

@@ -18,10 +18,10 @@ import (
 func (s *KeeperServer) UpdateCredentials(ctx context.Context, in *pb.UpdateCredentialsRequest) (*emptypb.Empty, error) {
 	creds := &entity.Credentials{
 		ID:          in.GetId(),
-		Title:       in.Credentials.GetTitle(),
-		Description: in.Credentials.GetDescription(),
-		Username:    in.Credentials.GetUsername(),
-		Password:    in.Credentials.GetPassword(),
+		Title:       in.GetCredentials().GetTitle(),
+		Description: in.GetCredentials().GetDescription(),
+		Username:    in.GetCredentials().GetUsername(),
+		Password:    in.GetCredentials().GetPassword(),
 		CreatedBy:   ctx.Value(interceptors.UserContextKey).(string),
 		Version:     in.GetVersion(),
 	}

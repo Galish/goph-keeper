@@ -16,6 +16,7 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 	creds, err := a.notes.GetCredentialsList(ctx)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -57,6 +58,7 @@ func (a *App) viewCredentials(ctx context.Context, id string) {
 	creds, err := a.notes.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -117,6 +119,7 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 	creds, err := a.notes.GetCredentials(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
+
 		return
 	}
 
@@ -141,6 +144,7 @@ func (a *App) editCredentials(ctx context.Context, id string) {
 			if errors.Is(err, notes.ErrVersionConflict) {
 				if ok := a.ui.Confirm("Credentials have already been updated. Want to overwrite"); ok {
 					overwrite = true
+
 					continue
 				}
 
@@ -170,6 +174,7 @@ func (a *App) deleteCredentials(ctx context.Context, id string) {
 		}
 
 		a.viewCredentialsList(ctx)
+
 		return
 	}
 

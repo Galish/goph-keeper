@@ -16,12 +16,12 @@ import (
 
 func (s *KeeperServer) AddCard(ctx context.Context, in *pb.AddCardRequest) (*pb.AddCardResponse, error) {
 	card := entity.NewCard()
-	card.Title = in.Card.GetTitle()
-	card.Description = in.Card.GetDescription()
-	card.Number = in.Card.GetNumber()
-	card.Holder = in.Card.GetHolder()
-	card.CVC = in.Card.GetCvc()
-	card.Expiry = in.Card.Expiry.AsTime()
+	card.Title = in.GetCard().GetTitle()
+	card.Description = in.GetCard().GetDescription()
+	card.Number = in.GetCard().GetNumber()
+	card.Holder = in.GetCard().GetHolder()
+	card.CVC = in.GetCard().GetCvc()
+	card.Expiry = in.GetCard().GetExpiry().AsTime()
 	card.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.notes.AddCard(ctx, card)

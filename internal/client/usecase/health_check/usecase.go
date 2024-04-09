@@ -17,21 +17,21 @@ var (
 	ErrNoConnection = errors.New("check your connection and try again")
 )
 
-type HealthCheckUseCase struct {
+type UseCase struct {
 	client pb.KeeperClient
 }
 
-func New(client pb.KeeperClient) *HealthCheckUseCase {
-	return &HealthCheckUseCase{
+func New(client pb.KeeperClient) *UseCase {
+	return &UseCase{
 		client: client,
 	}
 }
 
-func (hc *HealthCheckUseCase) Check(ctx context.Context) error {
+func (u *UseCase) Check(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
-	_, err := hc.client.HealthCheck(ctx, &emptypb.Empty{})
+	_, err := u.client.HealthCheck(ctx, &emptypb.Empty{})
 	if err != nil {
 		e, ok := status.FromError(err)
 		if !ok {

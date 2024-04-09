@@ -13,6 +13,7 @@ func (ui *UI) ReadFile(label string, isRequired bool) []byte {
 		b, err := os.ReadFile(filePath)
 		if err != nil {
 			ui.Error(err)
+
 			continue
 		}
 
@@ -30,6 +31,7 @@ func (ui *UI) WriteFile(label string, data []byte, isRequired bool) {
 
 		if err := os.WriteFile(filePath, data, 0666); err != nil {
 			ui.Error(err)
+
 			continue
 		}
 

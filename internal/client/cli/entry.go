@@ -26,7 +26,7 @@ func (a *App) viewAuthScreen(ctx context.Context) {
 			},
 			{
 				Label: "Exit",
-				Run:   a.Stop,
+				Run:   a.ui.Exit,
 			},
 		},
 	)

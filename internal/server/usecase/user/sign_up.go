@@ -11,7 +11,7 @@ import (
 	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
-func (uc *UserUseCase) SignUp(ctx context.Context, username, password string) (string, error) {
+func (uc *UseCase) SignUp(ctx context.Context, username, password string) (string, error) {
 	if username == "" || password == "" {
 		return "", ErrMissingCredentials
 	}

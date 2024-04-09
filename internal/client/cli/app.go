@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"syscall"
 
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/cli/ui"
@@ -10,7 +9,7 @@ import (
 )
 
 type App struct {
-	auth   *auth.AuthManager
+	auth   *auth.Manager
 	user   usecase.User
 	notes  usecase.SecureNotes
 	health usecase.HealthCheck
@@ -18,7 +17,7 @@ type App struct {
 }
 
 func NewApp(
-	auth *auth.AuthManager,
+	auth *auth.Manager,
 	user usecase.User,
 	notes usecase.SecureNotes,
 	health usecase.HealthCheck,
@@ -43,7 +42,7 @@ func (a *App) Run(ctx context.Context) {
 		}
 
 		if ok := a.ui.Retry(err); !ok {
-			a.Stop()
+			a.ui.Exit()
 		}
 
 		a.ui.Break()
@@ -54,10 +53,6 @@ func (a *App) Run(ctx context.Context) {
 	} else {
 		a.viewAuthScreen(ctx)
 	}
-}
-
-func (a *App) Stop() {
-	syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 }
 
 func (a *App) Close() error {

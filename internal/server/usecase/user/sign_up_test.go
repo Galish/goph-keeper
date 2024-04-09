@@ -117,6 +117,7 @@ func TestSignUp(t *testing.T) {
 
 			if tt.want.err != nil {
 				assert.Equal(t, err, tt.want.err)
+
 				return
 			}
 

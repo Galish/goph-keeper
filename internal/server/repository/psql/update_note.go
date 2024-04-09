@@ -9,10 +9,10 @@ import (
 	"github.com/Galish/goph-keeper/internal/server/repository"
 )
 
-func (s *psqlStore) UpdateSecureNote(ctx context.Context, note *repository.SecureNote) error {
+func (s *Store) UpdateSecureNote(ctx context.Context, note *repository.SecureNote) error {
 	protected, err := s.encrypt(note)
 	if err != nil {
-		return fmt.Errorf("encryption failed: %v", err)
+		return fmt.Errorf("encryption failed: %w", err)
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
@@ -46,18 +46,23 @@ func (s *psqlStore) UpdateSecureNote(ctx context.Context, note *repository.Secur
 
 	var version int32
 	err = row.Scan(&version)
+
 	if errors.Is(err, sql.ErrNoRows) {
 		return repository.ErrNotFound
 	}
 
 	if err != nil {
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 
 		return err
 	}
 
 	if note.Version > 0 && note.Version != version {
-		tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			return err
+		}
 
 		return repository.ErrVersionConflict
 	}

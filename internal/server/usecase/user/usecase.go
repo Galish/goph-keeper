@@ -5,13 +5,13 @@ import (
 	"github.com/Galish/goph-keeper/pkg/auth"
 )
 
-type UserUseCase struct {
+type UseCase struct {
 	repo       repository.UserRepository
 	jwtManager *auth.JWTManager
 }
 
-func New(repo repository.UserRepository, jwtManager *auth.JWTManager) *UserUseCase {
-	return &UserUseCase{
+func New(repo repository.UserRepository, jwtManager *auth.JWTManager) *UseCase {
+	return &UseCase{
 		repo:       repo,
 		jwtManager: jwtManager,
 	}

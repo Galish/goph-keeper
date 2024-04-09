@@ -17,12 +17,12 @@ const (
 	errCodeCheckViolation = "23514"
 )
 
-type psqlStore struct {
+type Store struct {
 	db  *sql.DB
 	enc encryption.Encryptor
 }
 
-func New(cfg *config.Config) (*psqlStore, error) {
+func New(cfg *config.Config) (*Store, error) {
 	if cfg.DBAddr == "" {
 		return nil, errors.New("database address missing")
 	}
@@ -34,7 +34,7 @@ func New(cfg *config.Config) (*psqlStore, error) {
 		return nil, err
 	}
 
-	store := &psqlStore{
+	store := &Store{
 		db:  db,
 		enc: encryption.NewAESEncryptor([]byte(cfg.EncryptPassphrase)),
 	}
@@ -46,7 +46,7 @@ func New(cfg *config.Config) (*psqlStore, error) {
 	return store, nil
 }
 
-func (s *psqlStore) Bootstrap(filePath string) error {
+func (s *Store) Bootstrap(filePath string) error {
 	logger.Info("database initialization")
 
 	query, err := os.ReadFile(filePath)
@@ -62,7 +62,7 @@ func (s *psqlStore) Bootstrap(filePath string) error {
 	return nil
 }
 
-func (s *psqlStore) Close() error {
+func (s *Store) Close() error {
 	logger.Info("shutting down the DB server")
 
 	return s.db.Close()

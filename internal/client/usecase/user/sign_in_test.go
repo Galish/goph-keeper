@@ -28,20 +28,20 @@ func TestSignIn(t *testing.T) {
 
 	m.EXPECT().
 		SignIn(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(_ context.Context, in *pb.AuthRequest, opts ...grpc.CallOption) (*pb.AuthResponse, error) {
-			if in.Username == "unavailable" {
+		DoAndReturn(func(_ context.Context, in *pb.AuthRequest, _ ...grpc.CallOption) (*pb.AuthResponse, error) {
+			if in.GetUsername() == "unavailable" {
 				return nil, status.Error(codes.Unavailable, errors.New("no internet connection").Error())
 			}
 
-			if in.Username == "joe.doeeee" {
+			if in.GetUsername() == "joe.doeeee" {
 				return nil, status.Error(codes.Internal, errReadFromRepo.Error())
 			}
 
-			if in.Username != "john.doe" {
+			if in.GetUsername() != "john.doe" {
 				return nil, status.Error(codes.NotFound, errors.New("user not found").Error())
 			}
 
-			if in.Password != "qwe123456" {
+			if in.GetPassword() != "qwe123456" {
 				return nil, status.Error(codes.InvalidArgument, errors.New("incorrect login/password pair").Error())
 			}
 

@@ -16,7 +16,7 @@ import (
 func (s *KeeperServer) GetTextNote(ctx context.Context, in *pb.GetRequest) (*pb.GetTextNoteResponse, error) {
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	note, err := s.notes.GetTextNote(ctx, user, in.Id)
+	note, err := s.notes.GetTextNote(ctx, user, in.GetId())
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{

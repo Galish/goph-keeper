@@ -18,12 +18,12 @@ import (
 func (s *KeeperServer) UpdateCard(ctx context.Context, in *pb.UpdateCardRequest) (*emptypb.Empty, error) {
 	card := &entity.Card{
 		ID:          in.GetId(),
-		Title:       in.Card.GetTitle(),
-		Description: in.Card.GetDescription(),
-		Number:      in.Card.GetNumber(),
-		Holder:      in.Card.GetHolder(),
-		CVC:         in.Card.GetCvc(),
-		Expiry:      in.Card.GetExpiry().AsTime(),
+		Title:       in.GetCard().GetTitle(),
+		Description: in.GetCard().GetDescription(),
+		Number:      in.GetCard().GetNumber(),
+		Holder:      in.GetCard().GetHolder(),
+		CVC:         in.GetCard().GetCvc(),
+		Expiry:      in.GetCard().GetExpiry().AsTime(),
 		CreatedBy:   ctx.Value(interceptors.UserContextKey).(string),
 		Version:     in.GetVersion(),
 	}

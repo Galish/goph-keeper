@@ -8,24 +8,24 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (c *KeeperClient) SignUp(ctx context.Context, in *pb.AuthRequest, opts ...grpc.CallOption) (*pb.AuthResponse, error) {
+func (c *KeeperClient) SignUp(ctx context.Context, in *pb.AuthRequest, _ ...grpc.CallOption) (*pb.AuthResponse, error) {
 	resp, err := c.KeeperClient.SignUp(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 
-	c.auth.SetToken(resp.AccessToken)
+	c.auth.SetToken(resp.GetAccessToken())
 
 	return resp, nil
 }
 
-func (c *KeeperClient) SignIn(ctx context.Context, in *pb.AuthRequest, opts ...grpc.CallOption) (*pb.AuthResponse, error) {
+func (c *KeeperClient) SignIn(ctx context.Context, in *pb.AuthRequest, _ ...grpc.CallOption) (*pb.AuthResponse, error) {
 	resp, err := c.KeeperClient.SignIn(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 
-	c.auth.SetToken(resp.AccessToken)
+	c.auth.SetToken(resp.GetAccessToken())
 
 	return resp, nil
 }

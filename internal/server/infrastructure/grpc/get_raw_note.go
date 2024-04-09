@@ -16,7 +16,7 @@ import (
 func (s *KeeperServer) GetRawNote(ctx context.Context, in *pb.GetRequest) (*pb.GetRawNoteResponse, error) {
 	user := ctx.Value(interceptors.UserContextKey).(string)
 
-	note, err := s.notes.GetRawNote(ctx, user, in.Id)
+	note, err := s.notes.GetRawNote(ctx, user, in.GetId())
 	if err != nil {
 		logger.
 			WithFields(logger.Fields{

@@ -16,9 +16,9 @@ import (
 
 func (s *KeeperServer) AddRawNote(ctx context.Context, in *pb.AddRawNoteRequest) (*pb.AddRawNoteResponse, error) {
 	note := entity.NewRawNote()
-	note.Title = in.Note.GetTitle()
-	note.Description = in.Note.GetDescription()
-	note.Value = in.Note.GetValue()
+	note.Title = in.GetNote().GetTitle()
+	note.Description = in.GetNote().GetDescription()
+	note.Value = in.GetNote().GetValue()
 	note.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.notes.AddRawNote(ctx, note)

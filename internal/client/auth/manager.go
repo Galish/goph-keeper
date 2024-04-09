@@ -1,23 +1,23 @@
 package auth
 
-type AuthManager struct {
+type Manager struct {
 	accessToken string
 }
 
-func New() *AuthManager {
-	return &AuthManager{
+func New() *Manager {
+	return &Manager{
 		accessToken: "",
 	}
 }
 
-func (a *AuthManager) GetToken() string {
-	return a.accessToken
+func (m *Manager) GetToken() string {
+	return m.accessToken
 }
 
-func (a *AuthManager) SetToken(accessToken string) {
-	a.accessToken = accessToken
+func (m *Manager) SetToken(accessToken string) {
+	m.accessToken = accessToken
 }
 
-func (a *AuthManager) IsAuthorized() bool {
-	return a.accessToken != ""
+func (m *Manager) IsAuthorized() bool {
+	return m.accessToken != ""
 }

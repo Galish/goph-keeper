@@ -25,6 +25,7 @@ func TestAddRawNote(t *testing.T) {
 			if r.ID == "#765432" {
 				return errWriteToRepo
 			}
+
 			return nil
 		}).
 		AnyTimes()
@@ -84,7 +85,7 @@ func TestGetRawNote(t *testing.T) {
 
 	m.EXPECT().
 		GetSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
-		DoAndReturn(func(_ context.Context, user, id string, t repository.SecureNoteType) (*repository.SecureNote, error) {
+		DoAndReturn(func(_ context.Context, _, id string, _ repository.SecureNoteType) (*repository.SecureNote, error) {
 			switch id {
 			case "#23456":
 				return &repository.SecureNote{
@@ -421,7 +422,7 @@ func TestDeleteRawNote(t *testing.T) {
 
 	m.EXPECT().
 		DeleteSecureNote(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Eq(repository.TypeRawNote)).
-		DoAndReturn(func(_ context.Context, user, id string, _ repository.SecureNoteType) error {
+		DoAndReturn(func(_ context.Context, _, id string, _ repository.SecureNoteType) error {
 			switch id {
 			case "#12345":
 				return repository.ErrNotFound

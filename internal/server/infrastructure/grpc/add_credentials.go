@@ -14,12 +14,15 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *KeeperServer) AddCredentials(ctx context.Context, in *pb.AddCredentialsRequest) (*pb.AddCredentialsResponse, error) {
+func (s *KeeperServer) AddCredentials(
+	ctx context.Context,
+	in *pb.AddCredentialsRequest,
+) (*pb.AddCredentialsResponse, error) {
 	creds := entity.NewCredentials()
-	creds.Title = in.Credentials.GetTitle()
-	creds.Description = in.Credentials.GetDescription()
-	creds.Username = in.Credentials.GetUsername()
-	creds.Password = in.Credentials.GetPassword()
+	creds.Title = in.GetCredentials().GetTitle()
+	creds.Description = in.GetCredentials().GetDescription()
+	creds.Username = in.GetCredentials().GetUsername()
+	creds.Password = in.GetCredentials().GetPassword()
 	creds.CreatedBy = ctx.Value(interceptors.UserContextKey).(string)
 
 	err := s.notes.AddCredentials(ctx, creds)

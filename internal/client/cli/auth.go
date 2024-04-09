@@ -15,6 +15,7 @@ func (a *App) signInUser(ctx context.Context) {
 
 	if err != nil {
 		a.viewAuthScreen(ctx)
+
 		return
 	}
 
@@ -36,6 +37,7 @@ func (a *App) signUpUser(ctx context.Context) {
 
 	if err != nil {
 		a.viewAuthScreen(ctx)
+
 		return
 	}
 
