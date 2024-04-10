@@ -10,7 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
+// AddCredentials creates a new login password pair.
+func (uc *UseCase) AddCredentials(ctx context.Context, creds *entity.Credentials) error {
 	if creds == nil || !creds.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -32,7 +33,8 @@ func (uc *KeeperUseCase) AddCredentials(ctx context.Context, creds *entity.Crede
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
+// UpdateCredentials updates a login password pair.
+func (uc *UseCase) UpdateCredentials(ctx context.Context, creds *entity.Credentials, overwrite bool) error {
 	if creds == nil || creds.ID == "" || !creds.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -57,7 +59,8 @@ func (uc *KeeperUseCase) UpdateCredentials(ctx context.Context, creds *entity.Cr
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetCredentials(ctx context.Context, id string) (*entity.Credentials, error) {
+// GetCredentials returns a login password pair for the given identifier.
+func (uc *UseCase) GetCredentials(ctx context.Context, id string) (*entity.Credentials, error) {
 	if id == "" {
 		return nil, ErrMissingArgument
 	}
@@ -85,7 +88,8 @@ func (uc *KeeperUseCase) GetCredentials(ctx context.Context, id string) (*entity
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) GetCredentialsList(ctx context.Context) ([]*entity.Credentials, error) {
+// GetCredentialsList returns login password pairs list.
+func (uc *UseCase) GetCredentialsList(ctx context.Context) ([]*entity.Credentials, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -107,7 +111,8 @@ func (uc *KeeperUseCase) GetCredentialsList(ctx context.Context) ([]*entity.Cred
 	return creds, nil
 }
 
-func (uc *KeeperUseCase) DeleteCredentials(ctx context.Context, id string) error {
+// DeleteCredentials deletes the login password pair for the given identifier.
+func (uc *UseCase) DeleteCredentials(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrMissingArgument
 	}

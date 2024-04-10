@@ -10,7 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote) error {
+// AddTextNote creates a new text note.
+func (uc *UseCase) AddTextNote(ctx context.Context, note *entity.TextNote) error {
 	if note == nil || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -31,7 +32,8 @@ func (uc *KeeperUseCase) AddTextNote(ctx context.Context, note *entity.TextNote)
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote, overwrite bool) error {
+// UpdateTextNote updates the text note.
+func (uc *UseCase) UpdateTextNote(ctx context.Context, note *entity.TextNote, overwrite bool) error {
 	if note == nil || note.ID == "" || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -55,7 +57,8 @@ func (uc *KeeperUseCase) UpdateTextNote(ctx context.Context, note *entity.TextNo
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.TextNote, error) {
+// GetTextNote returns a text note for the given identifier.
+func (uc *UseCase) GetTextNote(ctx context.Context, id string) (*entity.TextNote, error) {
 	if id == "" {
 		return nil, ErrMissingArgument
 	}
@@ -82,7 +85,8 @@ func (uc *KeeperUseCase) GetTextNote(ctx context.Context, id string) (*entity.Te
 	return note, nil
 }
 
-func (uc *KeeperUseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNote, error) {
+// GetTextNotesList returns all text notes.
+func (uc *UseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNote, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -104,7 +108,8 @@ func (uc *KeeperUseCase) GetTextNotesList(ctx context.Context) ([]*entity.TextNo
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) DeleteTextNote(ctx context.Context, id string) error {
+// DeleteTextNote deletes the text note for the given identifier.
+func (uc *UseCase) DeleteTextNote(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrMissingArgument
 	}

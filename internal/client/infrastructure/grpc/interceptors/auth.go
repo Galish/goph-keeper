@@ -1,3 +1,4 @@
+// Package contains gRPC client interceptors.
 package interceptors
 
 import (
@@ -9,6 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// New AuthInterceptor returns a new interceptor that handles authentication by adding an access token to the request metadata.
 func NewAuthInterceptor(authClient *auth.Manager) grpc.UnaryClientInterceptor {
 	return func(
 		ctx context.Context,

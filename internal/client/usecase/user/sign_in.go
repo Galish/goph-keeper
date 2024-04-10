@@ -6,6 +6,7 @@ import (
 	grpc "github.com/Galish/goph-keeper/api/proto"
 )
 
+// SignIn implements user authorization.
 func (uc *UseCase) SignIn(ctx context.Context, username, password string) error {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
