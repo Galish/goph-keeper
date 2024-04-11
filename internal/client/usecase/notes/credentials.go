@@ -2,7 +2,6 @@ package notes
 
 import (
 	"context"
-	"fmt"
 
 	pb "github.com/Galish/goph-keeper/api/proto"
 
@@ -92,7 +91,6 @@ func (uc *KeeperUseCase) GetCredentialsList(ctx context.Context) ([]*entity.Cred
 
 	resp, err := uc.client.GetCredentialsList(ctx, &emptypb.Empty{})
 	if err != nil {
-		fmt.Println("---1---", nil, handleError(err))
 		return nil, handleError(err)
 	}
 
