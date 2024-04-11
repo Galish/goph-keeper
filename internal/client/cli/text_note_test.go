@@ -1,13 +1,14 @@
+//go:build integration
+// +build integration
+
 package cli_test
 
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"testing"
 
 	"github.com/Galish/goph-keeper/internal/client/auth"
-	"github.com/Galish/goph-keeper/internal/client/config"
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc"
 	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/client/usecase/user"
@@ -16,29 +17,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	id       string
-	username string = randString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 10)
-	password string = randString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-!", 25)
-)
-
-func randString(symbols string, n int) string {
-	b := make([]byte, n)
-
-	for i := range b {
-		b[i] = symbols[rand.Intn(len(symbols))]
-	}
-
-	return string(b)
-}
-
 func TestAddCredentials(t *testing.T) {
-	cfg := config.New()
+	var id string
+	username := generateUsername()
+	password := generatePassword()
 
-	grpcClient := grpc.NewClient(cfg, auth.New())
+	client := grpc.NewClient(cfg, auth.New())
 
-	userUseCase := user.New(grpcClient)
-	notesUseCase := notes.New(grpcClient)
+	userUseCase := user.New(client)
+	notesUseCase := notes.New(client)
 
 	t.Run("should fail with authorization error", func(t *testing.T) {
 		creds, err := notesUseCase.GetCredentialsList(context.Background())
@@ -47,26 +34,8 @@ func TestAddCredentials(t *testing.T) {
 		assert.Equal(t, notes.ErrAuthRequired, err)
 	})
 
-	t.Run("should fail with user not found error", func(t *testing.T) {
-		err := userUseCase.SignIn(context.Background(), username, password)
-
-		assert.Equal(t, user.ErrNotFound, err)
-	})
-
 	t.Run("should successfully authenticate the user", func(t *testing.T) {
 		err := userUseCase.SignUp(context.Background(), username, password)
-
-		assert.NoError(t, err)
-	})
-
-	t.Run("should fail with conflict error", func(t *testing.T) {
-		err := userUseCase.SignUp(context.Background(), username, password)
-
-		assert.Equal(t, user.ErrAlreadyExists, err)
-	})
-
-	t.Run("should successfully authorize the user", func(t *testing.T) {
-		err := userUseCase.SignIn(context.Background(), username, password)
 
 		assert.NoError(t, err)
 	})
@@ -76,6 +45,18 @@ func TestAddCredentials(t *testing.T) {
 
 		assert.Empty(t, creds)
 		assert.NoError(t, err)
+	})
+
+	t.Run("should fail with validation error", func(t *testing.T) {
+		creds := &entity.Credentials{
+			Description: fmt.Sprintf("Gmail account credentials for %s", username),
+			Username:    username,
+			Password:    password,
+		}
+
+		err := notesUseCase.AddCredentials(context.Background(), creds)
+
+		assert.Equal(t, notes.ErrInvalidEntity, err)
 	})
 
 	t.Run("should successfully create a note", func(t *testing.T) {
