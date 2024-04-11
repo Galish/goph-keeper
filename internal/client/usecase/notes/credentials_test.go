@@ -24,6 +24,10 @@ func TestAddCredentials(t *testing.T) {
 
 	m.EXPECT().
 		AddCredentials(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		AddCredentials(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
@@ -54,6 +58,15 @@ func TestAddCredentials(t *testing.T) {
 			"invalid entity",
 			&entity.Credentials{},
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.Credentials{
+				Title:    "Gmail",
+				Username: "john.doe",
+				Password: "qwe123456",
+			},
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -114,6 +127,10 @@ func TestUpdateCredentials(t *testing.T) {
 
 	m.EXPECT().
 		UpdateCredentials(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		UpdateCredentials(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
@@ -168,6 +185,17 @@ func TestUpdateCredentials(t *testing.T) {
 			},
 			false,
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.Credentials{
+				ID:       "#12345678",
+				Title:    "Gmail",
+				Username: "john.doe",
+				Password: "qwe123456",
+			},
+			false,
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -258,6 +286,10 @@ func TestGetCredentials(t *testing.T) {
 
 	m.EXPECT().
 		GetCredentials(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		GetCredentials(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
@@ -282,8 +314,8 @@ func TestGetCredentials(t *testing.T) {
 	uc := notes.New(m)
 
 	type want struct {
-		Credentials *entity.Credentials
-		err         error
+		creds *entity.Credentials
+		err   error
 	}
 
 	tests := []struct {
@@ -297,6 +329,14 @@ func TestGetCredentials(t *testing.T) {
 			&want{
 				nil,
 				notes.ErrMissingArgument,
+			},
+		},
+		{
+			"authorization required",
+			"#12345",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
 			},
 		},
 		{
@@ -340,9 +380,9 @@ func TestGetCredentials(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Credentials, err := uc.GetCredentials(context.Background(), tt.id)
+			creds, err := uc.GetCredentials(context.Background(), tt.id)
 
-			assert.Equal(t, tt.want.Credentials, Credentials)
+			assert.Equal(t, tt.want.creds, creds)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -358,6 +398,10 @@ func TestGetCredentialsList(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		GetCredentialsList(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		GetCredentialsList(gomock.Any(), gomock.Any()).
@@ -391,14 +435,21 @@ func TestGetCredentialsList(t *testing.T) {
 	uc := notes.New(m)
 
 	type want struct {
-		Credentialss []*entity.Credentials
-		err          error
+		creds []*entity.Credentials
+		err   error
 	}
 
 	tests := []struct {
 		name string
 		want *want
 	}{
+		{
+			"authorization required",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
+			},
+		},
 		{
 			"nothing found",
 			&want{
@@ -442,9 +493,9 @@ func TestGetCredentialsList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Credentialss, err := uc.GetCredentialsList(context.Background())
+			creds, err := uc.GetCredentialsList(context.Background())
 
-			assert.Equal(t, tt.want.Credentialss, Credentialss)
+			assert.Equal(t, tt.want.creds, creds)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -460,6 +511,10 @@ func TestDeleteCredentials(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		DeleteCredentials(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		DeleteCredentials(gomock.Any(), gomock.Any()).
@@ -488,6 +543,11 @@ func TestDeleteCredentials(t *testing.T) {
 			"missing argument",
 			"",
 			notes.ErrMissingArgument,
+		},
+		{
+			"authorization required",
+			"#12345",
+			notes.ErrAuthRequired,
 		},
 		{
 			"nothing found",

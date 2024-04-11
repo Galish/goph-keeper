@@ -13,6 +13,7 @@ var (
 	ErrNoConnection    = errors.New("check your connection and try again")
 	ErrNotFound        = errors.New("entity not found")
 	ErrVersionConflict = errors.New("version conflict")
+	ErrAuthRequired    = errors.New("authentication required")
 )
 
 var errorMap = map[codes.Code]error{
@@ -20,6 +21,7 @@ var errorMap = map[codes.Code]error{
 	codes.InvalidArgument:    ErrInvalidEntity,
 	codes.NotFound:           ErrNotFound,
 	codes.Unavailable:        ErrNoConnection,
+	codes.Unauthenticated:    ErrAuthRequired,
 }
 
 func handleError(err error) error {

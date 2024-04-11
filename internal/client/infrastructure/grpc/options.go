@@ -10,7 +10,13 @@ import (
 )
 
 func withTransport(cfg *config.Config) grpc.DialOption {
-	creds, err := credentials.NewClientTLSFromFile(cfg.CertPath, "")
+	var certPath string
+
+	if cfg != nil {
+		certPath = cfg.CertPath
+	}
+
+	creds, err := credentials.NewClientTLSFromFile(certPath, "")
 	if err != nil {
 		logger.WithError(err).Debug("error initializing client credentials")
 

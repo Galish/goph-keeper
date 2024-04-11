@@ -24,6 +24,10 @@ func TestAddTextNote(t *testing.T) {
 
 	m.EXPECT().
 		AddTextNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		AddTextNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
@@ -41,9 +45,9 @@ func TestAddTextNote(t *testing.T) {
 	uc := notes.New(m)
 
 	tests := []struct {
-		name     string
-		TextNote *entity.TextNote
-		err      error
+		name string
+		note *entity.TextNote
+		err  error
 	}{
 		{
 			"missing entity",
@@ -54,6 +58,14 @@ func TestAddTextNote(t *testing.T) {
 			"invalid entity",
 			&entity.TextNote{},
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.TextNote{
+				Title: "My text note",
+				Value: "Text note ...",
+			},
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -91,7 +103,7 @@ func TestAddTextNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.AddTextNote(context.Background(), tt.TextNote)
+			err := uc.AddTextNote(context.Background(), tt.note)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -107,6 +119,10 @@ func TestUpdateTextNote(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		UpdateTextNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		UpdateTextNote(gomock.Any(), gomock.Any()).
@@ -136,7 +152,7 @@ func TestUpdateTextNote(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		TextNote  *entity.TextNote
+		note      *entity.TextNote
 		overwrite bool
 		err       error
 	}{
@@ -163,6 +179,16 @@ func TestUpdateTextNote(t *testing.T) {
 			},
 			false,
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.TextNote{
+				ID:    "#12345678",
+				Title: "My text note",
+				Value: "Text note ...",
+			},
+			false,
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -228,7 +254,7 @@ func TestUpdateTextNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.UpdateTextNote(context.Background(), tt.TextNote, tt.overwrite)
+			err := uc.UpdateTextNote(context.Background(), tt.note, tt.overwrite)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -244,6 +270,10 @@ func TestGetTextNote(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		GetTextNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		GetTextNote(gomock.Any(), gomock.Any()).
@@ -270,8 +300,8 @@ func TestGetTextNote(t *testing.T) {
 	uc := notes.New(m)
 
 	type want struct {
-		TextNote *entity.TextNote
-		err      error
+		note *entity.TextNote
+		err  error
 	}
 
 	tests := []struct {
@@ -285,6 +315,14 @@ func TestGetTextNote(t *testing.T) {
 			&want{
 				nil,
 				notes.ErrMissingArgument,
+			},
+		},
+		{
+			"authorization required",
+			"#12345",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
 			},
 		},
 		{
@@ -327,9 +365,9 @@ func TestGetTextNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			TextNote, err := uc.GetTextNote(context.Background(), tt.id)
+			note, err := uc.GetTextNote(context.Background(), tt.id)
 
-			assert.Equal(t, tt.want.TextNote, TextNote)
+			assert.Equal(t, tt.want.note, note)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -345,6 +383,10 @@ func TestGetTextNotesList(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		GetTextNotesList(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		GetTextNotesList(gomock.Any(), gomock.Any()).
@@ -378,14 +420,21 @@ func TestGetTextNotesList(t *testing.T) {
 	uc := notes.New(m)
 
 	type want struct {
-		TextNotes []*entity.TextNote
-		err       error
+		notes []*entity.TextNote
+		err   error
 	}
 
 	tests := []struct {
 		name string
 		want *want
 	}{
+		{
+			"authorization required",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
+			},
+		},
 		{
 			"nothing found",
 			&want{
@@ -429,9 +478,9 @@ func TestGetTextNotesList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			TextNotes, err := uc.GetTextNotesList(context.Background())
+			notes, err := uc.GetTextNotesList(context.Background())
 
-			assert.Equal(t, tt.want.TextNotes, TextNotes)
+			assert.Equal(t, tt.want.notes, notes)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -447,6 +496,10 @@ func TestDeleteTextNote(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		DeleteTextNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		DeleteTextNote(gomock.Any(), gomock.Any()).
@@ -475,6 +528,11 @@ func TestDeleteTextNote(t *testing.T) {
 			"missing argument",
 			"",
 			notes.ErrMissingArgument,
+		},
+		{
+			"authorization required",
+			"#12345",
+			notes.ErrAuthRequired,
 		},
 		{
 			"nothing found",

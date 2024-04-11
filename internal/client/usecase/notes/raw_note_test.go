@@ -24,6 +24,10 @@ func TestAddRawNote(t *testing.T) {
 
 	m.EXPECT().
 		AddRawNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		AddRawNote(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
@@ -41,9 +45,9 @@ func TestAddRawNote(t *testing.T) {
 	uc := notes.New(m)
 
 	tests := []struct {
-		name    string
-		RawNote *entity.RawNote
-		err     error
+		name string
+		note *entity.RawNote
+		err  error
 	}{
 		{
 			"missing entity",
@@ -54,6 +58,14 @@ func TestAddRawNote(t *testing.T) {
 			"invalid entity",
 			&entity.RawNote{},
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.RawNote{
+				Title: "Secret file",
+				Value: []byte("Hello world!"),
+			},
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -91,7 +103,7 @@ func TestAddRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.AddRawNote(context.Background(), tt.RawNote)
+			err := uc.AddRawNote(context.Background(), tt.note)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -107,6 +119,10 @@ func TestUpdateRawNote(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		UpdateRawNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		UpdateRawNote(gomock.Any(), gomock.Any()).
@@ -136,7 +152,7 @@ func TestUpdateRawNote(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		RawNote   *entity.RawNote
+		note      *entity.RawNote
 		overwrite bool
 		err       error
 	}{
@@ -163,6 +179,16 @@ func TestUpdateRawNote(t *testing.T) {
 			},
 			false,
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.RawNote{
+				ID:    "#12345678",
+				Title: "Secret file",
+				Value: []byte("Hello world!"),
+			},
+			false,
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -228,7 +254,7 @@ func TestUpdateRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := uc.UpdateRawNote(context.Background(), tt.RawNote, tt.overwrite)
+			err := uc.UpdateRawNote(context.Background(), tt.note, tt.overwrite)
 
 			if err != nil {
 				assert.Equal(t, err, tt.err)
@@ -244,6 +270,10 @@ func TestGetRawNote(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		GetRawNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		GetRawNote(gomock.Any(), gomock.Any()).
@@ -270,8 +300,8 @@ func TestGetRawNote(t *testing.T) {
 	uc := notes.New(m)
 
 	type want struct {
-		RawNote *entity.RawNote
-		err     error
+		note *entity.RawNote
+		err  error
 	}
 
 	tests := []struct {
@@ -285,6 +315,14 @@ func TestGetRawNote(t *testing.T) {
 			&want{
 				nil,
 				notes.ErrMissingArgument,
+			},
+		},
+		{
+			"authorization required",
+			"#12345",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
 			},
 		},
 		{
@@ -327,9 +365,9 @@ func TestGetRawNote(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			RawNote, err := uc.GetRawNote(context.Background(), tt.id)
+			note, err := uc.GetRawNote(context.Background(), tt.id)
 
-			assert.Equal(t, tt.want.RawNote, RawNote)
+			assert.Equal(t, tt.want.note, note)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -345,6 +383,10 @@ func TestGetRawNotesList(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		GetRawNotesList(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		GetRawNotesList(gomock.Any(), gomock.Any()).
@@ -378,14 +420,21 @@ func TestGetRawNotesList(t *testing.T) {
 	uc := notes.New(m)
 
 	type want struct {
-		RawNotes []*entity.RawNote
-		err      error
+		notes []*entity.RawNote
+		err   error
 	}
 
 	tests := []struct {
 		name string
 		want *want
 	}{
+		{
+			"authorization required",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
+			},
+		},
 		{
 			"nothing found",
 			&want{
@@ -429,9 +478,9 @@ func TestGetRawNotesList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			RawNotes, err := uc.GetRawNotesList(context.Background())
+			notes, err := uc.GetRawNotesList(context.Background())
 
-			assert.Equal(t, tt.want.RawNotes, RawNotes)
+			assert.Equal(t, tt.want.notes, notes)
 
 			if err != nil {
 				assert.Equal(t, err, tt.want.err)
@@ -447,6 +496,10 @@ func TestDeleteRawNote(t *testing.T) {
 	defer ctrl.Finish()
 
 	m := mocks.NewMockKeeperClient(ctrl)
+
+	m.EXPECT().
+		DeleteRawNote(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
 
 	m.EXPECT().
 		DeleteRawNote(gomock.Any(), gomock.Any()).
@@ -475,6 +528,11 @@ func TestDeleteRawNote(t *testing.T) {
 			"missing argument",
 			"",
 			notes.ErrMissingArgument,
+		},
+		{
+			"authorization required",
+			"#12345",
+			notes.ErrAuthRequired,
 		},
 		{
 			"nothing found",

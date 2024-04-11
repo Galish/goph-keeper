@@ -31,6 +31,10 @@ func TestAddCard(t *testing.T) {
 
 	m.EXPECT().
 		AddCard(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		AddCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
@@ -61,6 +65,17 @@ func TestAddCard(t *testing.T) {
 			"invalid entity",
 			&entity.Card{},
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.Card{
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
+			},
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -129,6 +144,10 @@ func TestUpdateCard(t *testing.T) {
 
 	m.EXPECT().
 		UpdateCard(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		UpdateCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.InvalidArgument, errors.New("failed entity validation").Error()))
 
 	m.EXPECT().
@@ -185,6 +204,19 @@ func TestUpdateCard(t *testing.T) {
 			},
 			false,
 			notes.ErrInvalidEntity,
+		},
+		{
+			"authorization required",
+			&entity.Card{
+				ID:     "#12345678",
+				Title:  "Credit card",
+				Number: "1234 5678 9012 4453",
+				Holder: "John Daw",
+				CVC:    "123",
+				Expiry: time.Date(2025, time.Month(6), 11, 0, 0, 0, 0, time.UTC),
+			},
+			false,
+			notes.ErrAuthRequired,
 		},
 		{
 			"failed validation",
@@ -287,6 +319,10 @@ func TestGetCard(t *testing.T) {
 
 	m.EXPECT().
 		GetCard(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		GetCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
@@ -328,6 +364,14 @@ func TestGetCard(t *testing.T) {
 			&want{
 				nil,
 				notes.ErrMissingArgument,
+			},
+		},
+		{
+			"authorization required",
+			"#12345",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
 			},
 		},
 		{
@@ -394,6 +438,10 @@ func TestGetCardsList(t *testing.T) {
 
 	m.EXPECT().
 		GetCardsList(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		GetCardsList(gomock.Any(), gomock.Any()).
 		Return(&pb.GetListResponse{}, nil)
 
 	m.EXPECT().
@@ -432,6 +480,13 @@ func TestGetCardsList(t *testing.T) {
 		name string
 		want *want
 	}{
+		{
+			"authorization required",
+			&want{
+				nil,
+				notes.ErrAuthRequired,
+			},
+		},
 		{
 			"nothing found",
 			&want{
@@ -496,6 +551,10 @@ func TestDeleteCard(t *testing.T) {
 
 	m.EXPECT().
 		DeleteCard(gomock.Any(), gomock.Any()).
+		Return(nil, status.Error(codes.Unauthenticated, errors.New("authorization required").Error()))
+
+	m.EXPECT().
+		DeleteCard(gomock.Any(), gomock.Any()).
 		Return(nil, status.Error(codes.NotFound, errors.New("no entity found").Error()))
 
 	m.EXPECT().
@@ -521,6 +580,11 @@ func TestDeleteCard(t *testing.T) {
 			"missing argument",
 			"",
 			notes.ErrMissingArgument,
+		},
+		{
+			"authorization required",
+			"#12345",
+			notes.ErrAuthRequired,
 		},
 		{
 			"nothing found",
