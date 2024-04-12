@@ -5,6 +5,7 @@ package app_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 
@@ -17,7 +18,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddCredentials(t *testing.T) {
+var errVersionRequired = errors.New("version is required")
+
+func TestCredentials(t *testing.T) {
 	var id string
 	username := generateUsername()
 	password := generatePassword()
@@ -28,9 +31,9 @@ func TestAddCredentials(t *testing.T) {
 	notesUseCase := notes.New(client)
 
 	t.Run("should fail with authorization error", func(t *testing.T) {
-		creds, err := notesUseCase.GetCredentialsList(context.Background())
+		list, err := notesUseCase.GetCredentialsList(context.Background())
 
-		assert.Nil(t, creds)
+		assert.Nil(t, list)
 		assert.Equal(t, notes.ErrAuthRequired, err)
 	})
 
@@ -49,9 +52,9 @@ func TestAddCredentials(t *testing.T) {
 
 	t.Run("should fail with validation error", func(t *testing.T) {
 		creds := &entity.Credentials{
+			Title:       "Gmail",
 			Description: fmt.Sprintf("Gmail account credentials for %s", username),
 			Username:    username,
-			Password:    password,
 		}
 
 		err := notesUseCase.AddCredentials(context.Background(), creds)
@@ -82,16 +85,58 @@ func TestAddCredentials(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("should return a note by identifier", func(t *testing.T) {
+	t.Run("should return note by id", func(t *testing.T) {
 		creds, err := notesUseCase.GetCredentials(context.Background(), id)
 
-		assert.Equal(t, &entity.Credentials{
+		expected := &entity.Credentials{
 			Title:       "Gmail",
 			Description: fmt.Sprintf("Gmail account credentials for %s", username),
 			Username:    username,
 			Password:    password,
 			Version:     0,
-		}, creds)
+		}
+
+		assert.Equal(t, expected, creds)
+		assert.NoError(t, err)
+	})
+
+	t.Run("should fail with validation error", func(t *testing.T) {
+		creds := &entity.Credentials{
+			ID:       id,
+			Title:    "Yandex",
+			Username: username,
+		}
+
+		err := notesUseCase.UpdateCredentials(context.Background(), creds, false)
+
+		assert.Equal(t, notes.ErrInvalidEntity, err)
+	})
+
+	t.Run("should fail with version conflict error", func(t *testing.T) {
+		creds := &entity.Credentials{
+			ID:          id,
+			Title:       "Yandex",
+			Description: "Yandex mail account credentials",
+			Username:    username,
+			Password:    password,
+		}
+
+		err := notesUseCase.UpdateCredentials(context.Background(), creds, false)
+
+		assert.Equal(t, errVersionRequired, err)
+	})
+
+	t.Run("should successfully update note", func(t *testing.T) {
+		creds := &entity.Credentials{
+			ID:          id,
+			Title:       "Yandex",
+			Description: "Yandex mail account credentials",
+			Username:    username,
+			Password:    password,
+			Version:     1,
+		}
+
+		err := notesUseCase.UpdateCredentials(context.Background(), creds, false)
 
 		assert.NoError(t, err)
 	})
@@ -105,7 +150,7 @@ func TestAddCredentials(t *testing.T) {
 			Password:    password,
 		}
 
-		err := notesUseCase.UpdateCredentials(context.Background(), creds, true) // overwrite
+		err := notesUseCase.UpdateCredentials(context.Background(), creds, true)
 
 		assert.NoError(t, err)
 	})
@@ -113,14 +158,15 @@ func TestAddCredentials(t *testing.T) {
 	t.Run("should return undated note by identifier", func(t *testing.T) {
 		creds, err := notesUseCase.GetCredentials(context.Background(), id)
 
-		assert.Equal(t, &entity.Credentials{
+		expected := &entity.Credentials{
 			Title:       "Yandex",
 			Description: fmt.Sprintf("Yandex mail account credentials for %s", username),
 			Username:    username,
 			Password:    password,
-			Version:     1,
-		}, creds)
+			Version:     2,
+		}
 
+		assert.Equal(t, expected, creds)
 		assert.NoError(t, err)
 	})
 
@@ -131,9 +177,9 @@ func TestAddCredentials(t *testing.T) {
 	})
 
 	t.Run("should return an empty list", func(t *testing.T) {
-		creds, err := notesUseCase.GetCredentialsList(context.Background())
+		list, err := notesUseCase.GetCredentialsList(context.Background())
 
-		assert.Empty(t, creds)
+		assert.Empty(t, list)
 		assert.NoError(t, err)
 	})
 

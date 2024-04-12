@@ -7,6 +7,7 @@ import (
 	"context"
 	"math/rand"
 	"testing"
+	"time"
 
 	"github.com/Galish/goph-keeper/internal/client/auth"
 	"github.com/Galish/goph-keeper/internal/client/config"
@@ -62,6 +63,8 @@ func generatePassword() string {
 }
 
 func randString(symbols string, n int) string {
+	rand.Seed(time.Now().UnixNano())
+
 	b := make([]byte, n)
 
 	for i := range b {
