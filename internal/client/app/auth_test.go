@@ -1,7 +1,7 @@
 //go:build integration
 // +build integration
 
-package cli_test
+package app_test
 
 import (
 	"context"

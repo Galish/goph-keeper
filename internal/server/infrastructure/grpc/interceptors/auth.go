@@ -22,7 +22,7 @@ var (
 	}
 
 	ErrInvalidAccessToken = errors.New("access token is invalid")
-	ErrNoAccessToken      = errors.New("access token token is not provided")
+	ErrNoAccessToken      = errors.New("access token is not provided")
 
 	UserContextKey = contextKey("user")
 )

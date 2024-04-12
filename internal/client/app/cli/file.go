@@ -1,10 +1,10 @@
-package ui
+package cli
 
 import "os"
 
-func (ui *UI) ReadFile(label string, isRequired bool) []byte {
+func (c *Cli) ReadFile(label string, isRequired bool) []byte {
 	for {
-		filePath := ui.Input(label, isRequired)
+		filePath := c.Input(label, isRequired)
 
 		if filePath == "" {
 			return nil
@@ -12,7 +12,7 @@ func (ui *UI) ReadFile(label string, isRequired bool) []byte {
 
 		b, err := os.ReadFile(filePath)
 		if err != nil {
-			ui.Error(err)
+			c.Error(err)
 
 			continue
 		}
@@ -21,16 +21,16 @@ func (ui *UI) ReadFile(label string, isRequired bool) []byte {
 	}
 }
 
-func (ui *UI) WriteFile(label string, data []byte, isRequired bool) {
+func (c *Cli) WriteFile(label string, data []byte, isRequired bool) {
 	for {
-		filePath := ui.Input(label, isRequired)
+		filePath := c.Input(label, isRequired)
 
 		if filePath == "" {
 			return
 		}
 
 		if err := os.WriteFile(filePath, data, 0666); err != nil {
-			ui.Error(err)
+			c.Error(err)
 
 			continue
 		}

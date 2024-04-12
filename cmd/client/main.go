@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
+	"github.com/Galish/goph-keeper/internal/client/app"
 	"github.com/Galish/goph-keeper/internal/client/auth"
-	"github.com/Galish/goph-keeper/internal/client/cli"
 	"github.com/Galish/goph-keeper/internal/client/config"
 	"github.com/Galish/goph-keeper/internal/client/infrastructure/grpc"
 	healthcheck "github.com/Galish/goph-keeper/internal/client/usecase/health_check"
@@ -25,7 +25,7 @@ func main() {
 
 	grpcClient := grpc.NewClient(cfg, authManager)
 
-	app := cli.NewApp(
+	app := app.New(
 		authManager,
 		user.New(grpcClient),
 		notes.New(grpcClient),

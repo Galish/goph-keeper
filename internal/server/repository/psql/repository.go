@@ -39,10 +39,6 @@ func New(cfg *config.Config) (*Store, error) {
 		enc: encryption.NewAESEncryptor([]byte(cfg.EncryptPassphrase)),
 	}
 
-	if err := store.Bootstrap(cfg.DBInitPath); err != nil {
-		logger.WithError(err).Fatal("database initialization error")
-	}
-
 	return store, nil
 }
 

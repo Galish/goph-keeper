@@ -1,30 +1,30 @@
-package cli
+package app
 
 import (
 	"context"
 	"errors"
 	"fmt"
 
-	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/app/cli"
 	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (a *App) viewTextNotesList(ctx context.Context) {
+func (a *App) viewRawNotesList(ctx context.Context) {
 	a.ui.Break()
 
-	notes, err := a.notes.GetTextNotesList(ctx)
+	notes, err := a.notes.GetRawNotesList(ctx)
 	if err != nil {
 		a.ui.Error(err)
 
 		return
 	}
 
-	commands := []*ui.SelectOption{
+	commands := []*cli.SelectOption{
 		{
 			Label: "+ Add new",
 			Run: func() {
-				a.addTextNote(ctx)
+				a.addRawNote(ctx)
 			},
 		},
 		{
@@ -40,22 +40,22 @@ func (a *App) viewTextNotesList(ctx context.Context) {
 
 		commands = append(
 			commands,
-			&ui.SelectOption{
+			&cli.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, n.Title, n.Description),
 				Run: func() {
-					a.viewTextNote(ctx, id)
+					a.viewRawNote(ctx, id)
 				},
 			},
 		)
 	}
 
-	a.ui.Select("Add new text note or select existing", commands)
+	a.ui.Select("Add new binary note or select existing", commands)
 }
 
-func (a *App) viewTextNote(ctx context.Context, id string) {
+func (a *App) viewRawNote(ctx context.Context, id string) {
 	a.ui.Break()
 
-	note, err := a.notes.GetTextNote(ctx, id)
+	note, err := a.notes.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 
@@ -63,25 +63,26 @@ func (a *App) viewTextNote(ctx context.Context, id string) {
 	}
 
 	a.ui.Print(note.String())
+	a.ui.WriteFile("Enter the path to save the file", note.Value, false)
 	a.ui.Break()
 
-	var commands = []*ui.SelectOption{
+	var commands = []*cli.SelectOption{
 		{
 			Label: "Edit",
 			Run: func() {
-				a.editTextNote(ctx, id)
+				a.editRawNote(ctx, id)
 			},
 		},
 		{
 			Label: "Delete",
 			Run: func() {
-				a.deleteTextNote(ctx, id)
+				a.deleteRawNote(ctx, id)
 			},
 		},
 		{
 			Label: "Cancel",
 			Run: func() {
-				a.viewTextNotesList(ctx)
+				a.viewRawNotesList(ctx)
 			},
 		},
 	}
@@ -89,33 +90,33 @@ func (a *App) viewTextNote(ctx context.Context, id string) {
 	a.ui.Select("Select action", commands)
 }
 
-func (a *App) addTextNote(ctx context.Context) {
+func (a *App) addRawNote(ctx context.Context) {
 	a.ui.Break()
 
-	var note = new(entity.TextNote)
+	var note = new(entity.RawNote)
 
 	note.Title = a.ui.Input("Title", true)
 	note.Description = a.ui.Input("Description", false)
-	note.Value = a.ui.Input("Note", true)
+	note.Value = a.ui.ReadFile("Enter file path", true)
 
 	a.ui.Break()
 
-	if ok := a.ui.Confirm("Add text note"); ok {
+	if ok := a.ui.Confirm("Add binary note"); ok {
 		for {
-			err := a.notes.AddTextNote(ctx, note)
+			err := a.notes.AddRawNote(ctx, note)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 	}
 
-	a.viewTextNotesList(ctx)
+	a.viewRawNotesList(ctx)
 }
 
-func (a *App) editTextNote(ctx context.Context, id string) {
+func (a *App) editRawNote(ctx context.Context, id string) {
 	a.ui.Break()
 
-	note, err := a.notes.GetTextNote(ctx, id)
+	note, err := a.notes.GetRawNote(ctx, id)
 	if err != nil {
 		a.ui.Error(err)
 
@@ -124,7 +125,7 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 
 	var (
 		overwrite bool
-		updated   = &entity.TextNote{
+		updated   = &entity.RawNote{
 			ID:      id,
 			Version: note.Version + 1,
 		}
@@ -132,15 +133,20 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 
 	updated.Title = a.ui.Edit("Title", note.Title, true)
 	updated.Description = a.ui.Edit("Description", note.Description, false)
-	updated.Value = a.ui.Edit("Note", note.Value, true)
+
+	if value := a.ui.ReadFile("Enter file path", false); value != nil {
+		updated.Value = value
+	} else {
+		updated.Value = note.Value
+	}
 
 	a.ui.Break()
 
-	if ok := a.ui.Confirm("Update text note"); ok {
+	if ok := a.ui.Confirm("Update binary note"); ok {
 		for {
-			err := a.notes.UpdateTextNote(ctx, updated, overwrite)
+			err := a.notes.UpdateRawNote(ctx, updated, overwrite)
 			if errors.Is(err, notes.ErrVersionConflict) {
-				if ok := a.ui.Confirm("Text note has already been updated. Want to overwrite"); ok {
+				if ok := a.ui.Confirm("Binary note has already been updated. Want to overwrite"); ok {
 					overwrite = true
 
 					continue
@@ -157,24 +163,24 @@ func (a *App) editTextNote(ctx context.Context, id string) {
 		}
 	}
 
-	a.viewTextNotesList(ctx)
+	a.viewRawNotesList(ctx)
 }
 
-func (a *App) deleteTextNote(ctx context.Context, id string) {
+func (a *App) deleteRawNote(ctx context.Context, id string) {
 	a.ui.Break()
 
 	if ok := a.ui.Confirm("Are you sure"); ok {
 		for {
-			err := a.notes.DeleteTextNote(ctx, id)
+			err := a.notes.DeleteRawNote(ctx, id)
 			if ok := a.ui.Retry(err); !ok {
 				break
 			}
 		}
 
-		a.viewTextNotesList(ctx)
+		a.viewRawNotesList(ctx)
 
 		return
 	}
 
-	a.viewTextNote(ctx, id)
+	a.viewRawNote(ctx, id)
 }

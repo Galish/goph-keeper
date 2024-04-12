@@ -8,10 +8,11 @@ import (
 	context "context"
 	reflect "reflect"
 
-	grpc "github.com/Galish/goph-keeper/api/proto"
 	gomock "github.com/golang/mock/gomock"
 	grpc0 "google.golang.org/grpc"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+
+	grpc "github.com/Galish/goph-keeper/api/proto"
 )
 
 // MockKeeperClient is a mock of KeeperClient interface.

@@ -1,11 +1,11 @@
-package cli
+package app
 
 import (
 	"context"
 	"errors"
 	"fmt"
 
-	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/app/cli"
 	"github.com/Galish/goph-keeper/internal/client/usecase/notes"
 	"github.com/Galish/goph-keeper/internal/entity"
 )
@@ -20,7 +20,7 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 		return
 	}
 
-	commands := []*ui.SelectOption{
+	commands := []*cli.SelectOption{
 		{
 			Label: "+ Add new",
 			Run: func() {
@@ -40,7 +40,7 @@ func (a *App) viewCredentialsList(ctx context.Context) {
 
 		commands = append(
 			commands,
-			&ui.SelectOption{
+			&cli.SelectOption{
 				Label: fmt.Sprintf("%d. %s \t %s", i+1, c.Title, c.Description),
 				Run: func() {
 					a.viewCredentials(ctx, id)
@@ -65,7 +65,7 @@ func (a *App) viewCredentials(ctx context.Context, id string) {
 	a.ui.Print(creds.String())
 	a.ui.Break()
 
-	var commands = []*ui.SelectOption{
+	var commands = []*cli.SelectOption{
 		{
 			Label: "Edit",
 			Run: func() {
