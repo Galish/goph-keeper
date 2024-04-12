@@ -1,9 +1,9 @@
-package cli
+package app
 
 import (
 	"context"
 
-	"github.com/Galish/goph-keeper/internal/client/cli/ui"
+	"github.com/Galish/goph-keeper/internal/client/app/cli"
 )
 
 func (a *App) viewAuthScreen(ctx context.Context) {
@@ -11,7 +11,7 @@ func (a *App) viewAuthScreen(ctx context.Context) {
 
 	a.ui.Select(
 		"You need to log in or sign up before continuing",
-		[]*ui.SelectOption{
+		[]*cli.SelectOption{
 			{
 				Label: "Already have an account? Log in",
 				Run: func() {
@@ -37,7 +37,7 @@ func (a *App) selectCategory(ctx context.Context) {
 
 	a.ui.Select(
 		"Select category",
-		[]*ui.SelectOption{
+		[]*cli.SelectOption{
 			{
 				Label: "Credentials",
 				Run: func() {

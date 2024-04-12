@@ -8,7 +8,6 @@ import (
 
 type Config struct {
 	DBAddr            string
-	DBInitPath        string
 	GRPCServAddr      string
 	AuthSecretKey     string
 	EncryptPassphrase string
@@ -72,10 +71,6 @@ func withConfig(c *Config) func(*Config) {
 	return func(cfg *Config) {
 		if c.DBAddr != "" {
 			cfg.DBAddr = c.DBAddr
-		}
-
-		if c.DBInitPath != "" {
-			cfg.DBInitPath = c.DBInitPath
 		}
 
 		if c.GRPCServAddr != "" {

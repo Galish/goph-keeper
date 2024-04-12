@@ -1,22 +1,38 @@
-package cli
+package app
 
 import (
 	"context"
 
+	"github.com/Galish/goph-keeper/internal/client/app/cli"
 	"github.com/Galish/goph-keeper/internal/client/auth"
-	"github.com/Galish/goph-keeper/internal/client/cli/ui"
 	"github.com/Galish/goph-keeper/internal/client/usecase"
 )
+
+type UserInterface interface {
+	Break()
+	Close() error
+	Confirm(string) bool
+	Edit(string, string, bool) string
+	Error(error)
+	Exit()
+	Input(string, bool) string
+	InputPassword(string, bool) string
+	Print(string)
+	ReadFile(string, bool) []byte
+	Retry(error) bool
+	Select(string, []*cli.SelectOption)
+	WriteFile(string, []byte, bool)
+}
 
 type App struct {
 	auth   *auth.Manager
 	user   usecase.User
 	notes  usecase.SecureNotes
 	health usecase.HealthCheck
-	ui     ui.UserInterface
+	ui     UserInterface
 }
 
-func NewApp(
+func New(
 	auth *auth.Manager,
 	user usecase.User,
 	notes usecase.SecureNotes,
@@ -27,7 +43,7 @@ func NewApp(
 		user:   user,
 		notes:  notes,
 		health: health,
-		ui:     ui.New(),
+		ui:     cli.New(),
 	}
 }
 
