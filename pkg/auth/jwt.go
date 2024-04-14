@@ -1,3 +1,4 @@
+// Package auth provides functions for user authentication and authorization.
 package auth
 
 import (
@@ -7,21 +8,25 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+// JWTClaims represents data encoded into a token.
 type JWTClaims struct {
 	jwt.RegisteredClaims
 	UserID string
 }
 
+// JWTManager represents the authentication manager.
 type JWTManager struct {
 	secretKey string
 }
 
+// NewJWTManager returns a new JWT manager instance.
 func NewJWTManager(secretKey string) *JWTManager {
 	return &JWTManager{
 		secretKey,
 	}
 }
 
+// Generate creates and returns a JWT token string.
 func (m *JWTManager) Generate(claims *JWTClaims) (string, error) {
 	if claims == nil {
 		return "", errors.New("missing required argument")
@@ -35,6 +40,7 @@ func (m *JWTManager) Generate(claims *JWTClaims) (string, error) {
 	return token.SignedString([]byte(m.secretKey))
 }
 
+// Verify decodes JWT token string.
 func (m *JWTManager) Verify(accessToken string) (*JWTClaims, error) {
 	var claims JWTClaims
 
