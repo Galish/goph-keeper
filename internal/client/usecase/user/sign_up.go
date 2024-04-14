@@ -6,6 +6,7 @@ import (
 	grpc "github.com/Galish/goph-keeper/api/proto"
 )
 
+// SignUp implements the creation of a user account.
 func (uc *UseCase) SignUp(ctx context.Context, username, password string) error {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()

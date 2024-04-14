@@ -11,7 +11,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
+// AddCard adds a new card details.
+func (uc *UseCase) AddCard(ctx context.Context, card *entity.Card) error {
 	if card == nil || !card.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -35,7 +36,8 @@ func (uc *KeeperUseCase) AddCard(ctx context.Context, card *entity.Card) error {
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
+// UpdateCard updates the card details.
+func (uc *UseCase) UpdateCard(ctx context.Context, card *entity.Card, overwrite bool) error {
 	if card == nil || card.ID == "" || !card.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -62,7 +64,8 @@ func (uc *KeeperUseCase) UpdateCard(ctx context.Context, card *entity.Card, over
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetCard(ctx context.Context, id string) (*entity.Card, error) {
+// GetCard returns card details for the given identifier.
+func (uc *UseCase) GetCard(ctx context.Context, id string) (*entity.Card, error) {
 	if id == "" {
 		return nil, ErrMissingArgument
 	}
@@ -92,7 +95,8 @@ func (uc *KeeperUseCase) GetCard(ctx context.Context, id string) (*entity.Card, 
 	return card, nil
 }
 
-func (uc *KeeperUseCase) GetCardsList(ctx context.Context) ([]*entity.Card, error) {
+// GetCardsList returns cards list.
+func (uc *UseCase) GetCardsList(ctx context.Context) ([]*entity.Card, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -114,7 +118,8 @@ func (uc *KeeperUseCase) GetCardsList(ctx context.Context) ([]*entity.Card, erro
 	return cards, nil
 }
 
-func (uc *KeeperUseCase) DeleteCard(ctx context.Context, id string) error {
+// DeleteCard deletes card details for the given identifier.
+func (uc *UseCase) DeleteCard(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrMissingArgument
 	}

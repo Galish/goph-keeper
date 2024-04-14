@@ -10,7 +10,8 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
-func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) error {
+// AddRawNote creates a new binary note.
+func (uc *UseCase) AddRawNote(ctx context.Context, note *entity.RawNote) error {
 	if note == nil || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -31,7 +32,8 @@ func (uc *KeeperUseCase) AddRawNote(ctx context.Context, note *entity.RawNote) e
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
+// UpdateRawNote updates the binary note.
+func (uc *UseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote, overwrite bool) error {
 	if note == nil || note.ID == "" || !note.IsValid() {
 		return ErrInvalidEntity
 	}
@@ -55,7 +57,8 @@ func (uc *KeeperUseCase) UpdateRawNote(ctx context.Context, note *entity.RawNote
 	return handleError(err)
 }
 
-func (uc *KeeperUseCase) GetRawNote(ctx context.Context, id string) (*entity.RawNote, error) {
+// GetRawNote returns a binary note for the given identifier.
+func (uc *UseCase) GetRawNote(ctx context.Context, id string) (*entity.RawNote, error) {
 	if id == "" {
 		return nil, ErrMissingArgument
 	}
@@ -82,7 +85,8 @@ func (uc *KeeperUseCase) GetRawNote(ctx context.Context, id string) (*entity.Raw
 	return note, nil
 }
 
-func (uc *KeeperUseCase) GetRawNotesList(ctx context.Context) ([]*entity.RawNote, error) {
+// GetRawNotesList returns all binary notes.
+func (uc *UseCase) GetRawNotesList(ctx context.Context) ([]*entity.RawNote, error) {
 	ctx, cancel := context.WithTimeout(ctx, defaultTimeout)
 	defer cancel()
 
@@ -104,7 +108,8 @@ func (uc *KeeperUseCase) GetRawNotesList(ctx context.Context) ([]*entity.RawNote
 	return notes, nil
 }
 
-func (uc *KeeperUseCase) DeleteRawNote(ctx context.Context, id string) error {
+// DeleteRawNote deletes a binary note for the given identifier.
+func (uc *UseCase) DeleteRawNote(ctx context.Context, id string) error {
 	if id == "" {
 		return ErrMissingArgument
 	}

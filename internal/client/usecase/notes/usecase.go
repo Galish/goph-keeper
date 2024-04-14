@@ -1,3 +1,4 @@
+// Package implements the logic for working with secure notes.
 package notes
 
 import (
@@ -8,12 +9,14 @@ import (
 
 var defaultTimeout = 1 * time.Minute
 
-type KeeperUseCase struct {
+// UseCase represents the secure notes usecase.
+type UseCase struct {
 	client pb.KeeperClient
 }
 
-func New(client pb.KeeperClient) *KeeperUseCase {
-	return &KeeperUseCase{
+// New returns a new secure notes usecase.
+func New(client pb.KeeperClient) *UseCase {
+	return &UseCase{
 		client: client,
 	}
 }

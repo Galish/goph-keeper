@@ -1,3 +1,4 @@
+// Package encryption provides functions for data encryption.
 package encryption
 
 import (
@@ -8,21 +9,25 @@ import (
 	"io"
 )
 
+// Encryptor the authentication manager.
 type Encryptor interface {
 	Encrypt(string) (string, error)
 	Decrypt(string) (string, error)
 }
 
+// AESEncryptor represents the AES encryptor.
 type AESEncryptor struct {
 	passphrase []byte
 }
 
+// NewAESEncryptor returns a new AES encryptor instance.
 func NewAESEncryptor(passphrase []byte) *AESEncryptor {
 	return &AESEncryptor{
 		passphrase: passphrase,
 	}
 }
 
+// Encrypt encrypts a string using the AES algorithm.
 func (e *AESEncryptor) Encrypt(input string) (string, error) {
 	block, err := aes.NewCipher(e.passphrase)
 	if err != nil {
@@ -44,6 +49,7 @@ func (e *AESEncryptor) Encrypt(input string) (string, error) {
 	return base64.StdEncoding.EncodeToString(encrypted), nil
 }
 
+// Decrypt decrypts a string using the AES algorithm.
 func (e *AESEncryptor) Decrypt(input string) (string, error) {
 	str, err := base64.StdEncoding.DecodeString(input)
 	if err != nil {

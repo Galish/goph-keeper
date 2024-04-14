@@ -33,7 +33,7 @@ Run unit tests:
 $ go test ./... -tags=unit -v
 ```
 
-Run behavior (integration) tests:
+Run behavior (integration) tests (the server application must be running):
 
 ```
 $ go test ./... -tags=integration -v

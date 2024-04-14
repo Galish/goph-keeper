@@ -1,3 +1,4 @@
+// Package implements usecases.
 package usecase
 
 import (
@@ -6,11 +7,13 @@ import (
 	"github.com/Galish/goph-keeper/internal/entity"
 )
 
+// SecureNotes represents an instance of the user usecase.
 type User interface {
 	SignUp(context.Context, string, string) error
 	SignIn(context.Context, string, string) error
 }
 
+// SecureNotes represents an instance of the secure notes usecase.
 type SecureNotes interface {
 	AddCard(context.Context, *entity.Card) error
 	GetCard(context.Context, string) (*entity.Card, error)

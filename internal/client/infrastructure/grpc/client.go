@@ -1,3 +1,4 @@
+// Package implements gRPC client.
 package grpc
 
 import (
@@ -10,12 +11,14 @@ import (
 	"google.golang.org/grpc"
 )
 
+// KeeperClient represents the gRPC client.
 type KeeperClient struct {
 	pb.KeeperClient
 	auth *auth.Manager
 	conn *grpc.ClientConn
 }
 
+// NewClient returns a new gRPC client.
 func NewClient(cfg *config.Config, auth *auth.Manager) *KeeperClient {
 	conn, err := grpc.Dial(
 		cfg.GRPCServAddr,
@@ -35,6 +38,7 @@ func NewClient(cfg *config.Config, auth *auth.Manager) *KeeperClient {
 	return client
 }
 
+// Close closes the gRPC connection.
 func (c *KeeperClient) Close() error {
 	logger.Info("shutting down the gRPC client")
 
