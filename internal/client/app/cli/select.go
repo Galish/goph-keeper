@@ -1,4 +1,4 @@
-package ui
+package cli
 
 import (
 	"errors"
@@ -19,8 +19,8 @@ type selectOptions struct {
 	HideSelected bool
 }
 
-func (ui *UI) Select(label string, items []*SelectOption) {
-	index := ui.promptSelect(
+func (c *Cli) Select(label string, items []*SelectOption) {
+	index := c.promptSelect(
 		label,
 		items,
 		nil,
@@ -31,8 +31,8 @@ func (ui *UI) Select(label string, items []*SelectOption) {
 	}
 }
 
-func (ui *UI) Confirm(label string) bool {
-	index := ui.promptSelect(
+func (c *Cli) Confirm(label string) bool {
+	index := c.promptSelect(
 		label,
 		[]*SelectOption{
 			{
@@ -48,24 +48,24 @@ func (ui *UI) Confirm(label string) bool {
 	return index == 0
 }
 
-func (ui *UI) Retry(err error) bool {
+func (c *Cli) Retry(err error) bool {
 	if err == nil {
 		return false
 	}
 
-	ui.Error(err)
-	ui.Break()
+	c.Error(err)
+	c.Break()
 
-	return ui.Confirm("Want to try again")
+	return c.Confirm("Want to try again")
 }
 
-func (ui *UI) promptSelect(label string, items []*SelectOption, opts *selectOptions) int {
+func (c *Cli) promptSelect(label string, items []*SelectOption, opts *selectOptions) int {
 	prompt := promptui.Select{
 		Label:    label,
 		Items:    items,
 		HideHelp: true,
-		Stdin:    ui.r,
-		Stdout:   ui.w,
+		Stdin:    c.r,
+		Stdout:   c.w,
 	}
 
 	if opts != nil {
@@ -75,7 +75,7 @@ func (ui *UI) promptSelect(label string, items []*SelectOption, opts *selectOpti
 	index, _, err := prompt.Run()
 
 	if errors.Is(err, promptui.ErrInterrupt) {
-		ui.Exit()
+		c.Exit()
 
 		return -1
 	}

@@ -1,4 +1,4 @@
-package ui
+package cli
 
 import (
 	"io"
@@ -24,30 +24,30 @@ type UserInterface interface {
 	WriteFile(string, []byte, bool)
 }
 
-type UI struct {
+type Cli struct {
 	r io.ReadCloser
 	w io.WriteCloser
 }
 
-func New() *UI {
-	return &UI{
+func New() *Cli {
+	return &Cli{
 		r: os.Stdin,
 		w: os.Stdout,
 	}
 }
 
-func (ui *UI) Exit() {
+func (c *Cli) Exit() {
 	if err := syscall.Kill(syscall.Getpid(), syscall.SIGINT); err != nil {
 		logger.WithError(err).Debug("failed exit")
 	}
 }
 
-func (ui *UI) Close() error {
+func (c *Cli) Close() error {
 	logger.Info("shutting down the CLI application")
 
-	if err := ui.r.Close(); err != nil {
+	if err := c.r.Close(); err != nil {
 		return err
 	}
 
-	return ui.w.Close()
+	return c.w.Close()
 }

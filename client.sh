@@ -1,1 +1,1 @@
-go run cmd/client/main.go -c certs/localhost.crt
+go run cmd/client/main.go -g :3200

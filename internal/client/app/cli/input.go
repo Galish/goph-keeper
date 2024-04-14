@@ -1,4 +1,4 @@
-package ui
+package cli
 
 import (
 	"errors"
@@ -15,8 +15,8 @@ type inputOptions struct {
 	Validate  func(input string) error
 }
 
-func (ui *UI) Input(label string, isRequired bool) string {
-	return ui.promptInput(
+func (c *Cli) Input(label string, isRequired bool) string {
+	return c.promptInput(
 		label,
 		&inputOptions{
 			Validate: func(input string) error {
@@ -30,8 +30,8 @@ func (ui *UI) Input(label string, isRequired bool) string {
 	)
 }
 
-func (ui *UI) InputPassword(label string, isRequired bool) string {
-	return ui.promptInput(
+func (c *Cli) InputPassword(label string, isRequired bool) string {
+	return c.promptInput(
 		label,
 		&inputOptions{
 			Mask: '*',
@@ -46,8 +46,8 @@ func (ui *UI) InputPassword(label string, isRequired bool) string {
 	)
 }
 
-func (ui *UI) Edit(label, value string, isRequired bool) string {
-	return ui.promptInput(
+func (c *Cli) Edit(label, value string, isRequired bool) string {
+	return c.promptInput(
 		label,
 		&inputOptions{
 			AllowEdit: true,
@@ -63,11 +63,11 @@ func (ui *UI) Edit(label, value string, isRequired bool) string {
 	)
 }
 
-func (ui *UI) promptInput(label string, opts *inputOptions) string {
+func (c *Cli) promptInput(label string, opts *inputOptions) string {
 	prompt := promptui.Prompt{
 		Label:  label,
-		Stdin:  ui.r,
-		Stdout: ui.w,
+		Stdin:  c.r,
+		Stdout: c.w,
 	}
 
 	if opts != nil {
@@ -79,7 +79,7 @@ func (ui *UI) promptInput(label string, opts *inputOptions) string {
 
 	result, err := prompt.Run()
 	if errors.Is(err, promptui.ErrInterrupt) {
-		ui.Exit()
+		c.Exit()
 
 		return ""
 	}

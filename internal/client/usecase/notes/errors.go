@@ -13,13 +13,14 @@ var (
 	ErrNoConnection    = errors.New("check your connection and try again")
 	ErrNotFound        = errors.New("entity not found")
 	ErrVersionConflict = errors.New("version conflict")
+	ErrAuthRequired    = errors.New("authentication required")
 )
 
 var errorMap = map[codes.Code]error{
 	codes.FailedPrecondition: ErrVersionConflict,
-	codes.InvalidArgument:    ErrInvalidEntity,
 	codes.NotFound:           ErrNotFound,
 	codes.Unavailable:        ErrNoConnection,
+	codes.Unauthenticated:    ErrAuthRequired,
 }
 
 func handleError(err error) error {
@@ -32,14 +33,9 @@ func handleError(err error) error {
 		return err
 	}
 
-	if e.Code() == codes.Internal {
-		return errors.New(e.Message())
+	if custom, ok := errorMap[e.Code()]; ok {
+		return custom
 	}
 
-	custom, ok := errorMap[e.Code()]
-	if !ok {
-		return err
-	}
-
-	return custom
+	return errors.New(e.Message())
 }
